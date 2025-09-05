@@ -175,8 +175,13 @@ is_plugin() {
 }
 
 run_plugin() {
-    local pgname="$1"
-    eval "$PLUGINS_DIR/$pgname/$pgname" -T "$TEC_BASE" "$@"
+    local pgname="$1"; shift
+
+    if ! is_plugin "$pgname"; then
+        die "'$pgname': no such command nor plugin"
+        return 1
+    fi
+    "$PLUGINS_DIR/$pgname/$pgname" -T "$TEC_BASE" "$@"
 }
 
 # Load configuration
@@ -326,6 +331,12 @@ _env_cat() {
 _env_cd() {
     ARG_ENV="${1:-$ARG_ENV_CURR}"
 
+    if [ "$ARG_ENV" = "-" ] && [ -z "$ARG_ENV_PREV" ]; then
+        die "no previous task ID"
+        return 1
+    fi
+    ARG_ENV="${ARG_ENV/#-/$ARG_ENV_PREV}" # '-' is an alias to previous task ID
+
     if [ -z "$ARG_ENV" ]; then
         die "no current env or none is passed"
         return 1
@@ -372,8 +383,19 @@ _env_sync() {
 }
 
 # Generate a unique task ID
+# TODO: takes too long... find a better way
 generate_task_id() {
-    date +"task-%Y%m%d-%H%M%S"
+    local taskid_limit=10000000
+
+    for taskid in $(seq -w "$taskid_limit"); do
+        if [ ! -d "$TEC_BASE/$ARG_ENV/$ARG_DESK/$taskid" ]; then
+            echo "$taskid"
+            return 0
+        fi
+    done
+
+    die "task ID limit is reached. There are $taskid_limit already"
+    return 1
 }
 
 # Add a new task
@@ -397,17 +419,19 @@ cmd_add() {
     done
     shift $((OPTIND-1))
 
-    [ $# -eq 0 ] && set -- "$(generate_task_id)" # set default value
 
     ARG_ENV="${ARG_ENV:-$ARG_ENV_CURR}"
     ARG_DESK="${ARG_DESK:-$ARG_DESK_CURR}"
 
+    if ! check_arg_desk "$ARG_ENV" "$ARG_DESK"; then
+        return 1
+    fi
+    [ $# -eq 0 ] && set -- "$(generate_task_id)" # set default value
+
     for i in "${@}"; do
         ARG_TASK="${i}"
 
-        if ! check_arg_desk "$ARG_ENV" "$ARG_DESK"; then
-            continue
-        elif [ -d "$TEC_BASE/$ARG_ENV/$ARG_DESK/$ARG_TASK" ]; then
+        if [ -d "$TEC_BASE/$ARG_ENV/$ARG_DESK/$ARG_TASK" ]; then
             die "'$ARG_TASK': task ID already exists"
             continue
         fi
@@ -528,8 +552,10 @@ cmd_cd() {
 }
 
 cmd_desk() {
-    local cmd="${1:-ls}"
+    local cmd=
 
+    [ $# -eq 0 ] && set -- "ls" # set default command
+    cmd="${1}"
     case "$cmd" in
         "add")      shift; _desk_add "$@" ;;
         "cat")      shift; _desk_cat "$@" ;;
@@ -548,8 +574,10 @@ cmd_desk() {
 }
 
 cmd_env() {
-    local cmd="${1:-ls}"
+    local cmd=
 
+    [ $# -eq 0 ] && set -- "ls" # set default command
+    cmd="${1}"
     case "$cmd" in
         "add")      shift; _env_add "$@" ;;
         "cat")      shift; _env_cat "$@" ;;
@@ -575,23 +603,7 @@ cmd_help() {
 Usage: $PROGRAM COMMAND [OPTION]... [ARG]...
 Terminal project and task manager.
 
-System:
-  help       - Show help for commands.
-  init       - Init directory structure.
-
-Basic:
-  add        - Add a new task to project.
-  cat        - Show task unit values.
-  cd         - Switch to task.
-  desk       - Manage desks
-  env        - Manage environments
-  ls         - List project tasks.
-  mv         - Move (rename) tasks (under development).
-  rm         - Delete task from project.
-  set        - Set task unit values.
-  sync       - Sync (with) task ID
-
-Run '$PROGRAM help COMMAND' to get help on specific commands.
+    TODO: add some info about tec
 EOF
             ;;
         "add")
@@ -750,6 +762,7 @@ cmd_init() {
 
 # List tasks
 cmd_ls() {
+    local desc=
     local task_dir_db=
     local show_all=false
     local quiet=false
@@ -780,13 +793,15 @@ cmd_ls() {
     fi
 
     # List all task directories
-    find "$TEC_BASE/$ARG_ENV/$ARG_DESK" -type d | tail -n +2 | while read -r task_dir; do
+    local base="$TEC_BASE/$ARG_ENV/$ARG_DESK"
+    find "$base" -type d | tail -n +2 | while read -r task_dir; do
         local units="$task_dir/.tec/units"
 
         # TODO: show error in case of missing unit file or invalid content
         if [ -f "$units" ]; then
             task_id=$(basename "$task_dir")
-            echo "column $task_id      some description"
+            desc="$(grep desc "$base/$task_id/.tec/units" | cut -f 2 -d ':' | tr -s ' ')"
+            echo "column $task_id $desc"
         fi
     done
 }
@@ -898,6 +913,8 @@ tec() {
     done
     shift $((OPTIND-1))
 
+
+    [ $# -eq 0 ] && set -- "help" # set default command
     command="${1:-help}"
     #[ "$OPT_HELP" = true ] && command="help"
     #[ "$OPT_VERSION" = true ] && command="version"
@@ -917,13 +934,7 @@ tec() {
         "set")          shift; cmd_set "$@" ;;
         "sync")         shift; cmd_sync "$@" ;;
         "version")      shift; cmd_version "$@" ;;
-        *)
-            if is_plugin "$command"; then
-                run_plugin "$@"
-            else
-                die "$command: command not found"
-            fi
-            ;;
+        *)              shift; run_plugin "$command" "$@" ;;
     esac
 }
 
