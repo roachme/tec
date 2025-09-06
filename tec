@@ -345,8 +345,11 @@ _env_cd() {
         return 1
     fi
 
-    ARG_ENV_PREV="$ARG_ENV_CURR"
-    ARG_ENV_CURR="$ARG_ENV"
+    # Prevent duplicates in toggles
+    if [ "$ARG_ENV" != "$ARG_ENV_CURR" ]; then
+        ARG_ENV_PREV="$ARG_ENV_CURR"
+        ARG_ENV_CURR="$ARG_ENV"
+    fi
 
     cd "$TEC_BASE/$ARG_ENV" || return 1
 }
