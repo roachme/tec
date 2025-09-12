@@ -349,6 +349,9 @@ _env_cd() {
     if [ "$ARG_ENV" != "$ARG_ENV_CURR" ]; then
         ARG_ENV_PREV="$ARG_ENV_CURR"
         ARG_ENV_CURR="$ARG_ENV"
+
+        _toggle_load_desk "$ARG_ENV_CURR"
+        _toggle_load_task "$ARG_ENV_CURR" "$ARG_DESK_CURR"
     fi
 
     cd "$TEC_BASE/$ARG_ENV" || return 1
