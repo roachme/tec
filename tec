@@ -354,7 +354,14 @@ _env_cd() {
         _toggle_load_task "$ARG_ENV_CURR" "$ARG_DESK_CURR"
     fi
 
-    cd "$TEC_BASE/$ARG_ENV" || return 1
+    ARG_DESK="${ARG_DESK_CURR}"
+    ARG_TASK="${ARG_TASK_CURR}"
+
+    if [ -n "$ARG_DESK" ]; then
+        cd "$TEC_BASE/$ARG_ENV/$ARG_DESK/$ARG_TASK"
+    else
+        cd "$TEC_BASE/$ARG_ENV/$ARG_DESK"
+    fi
 }
 
 _env_ls() {
