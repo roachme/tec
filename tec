@@ -475,7 +475,7 @@ cmd_cat() {
     local task_dir=
     local keyname='.'
 
-    while getopts ":d:e:k:nqN" opt; do
+    while getopts ":d:e:hk:nqN" opt; do
         case $opt in
             d) ARG_DESK="$OPTARG" ;;
             e) ARG_ENV="$OPTARG" ;;
@@ -878,25 +878,52 @@ cmd_rm() {
 
 # Set task properties
 cmd_set() {
-    local task_id="$ARG_TASK_CURR"
-    local description=""
-    local task_type=""
-    local priority=""
-    local status=""
+    local description=
+    local opt_showhelp=false
+    local opt_bequiet=false
 
     # Parse options
-    while getopts ":d:t:P:s:" opt; do
+    while getopts ":e:d:hqD:" opt; do
         case $opt in
-            d) description="$OPTARG" ;;
-            t) task_type="$OPTARG" ;;
-            P) priority="$OPTARG" ;;
-            s) status="$OPTARG" ;;
+            d) ARG_DESK="$OPTARG" ;;
+            e) ARG_ENV="$OPTARG" ;;
+            h) opt_showhelp=true ;;
+            q) opt_bequiet=true ;;
+            D) description="$OPTARG" ;;
             *) die "Invalid option \`-$OPTARG'"; return 1 ;;
         esac
     done
     shift $((OPTIND-1))
 
+    [ $# -eq 0 ] && set -- "$ARG_TASK_CURR" # set default value
+    ARG_ENV="${ARG_ENV:-$ARG_ENV_CURR}"
+    ARG_DESK="${ARG_DESK:-$ARG_DESK_CURR}"
+
+    if [ -z "$description" ]; then
+        die "provide new description"
+        return 1
+    fi
+
     # TODO: add logic
+    for i in "${@}"; do
+        ARG_TASK="${i:-$ARG_TASK_CURR}"
+        task_dir="$TEC_BASE/$ARG_ENV/$ARG_DESK/$ARG_TASK"
+        units="$task_dir/.tec/units"
+
+        if ! check_arg_task "$ARG_ENV" "$ARG_DESK" "$ARG_TASK"; then
+            return 1
+        elif [ ! -f "$units" ]; then
+            die "Task $ARG_TASK does not have unit file"
+            return 1
+        fi
+        if [ ! -f "$units" ]; then
+            die "'$ARG_TASK': could not find unit file"
+            return 1
+        fi
+
+        sed -i "s/\(desc\)\s*:\s*\(.*\)/\1 : $description/" "$units"
+    done
+
 }
 
 cmd_sync() {
