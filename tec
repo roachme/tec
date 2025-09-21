@@ -812,7 +812,7 @@ cmd_ls() {
         if [ -f "$units" ]; then
             task_id=$(basename "$task_dir")
             desc="$(grep desc "$base/$task_id/.tec/units" | cut -f 2 -d ':' | tr -s ' ')"
-            echo "column $task_id $desc"
+            printf "%-10s %-10s %-10s\n" "column" "$task_id" "$desc"
         fi
     done
 }
