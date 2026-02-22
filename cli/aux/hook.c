@@ -12,7 +12,7 @@ static char pathname[PATH_MAX + 1];
 
 static char *_hook_cmd(tec_arg_t *args, char *name, char *cmd)
 {
-    const char *fmt = "%s/%s/%s -T %s %s -e %s -d %s -i %s";
+    const char *fmt = "%s/%s/%s -T %s %s -e %s -d %s %s";
     sprintf(pathname, fmt, teccfg.base.pgn, name, name, teccfg.base.task,
             cmd, args->env, args->desk, args->taskid);
     return pathname;

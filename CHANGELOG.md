@@ -14,6 +14,7 @@
 - `cli/pgn`: Style code
 - `cli/tec`: Fix segmentation fault for argvec
 - `cli`: Rename structure members
+- `cli/aux/hook`: Fix hook option generator
 
 ### Deleted
 
