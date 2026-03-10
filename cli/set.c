@@ -58,6 +58,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
     int opt_help, opt_interactive, opt_quiet;
     const char *errfmt = "cannot set task units '%s': %s";
 
+    retcode = LIBTEC_OK;
     opt_help = opt_interactive = opt_quiet = false;
     args.env = args.desk = args.taskid = NULL;
 
