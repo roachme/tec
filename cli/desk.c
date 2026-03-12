@@ -216,6 +216,7 @@ static int _desk_ls(int argc, const char **argv, tec_ctx_t *ctx)
     const char *errfmt = "cannot list desk(s) '%s': %s";
 
     opt_help = opt_quiet = false;
+    args.env = args.desk = args.taskid = NULL;
 
     argvec_init(&argvec);
     argvec_parse(&argvec, argc, argv);
