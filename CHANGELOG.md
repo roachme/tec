@@ -17,6 +17,7 @@
 - `cli/aux/hook`: Fix hook option generator
 - `cli/set`: Fix unintialized retcode
 - `cli/desk`: Fix unintialized values
+- `cli/rm`: Fix user current working directory path
 
 ### Deleted
 

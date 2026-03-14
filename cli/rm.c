@@ -19,18 +19,19 @@
 
 static char *user_cwd_ptr;
 static int change_dir = false;
-static char user_cwd[FILENAME_MAX + 1];
 
 #ifdef __linux__
-char *OS_GETCWD(char *buf, size_t bufsiz)
+static char *OS_GETCWD(void)
 {
-    return getcwd(buf, bufsiz);
+    /* Get logical current working directory via shell variable, because
+     * user current working directory might a symlink.  */
+    return getenv("PWD");
 }
 #endif
 
-static char *get_user_cwd()
+static char *get_user_cwd(void)
 {
-    return OS_GETCWD(user_cwd, sizeof(user_cwd));
+    return OS_GETCWD();
 }
 
 static bool do_change_user_cwd(tec_arg_t *args)
@@ -39,7 +40,7 @@ static bool do_change_user_cwd(tec_arg_t *args)
     char buf[FILENAME_MAX + 1] = { 0 };
 
     sprintf(buf, "%s/%s/%s/%s", base, args->env, args->desk, args->taskid);
-    return strcmp(buf, user_cwd) == 0;
+    return strcmp(buf, get_user_cwd()) == 0;
 }
 
 static int update_toggles_and_cwd(tec_arg_t *args)
