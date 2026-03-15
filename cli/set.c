@@ -88,7 +88,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            if (tec_unit_key(ctx->units, "type") == NULL)
+            if (tec_unit_get(ctx->units, "type") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "type", optarg);
             break;
         case 'D':
@@ -97,7 +97,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            if (tec_unit_key(ctx->units, "desc") == NULL)
+            if (tec_unit_get(ctx->units, "desc") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "desc", optarg);
             break;
         case 'P':
@@ -106,7 +106,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            if (tec_unit_key(ctx->units, "prio") == NULL)
+            if (tec_unit_get(ctx->units, "prio") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "prio", optarg);
             break;
         case ':':

@@ -56,7 +56,7 @@ static char *_get_toggle(const char *fname, char *buf, int bufsiz,
     while (fgets(buffer, BUFSIZ, fp) != NULL)
         units = tec_unit_parse(units, buffer);
 
-    if ((toggle = tec_unit_key(units, togname))) {
+    if ((toggle = tec_unit_get(units, togname))) {
         strncpy(buf, toggle, bufsiz);
         buf[bufsiz] = '\0';
     } else {

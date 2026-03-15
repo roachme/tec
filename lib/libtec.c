@@ -272,7 +272,7 @@ tec_unit_t *tec_unit_parse(struct tec_unit *head, const char *str)
     return unit_parse(head, str);
 }
 
-char *tec_unit_key(tec_unit_t *head, char *key)
+char *tec_unit_get(tec_unit_t *head, char *key)
 {
     return unit_get(head, key);
 }

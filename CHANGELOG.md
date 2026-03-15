@@ -19,6 +19,7 @@
 - `cli/desk`: Fix unintialized values
 - `cli/rm`: Fix user current working directory path
 - `cli/set`: Fix duplicate keys
+- `tec/libtec`: Rename tec_unit_key() to tec_unit_get()
 
 ### Deleted
 

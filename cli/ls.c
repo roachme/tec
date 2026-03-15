@@ -40,7 +40,7 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
     if ((status = tec_task_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
             elog(status, "'%s': %s one", args->taskid, tec_strerror(status));
-    } else if ((desc = tec_unit_key(ctx->units, "desc")) == NULL) {
+    } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
         if (quiet == false)
             elog(1, "'%s': %s", args->taskid, "description not found");
     }
