@@ -2,6 +2,8 @@
 
 ### Added
 
+- `cli/help`: Add return value descriptions
+
 ### Changed
 
 ### Fixed
