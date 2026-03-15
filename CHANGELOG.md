@@ -18,6 +18,7 @@
 - `cli/set`: Fix unintialized retcode
 - `cli/desk`: Fix unintialized values
 - `cli/rm`: Fix user current working directory path
+- `cli/set`: Fix duplicate keys
 
 ### Deleted
 

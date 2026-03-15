@@ -65,7 +65,6 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
     argvec_init(&argvec);
     argvec_parse(&argvec, argc, argv);
     while ((c = getopt(argvec.used, argvec.argv, ":d:e:hiqD:T:P:")) != -1) {
-        // TODO: add a protection for duplicates, use map data structure
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -89,7 +88,8 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            ctx->units = tec_unit_add(ctx->units, "type", optarg);
+            if (tec_unit_key(ctx->units, "type") == NULL)
+                ctx->units = tec_unit_add(ctx->units, "type", optarg);
             break;
         case 'D':
             if (valid_desc(optarg) == false) {
@@ -97,7 +97,8 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            ctx->units = tec_unit_add(ctx->units, "desc", optarg);
+            if (tec_unit_key(ctx->units, "desc") == NULL)
+                ctx->units = tec_unit_add(ctx->units, "desc", optarg);
             break;
         case 'P':
             if (valid_prio(optarg) == false) {
@@ -105,7 +106,8 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
                 help_usage("set");
                 return 1;
             }
-            ctx->units = tec_unit_add(ctx->units, "prio", optarg);
+            if (tec_unit_key(ctx->units, "prio") == NULL)
+                ctx->units = tec_unit_add(ctx->units, "prio", optarg);
             break;
         case ':':
             return elog(1, "option `-%c' requires an argument", optopt);
