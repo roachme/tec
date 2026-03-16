@@ -159,14 +159,11 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec.used);
 
-    if (change_dir) {
+    if (retcode == LIBTEC_OK && change_dir) {
         args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
-        toggle_task_get_curr(teccfg.base.task, &args);
-        if (args.taskid == NULL)
+        if (toggle_task_get_curr(teccfg.base.task, &args))
             args.taskid = "";
-
-        if (retcode == LIBTEC_OK)
-            retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
     }
 
     argvec_free(&argvec);

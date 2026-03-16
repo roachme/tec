@@ -7,6 +7,7 @@
 ### Fixed
 
 - `cli/rm`: Fix log message in case of error
+- `cli/rm`: Optimize logic
 
 ### Deleted
 
