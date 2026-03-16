@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `cli/rm`: Fix log message in case of error
+
+### Deleted
+
+
 ## [0.4.0] - (2026-03-16)
 
 ### Added

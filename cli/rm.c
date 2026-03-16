@@ -154,9 +154,7 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
         } else if ((status = tec_task_del(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
-        }
-
-        if (opt_verbose == true)
+        } else if (opt_verbose == true)
             llog(0, "removed task '%s'", args.taskid);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec.used);
