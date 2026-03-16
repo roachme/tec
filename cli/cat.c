@@ -88,11 +88,12 @@ static int show_specific_keys(char *task, tec_unit_t *unitbin,
 {
     int status;
     int retcode = LIBTEC_OK;
+    const char *errfmt = "cannot show unit key '%s': no such key";
 
     for (int i = 0; i < vec->used; i++) {
         if ((status = show_key(task, unitbin, unitpgn, vec->keys[i]))) {
             if (quiet == false)
-                elog(1, "key not found '%s'", vec->keys[i]);
+                elog(1, errfmt, vec->keys[i]);
             retcode = status == LIBTEC_OK ? retcode : status;
         }
     }

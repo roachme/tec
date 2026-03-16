@@ -4,6 +4,8 @@
 
 ### Changed
 
+- `cli/cat`: Change error message if unit key not found
+
 ### Fixed
 
 - `cli/rm`: Fix log message in case of error
