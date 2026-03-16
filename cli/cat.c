@@ -56,8 +56,8 @@ static int valid_unitkeys(tec_unit_t *units)
     return 0;
 }
 
-static int show_key(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn,
-                    char *key)
+static int _show_key(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn,
+                     char *key)
 {
     struct tec_unit *units;
 
@@ -83,15 +83,15 @@ static int show_key(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn,
     return 1;
 }
 
-static int show_specific_keys(char *task, tec_unit_t *unitbin,
-                              tec_unit_t *unitpgn, keyvec_t *vec, int quiet)
+static int show_key(char *task, tec_unit_t *unitbin,
+                    tec_unit_t *unitpgn, keyvec_t *vec, int quiet)
 {
     int status;
     int retcode = LIBTEC_OK;
     const char *errfmt = "cannot show unit key '%s': no such key";
 
     for (int i = 0; i < vec->used; i++) {
-        if ((status = show_key(task, unitbin, unitpgn, vec->keys[i]))) {
+        if ((status = _show_key(task, unitbin, unitpgn, vec->keys[i]))) {
             if (quiet == false)
                 elog(1, errfmt, vec->keys[i]);
             retcode = status == LIBTEC_OK ? retcode : status;
@@ -184,8 +184,7 @@ int tec_cli_cat(int argc, const char **argv, tec_ctx_t *ctx)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         } else if (opt_show_specific_key == true) {
             if ((status =
-                 show_specific_keys(args.taskid, ctx->units, unitpgn, &vec,
-                                    opt_quiet))) {
+                 show_key(args.taskid, ctx->units, unitpgn, &vec, opt_quiet))) {
                 ;
             }
         } else if ((status = show_keys(args.taskid, ctx->units, unitpgn))) {

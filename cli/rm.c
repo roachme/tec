@@ -13,8 +13,6 @@
 
 #ifdef __linux__
 #include <unistd.h>
-
-#define CWD_DELIM "/"
 #endif
 
 static char *user_cwd_ptr;
@@ -72,7 +70,6 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
     opt_ask_every = true;       /* prompt before every removal.  */
     opt_ask_once = false;       /* prompt before once for all task IDs.  */
     retcode = LIBTEC_OK;
-    user_cwd_ptr = get_user_cwd();
     errfmt = "cannot remove task '%s': %s";
     args.env = args.desk = args.taskid = NULL;
     opt_quiet = opt_help = opt_verbose = false;
@@ -118,8 +115,8 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
 
     if (opt_help == true)
         return help_usage("rm");
-    else if (user_cwd_ptr == NULL)
-        return elog(1, errfmt, "TASK", "could not get CWD");
+    else if ((user_cwd_ptr = get_user_cwd()) == NULL)
+        return elog(1, errfmt, "TASK", "could not get user current directory");
 
     if ((status = check_arg_env(&args, errfmt, opt_quiet)))
         return status;
