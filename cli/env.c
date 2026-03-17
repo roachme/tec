@@ -6,6 +6,22 @@
 #include "aux/config.h"
 #include "aux/toggle.h"
 
+// TODO: remove parameter 'quiet', return status, and let the caller to
+static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
+{
+    int status;
+    char *desc;
+
+    if ((status = tec_env_get(teccfg.base.task, args, ctx))) {
+        if (quiet == false)
+            elog(status, "'%s': %s", args->env, tec_strerror(status));
+    } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
+        if (quiet == false)
+            elog(1, "'%s': %s", args->env, "description not found");
+    }
+    return desc;
+}
+
 static int generate_units(tec_ctx_t *ctx, char *env)
 {
     struct tec_unit *units = NULL;
@@ -246,6 +262,7 @@ static int _env_rm(int argc, const char **argv, tec_ctx_t *ctx)
 
 static int _env_ls(int argc, const char **argv, tec_ctx_t *ctx)
 {
+    char *desc;
     int c, status;
     tec_arg_t args;
     tec_argvec_t argvec;
@@ -284,7 +301,12 @@ static int _env_ls(int argc, const char **argv, tec_ctx_t *ctx)
     }
 
     for (tec_list_t * obj = ctx->list; obj != NULL; obj = obj->next) {
-        LIST_OBJ_UNITS(obj->name, "", "some env description");
+        args.env = obj->name;
+        if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
+            continue;
+        }
+        LIST_OBJ_UNITS(obj->name, "", desc);
+        ctx->units = tec_unit_free(ctx->units);
     }
 
     argvec_free(&argvec);

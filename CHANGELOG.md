@@ -2,6 +2,8 @@
 
 ### Added
 
+- `cli`: Add support to show description for env and desk
+
 ### Changed
 
 - `cli/cat`: Change error message if unit key not found

@@ -6,6 +6,22 @@
 #include "aux/toggle.h"
 #include "aux/config.h"
 
+// TODO: remove parameter 'quiet', return status, and let the caller to
+static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
+{
+    int status;
+    char *desc;
+
+    if ((status = tec_desk_get(teccfg.base.task, args, ctx))) {
+        if (quiet == false)
+            elog(status, "'%s': %s one", args->desk, tec_strerror(status));
+    } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
+        if (quiet == false)
+            elog(1, "'%s': %s", args->desk, "description not found");
+    }
+    return desc;
+}
+
 static int valid_desc(const char *val)
 {
     if (!isalnum(*val++))
@@ -209,6 +225,7 @@ static int _desk_rm(int argc, const char **argv, tec_ctx_t *ctx)
 // TODO: show tasks in desk
 static int _desk_ls(int argc, const char **argv, tec_ctx_t *ctx)
 {
+    char *desc;
     tec_arg_t args;
     int c, i, status;
     tec_argvec_t argvec;
@@ -254,7 +271,11 @@ static int _desk_ls(int argc, const char **argv, tec_ctx_t *ctx)
         }
 
         for (tec_list_t * obj = ctx->list; obj != NULL; obj = obj->next) {
-            LIST_OBJ_UNITS(obj->name, "", "some desk description");
+            if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
+                continue;
+            }
+            LIST_OBJ_UNITS(obj->name, "", desc);
+            ctx->units = tec_unit_free(ctx->units);
         }
         ctx->list = tec_list_free(ctx->list);
     } while (++i < argvec.used);

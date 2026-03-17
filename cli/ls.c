@@ -36,7 +36,6 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
     int status;
     char *desc;
 
-    desc = NULL;
     if ((status = tec_task_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
             elog(status, "'%s': %s one", args->taskid, tec_strerror(status));
