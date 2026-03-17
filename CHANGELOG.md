@@ -13,6 +13,7 @@
 - `cli/rm`: Fix log message in case of error
 - `cli/rm`: Optimize logic
 - `cli/tec`: Add null terminator into argvec
+- `cli/ls`: Remove unnecessary hotfix
 
 ### Deleted
 

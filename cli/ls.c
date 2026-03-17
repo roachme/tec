@@ -166,9 +166,6 @@ int tec_cli_ls(int argc, const char **argv, tec_ctx_t *ctx)
         }
 
         ctx->list = tec_list_free(ctx->list);
-
-        // HOTFIX: cuz I've no clue how to sync desk feature into envs.
-        args.desk = NULL;
     } while (++i < argvec.used);
 
     argvec_free(&argvec);
