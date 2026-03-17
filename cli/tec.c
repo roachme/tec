@@ -124,7 +124,9 @@ void argvec_init(tec_argvec_t *vec)
 
 void argvec_add(tec_argvec_t *vec, const char *arg)
 {
-    if (vec->used >= vec->size) {
+    /* The last element is never used that's why minus one.
+     * It is a NULL terminator to mimic C argv.  */
+    if (vec->used >= vec->size - 1) {
         vec->size *= 2;
         if ((vec->argv =
              realloc(vec->argv, vec->size * sizeof(char *))) == NULL) {
