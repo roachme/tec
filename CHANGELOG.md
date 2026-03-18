@@ -14,6 +14,7 @@
 - `cli/rm`: Optimize logic
 - `cli/tec`: Add null terminator into argvec
 - `cli/ls`: Remove unnecessary hotfix
+- `cli/add`: Fix return code in case of invalid task ID
 
 ### Deleted
 

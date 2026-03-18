@@ -108,6 +108,7 @@ int tec_cli_add(int argc, const char **argv, tec_ctx_t *ctx)
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (is_valid_length(args.taskid, IDSIZ) == false) {
+            status = 1;
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "task ID is too long");
             retcode = status == LIBTEC_OK ? retcode : status;
@@ -117,7 +118,7 @@ int tec_cli_add(int argc, const char **argv, tec_ctx_t *ctx)
                 elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? retcode : !status;
             continue;
-        } else if (generate_units(ctx, args.env, args.taskid)) {
+        } else if ((status = generate_units(ctx, args.env, args.taskid))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.taskid, "unit generation failed");
             retcode = status == LIBTEC_OK ? retcode : status;
