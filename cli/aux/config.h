@@ -25,9 +25,16 @@ typedef struct tec_option {
     int hook;                   /* execute hooks from config, by default set */
 } tec_opt_t;
 
+typedef struct tec_alias {
+    char name[10];
+    char cmd[30];
+    struct tec_alias *next;
+} tec_alias_t;
+
 typedef struct config {
     tec_opt_t opts;
     tec_base_t base;
+    tec_alias_t *alias;
     struct tec_hook *hooks;
 } tec_cfg_t;
 
@@ -38,4 +45,5 @@ int tec_config_set_base(tec_base_t * base);
 int tec_config_set_options(tec_opt_t * opts);
 int tec_config_parse(tec_cfg_t * tec_config);
 void tec_config_destroy(tec_cfg_t * tec_config);
+
 #endif

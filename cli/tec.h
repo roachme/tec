@@ -68,6 +68,7 @@ void argvec_offset(tec_argvec_t * vec, int offset);
 void argvec_add(tec_argvec_t * vec, const char *arg);
 void argvec_parse(tec_argvec_t * vec, int argc, const char **argv);
 void argvec_replace(tec_argvec_t * vec, int vec_idx, char *arg, int argsiz);
+void argvec_show(tec_argvec_t * vec);
 
 int is_valid_length(const char *obj, int len);
 int check_arg_env(tec_arg_t * args, const char *errfmt, int quiet);

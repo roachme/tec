@@ -176,10 +176,14 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
         } else if ((status = valid_unitkeys(ctx->units))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "invalid unit keys");
-        } else if ((status = hook_show(&unitpgn, &args, "cat"))) {
+        }
+
+        else if ((status = hook_show(&unitpgn, &args, "cat"))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
-        } else if (opt_show_specific_key == true) {
+        }
+
+        else if (opt_show_specific_key == true) {
             if ((status =
                  show_key(args.taskid, ctx->units, unitpgn, &vec, opt_quiet))) {
                 ;
@@ -188,7 +192,6 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             if (opt_quiet == false)
                 elog(1, errfmt, args.taskid, "internal error");
         }
-
         unitpgn = tec_unit_free(unitpgn);
         ctx->units = tec_unit_free(ctx->units);
         retcode = status == LIBTEC_OK ? retcode : status;

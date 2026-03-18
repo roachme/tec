@@ -13,6 +13,9 @@
         optind = 0;         \
     } while (0)             \
 
+static char alias_name[20];
+static char alias_cmd[20];
+
 /*
 typedef struct tec_cli_status {
     const char *fmt;
@@ -60,6 +63,23 @@ static int tec_setup(int setuplvl)
     return status;
 }
 
+static int is_alias(char *pgndir, const char *cmd)
+{
+    struct tec_alias *head;
+
+    for (head = teccfg.alias; head != NULL;) {
+        if (strcmp(cmd, head->name) == 0) {
+            //printf("-> alias found\n");
+            strcpy(alias_name, head->name);
+            strcpy(alias_cmd, head->cmd);
+            return true;
+        }
+        //printf("--- '%s' : '%s' - '%s'\n", cmd, head->name, head->cmd);
+        head = head->next;
+    }
+    return false;
+}
+
 static builtin_t *is_builtin(const char *cmd)
 {
     for (int idx = 0; idx < ARRAY_SIZE(builtins); ++idx)
@@ -103,6 +123,34 @@ static int run_plugin(tec_argvec_t *argvec)
     return tec_cli_pgn(argvec, &ctx);
 }
 
+/* TODO: add support to include alias into alias (i.e. recursive aliases).  */
+static int run_alias(tec_argvec_t *argvec)
+{
+    char *tok;
+    int status = LIBTEC_OK;
+
+    tok = strtok(alias_cmd, " ");
+
+    if (is_plugin(teccfg.base.pgn, tok) == true) {
+        dlog(1, "alias execute as plugin: '%s'", alias_name);
+        argvec_replace(argvec, 0, tok, strlen(tok));
+
+        while ((tok = strtok(NULL, " ")) != NULL) {
+            argvec_add(argvec, tok);
+        }
+        status = run_plugin(argvec);
+    } else {
+        dlog(1, "alias execute as builtin: '%s'", alias_name);
+        argvec_replace(argvec, 0, tok, strlen(tok));
+
+        while ((tok = strtok(NULL, " ")) != NULL) {
+            argvec_add(argvec, tok);
+        }
+        status = run_builtin(argvec, is_builtin(alias_cmd));
+    }
+    return status;
+}
+
 static int valid_toggle(char *tog)
 {
     if (strcmp(tog, "on") == 0)
@@ -129,6 +177,13 @@ void argvec_init(tec_argvec_t *vec)
     vec->used = 0;
     vec->offset = 0;
     vec->size = size;
+}
+
+void argvec_show(tec_argvec_t *vec)
+{
+    for (int i = 0; i < vec->used; ++i) {
+        printf("argvec_show: %s\n", vec->argv[i]);
+    }
 }
 
 void argvec_add(tec_argvec_t *vec, const char *arg)
@@ -180,6 +235,29 @@ void argvec_free(tec_argvec_t *vec)
     for (int i = 0; i < vec->size; ++i)
         free(vec->argv[i]);
     free(vec->argv);
+}
+
+void argvec_remove(tec_argvec_t *vec, int index)
+{
+    /* Validate index */
+    if (index < 0 || index >= vec->used) {
+        elog(1, "argvec_remove: index out of range");
+        return;
+    }
+
+    /* Free the string at the specified index */
+    free(vec->argv[index]);
+
+    /* Shift all remaining elements left by one */
+    for (int i = index; i < vec->used - 1; i++) {
+        vec->argv[i] = vec->argv[i + 1];
+    }
+
+    /* Decrement used count */
+    vec->used--;
+
+    /* Set the now-unused last element to NULL */
+    vec->argv[vec->used] = NULL;
 }
 
 bool tec_cli_get_user_choice(void)
@@ -442,12 +520,14 @@ int main(int argc, const char **argv)
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
-    if (is_plugin(teccfg.base.pgn, cmd) == true) {
+    if (is_alias(teccfg.base.pgn, cmd) == true) {
+        status = run_alias(&argvec);
+    } else if (is_plugin(teccfg.base.pgn, cmd) == true) {
         status = run_plugin(&argvec);
     } else if ((builtin = is_builtin(cmd)) != NULL) {
         status = run_builtin(&argvec, builtin);
     } else {
-        status = elog(1, "'%s': no such command or plugin", cmd);
+        status = elog(1, "'%s': no such command, alias or plugin", cmd);
     }
 
  err:

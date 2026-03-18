@@ -54,6 +54,16 @@ static struct tec_hook *make_hook()
     return hook;
 }
 
+static tec_alias_t *make_alias()
+{
+    tec_alias_t *alias;
+
+    if ((alias = malloc(sizeof(tec_alias_t))) == NULL)
+        return NULL;
+    memset(alias, 0, sizeof(tec_alias_t));
+    return alias;
+}
+
 static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
 {
     config_setting_t *setting;
@@ -106,6 +116,31 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                 strcpy(hook->pgncmd, pgncmd);
                 hook->next = tec_config->hooks;
                 tec_config->hooks = hook;
+            }
+        }
+    }
+    return 0;
+}
+
+static int tec_config_get_aliases(config_t *cfg, tec_cfg_t *tec_config)
+{
+    tec_alias_t *alias;
+    const char *name, *value;
+    config_setting_t *setting;
+
+    if ((setting = config_lookup(cfg, "alias")) == NULL)
+        return 0;
+
+    // TODO: trim whitespaces
+    for (int i = 0; i < config_setting_length(setting); ++i) {
+        config_setting_t *_setting = config_setting_get_elem(setting, i);
+        name = config_setting_name(_setting);
+        if (config_setting_lookup_string(setting, name, &value)) {
+            if ((alias = make_alias()) != NULL) {
+                strcpy(alias->name, name);
+                strcpy(alias->cmd, value);
+                alias->next = tec_config->alias;
+                tec_config->alias = alias;
             }
         }
     }
@@ -166,6 +201,8 @@ static int parseconf(tec_cfg_t *tec_config, const char *fname)
         elog(1, "tec_config_get_options: FAILED\n");
     else if (tec_config_get_hooks(&cfg, tec_config))
         elog(1, "tec_config_get_hooks: FAILED\n");
+    else if (tec_config_get_aliases(&cfg, tec_config))
+        elog(1, "tec_config_get_aliases: FAILED\n");
 
     config_destroy(&cfg);
     return 0;
@@ -221,6 +258,7 @@ int tec_config_set_options(tec_opt_t *opts)
 
 void tec_config_destroy(tec_cfg_t *tec_config)
 {
+    tec_alias_t *alias;
     struct tec_hook *head;
 
     for (head = tec_config->hooks; head != NULL;) {
@@ -228,6 +266,13 @@ void tec_config_destroy(tec_cfg_t *tec_config)
         head = head->next;
         free(tmp);
     }
+
+    for (alias = tec_config->alias; alias != NULL;) {
+        tec_alias_t *tmp = alias;
+        alias = alias->next;
+        free(tmp);
+    }
+
     free(tec_config->base.task);
     free(tec_config->base.pgn);
 }

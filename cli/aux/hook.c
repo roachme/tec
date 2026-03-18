@@ -58,7 +58,9 @@ int hook_show(tec_unit_t **units, tec_arg_t *args, char *cmd)
         if (strcmp(hooks->cmd, cmd) != 0)
             continue;
 
-        if (!(pipe = popen(_hook_cmd(args, hooks->pgname, hooks->pgncmd), "r"))) {
+        char *hook_cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
+        //printf("## hook_cmd: '%s'\n", hook_cmd);
+        if (!(pipe = popen(hook_cmd, "r"))) {
             // TODO: add quiet option and show error message
             continue;
         }
