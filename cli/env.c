@@ -44,11 +44,10 @@ static int valid_desc(const char *val)
 }
 
 // TODO: Find a good error message in case option fails.  */
-static int _env_add(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     char c;
     tec_arg_t args;
-    tec_argvec_t argvec;
     int switch_dir, switch_env;
     int i, quiet, showhelp, status;
     const char *errfmt = "cannot add env '%s': %s";
@@ -59,9 +58,7 @@ static int _env_add(int argc, const char **argv, tec_ctx_t *ctx)
     switch_dir = switch_env = true;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:hnqN")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:hnqN")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -89,15 +86,15 @@ static int _env_add(int argc, const char **argv, tec_ctx_t *ctx)
     if (showhelp)
         return help_usage("env-add");
 
-    if (optind == argc)
+    if (optind == argvec->used)
         return elog(1, "env name required");
 
     /* Set default desk name to create.  */
     if (args.desk == NULL)
         args.desk = "desk";
 
-    for (i = optind; i < argc; ++i) {
-        args.env = argvec.argv[i];
+    for (i = optind; i < argvec->used; ++i) {
+        args.env = argvec->argv[i];
 
         if (is_valid_length(args.env, ENVSIZ) == false) {
             if (quiet == false)
@@ -137,11 +134,11 @@ static int _env_add(int argc, const char **argv, tec_ctx_t *ctx)
 
         if ((status = tec_env_add(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
-                elog(1, errfmt, argv[i], tec_strerror(status));
+                elog(1, errfmt, argvec->argv[i], tec_strerror(status));
             continue;
         } else if ((status = tec_desk_add(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
-                elog(1, errfmt, argv[i], tec_strerror(status));
+                elog(1, errfmt, argvec->argv[i], tec_strerror(status));
             continue;
         }
         ctx->units = tec_unit_free(ctx->units);
@@ -162,14 +159,12 @@ static int _env_add(int argc, const char **argv, tec_ctx_t *ctx)
     if (status == LIBTEC_OK && switch_dir)
         status = tec_pwd_env(&args) == LIBTEC_OK ? status : status;
 
-    argvec_free(&argvec);
     return status;
 }
 
-static int _env_rm(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     int i, c, retcode, status;
     const char *errfmt = "cannot delete env '%s': %s";
     int opt_ask_once, opt_ask_every, opt_quiet, opt_help, opt_verbose;
@@ -180,9 +175,7 @@ static int _env_rm(int argc, const char **argv, tec_ctx_t *ctx)
     opt_quiet = opt_help = opt_verbose = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:fhiqvI")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:fhiqvI")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -227,7 +220,7 @@ static int _env_rm(int argc, const char **argv, tec_ctx_t *ctx)
     }
 
     do {
-        args.env = argvec.argv[i];
+        args.env = argvec->argv[i];
         if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
@@ -243,38 +236,34 @@ static int _env_rm(int argc, const char **argv, tec_ctx_t *ctx)
                 elog(1, errfmt, args.env, "failed to execute hooks");
         } else if ((status = tec_env_del(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
-                elog(status, errfmt, argv[i], tec_strerror(status));
+                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }
 
         if (opt_verbose == true)
             llog(0, "removed environment '%s'", args.env);
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
     // TODO: update current directory if current env got deleted.
 
     if (retcode == LIBTEC_OK)
         retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
 
-    argvec_free(&argvec);
     return retcode;
 }
 
-static int _env_ls(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     char *desc;
     int c, status;
     tec_arg_t args;
-    tec_argvec_t argvec;
     int opt_help, opt_quiet;
 
     opt_quiet = false;
     opt_help = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":hq")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
         case 'q':
             opt_quiet = true;
@@ -309,17 +298,15 @@ static int _env_ls(int argc, const char **argv, tec_ctx_t *ctx)
         ctx->units = tec_unit_free(ctx->units);
     }
 
-    argvec_free(&argvec);
     ctx->list = tec_list_free(ctx->list);
     return status;
 }
 
-static int _env_rename(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     int status;
     const char *errfmt;
     tec_arg_t src, dst;
-    tec_argvec_t argvec;
     int c, opt_quiet, opt_help;
 
     opt_quiet = opt_help = false;
@@ -327,9 +314,7 @@ static int _env_rename(int argc, const char **argv, tec_ctx_t *ctx)
     src.env = src.desk = src.taskid = NULL;
     dst.env = dst.desk = dst.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":hq")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
         case 'h':
             opt_help = true;
@@ -345,11 +330,11 @@ static int _env_rename(int argc, const char **argv, tec_ctx_t *ctx)
     if (opt_help)
         return help_usage("env-rename");
 
-    if (argc - optind != 2)
+    if (argvec->used - optind != 2)
         return elog(1, "source or destination env name missing");
 
-    src.env = argvec.argv[optind];
-    dst.env = argvec.argv[optind + 1];
+    src.env = argvec->argv[optind];
+    dst.env = argvec->argv[optind + 1];
 
     /* TODO: trigger hooks if any */
 
@@ -372,10 +357,9 @@ static int _env_rename(int argc, const char **argv, tec_ctx_t *ctx)
     return tec_pwd_env(&dst);
 }
 
-static int _env_set(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     int atleast_one_key_set;
     int c, i, retcode, status;
     int opt_quiet, opt_help;
@@ -386,9 +370,7 @@ static int _env_set(int argc, const char **argv, tec_ctx_t *ctx)
     atleast_one_key_set = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:hqD:")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:hqD:")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -425,40 +407,37 @@ static int _env_set(int argc, const char **argv, tec_ctx_t *ctx)
 
     i = optind;
     do {
-        args.env = argvec.argv[i];
+        args.env = argvec->argv[i];
 
         if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_env_set(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
-                elog(status, errfmt, argv[i], tec_strerror(status));
+                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "env-set"))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         }
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
-    argvec_free(&argvec);
     ctx->units = tec_unit_free(ctx->units);
     return status;
 }
 
-static int _env_cat(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     int c, i, quiet, showhelp, status;
     struct tec_unit *unitbin, *unitpgn;
     const char *errfmt = "cannot show env units '%s': %s";
 
+    status = LIBTEC_OK;
     unitbin = unitpgn = NULL;
     quiet = showhelp = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:hq")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:hq")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -480,13 +459,14 @@ static int _env_cat(int argc, const char **argv, tec_ctx_t *ctx)
         return help_usage("env-cat");
 
     i = optind;
+
     do {
-        args.env = argvec.argv[i];
+        args.env = argvec->argv[i];
         if ((status = check_arg_env(&args, errfmt, quiet))) {
             continue;
         } else if ((status = tec_env_get(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
-                elog(status, errfmt, argv[i], tec_strerror(status));
+                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
             continue;
         }
 
@@ -496,16 +476,14 @@ static int _env_cat(int argc, const char **argv, tec_ctx_t *ctx)
 
         // TODO: add plugin output
         ctx->units = tec_unit_free(ctx->units);
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
-    argvec_free(&argvec);
     return status;
 }
 
-static int _env_cd(int argc, const char **argv, tec_ctx_t *ctx)
+static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     int c, i, retcode, status;
     const char *errfmt = "cannot switch to '%s': %s";
     int opt_quiet, opt_help, opt_cd_toggle, opt_cd_dir;
@@ -515,9 +493,7 @@ static int _env_cd(int argc, const char **argv, tec_ctx_t *ctx)
     opt_cd_toggle = opt_cd_dir = true;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:hnqN")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:hnqN")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -548,20 +524,20 @@ static int _env_cd(int argc, const char **argv, tec_ctx_t *ctx)
         return help_usage("env-cd");
 
     /* Check that alias '-' is not passed with other envs nor duplicated.  */
-    for (int idx = i; idx < argc; ++idx) {
-        if (strcmp(argv[idx], "-") == 0 && argc - i > 1)
+    for (int idx = i; idx < argvec->used; ++idx) {
+        if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - i > 1)
             return elog(1, "alias '-' is used alone");
     }
 
     /* Resolve alias '-' to switch to previous environment.  */
-    if (argv[i] && strcmp("-", argv[i]) == 0) {
+    if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {
         if ((status = toggle_env_get_prev(teccfg.base.task, &args)))
             return elog(1, errfmt, "PREV", "no previous environment");
-        argvec_replace(&argvec, i, args.env, ENVSIZ);
+        argvec_replace(argvec, i, args.env, ENVSIZ);
     }
 
     do {
-        args.env = argvec.argv[i];
+        args.env = argvec->argv[i];
         if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = hook_action(&args, "env-cd"))) {
@@ -574,12 +550,11 @@ static int _env_cd(int argc, const char **argv, tec_ctx_t *ctx)
             }
         }
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && opt_cd_dir)
         retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
 
-    argvec_free(&argvec);
     return retcode;
 }
 
@@ -593,13 +568,16 @@ static const builtin_t env_commands[] = {
     {.name = "set",.func = &_env_set},
 };
 
-int tec_cli_env(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_env(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argv[1] != NULL ? argv[1] : "ls";
+    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     for (int i = 0; i < ARRAY_SIZE(env_commands); ++i)
-        if (strcmp(cmd, env_commands[i].name) == 0)
-            return env_commands[i].func(argc - 1, argv + 1, ctx);
+        if (strcmp(cmd, env_commands[i].name) == 0) {
+            if (cmd == argvec->argv[1])
+                argvec_offset(argvec, 1);       /* Shift env subcommand.  */
+            return env_commands[i].func(argvec, ctx);
+        }
 
     return elog(1, "'%s': no such env command", cmd);
 }

@@ -4,10 +4,9 @@
 #include "aux/toggle.h"
 #include "aux/config.h"
 
-int tec_cli_cd(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     const char *errfmt;
     int c, i, retcode, status;
     int opt_quiet, opt_help, opt_cd_dir, opt_cd_toggle;
@@ -18,9 +17,7 @@ int tec_cli_cd(int argc, const char **argv, tec_ctx_t *ctx)
     errfmt = "cannot switch to '%s': %s";
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:e:hnqN")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:e:hnqN")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -59,20 +56,20 @@ int tec_cli_cd(int argc, const char **argv, tec_ctx_t *ctx)
         return status;
 
     /* Check that alias '-' is not passed with other task IDs nor duplicated.  */
-    for (int idx = i; idx < argvec.used; ++idx) {
-        if (strcmp(argvec.argv[idx], "-") == 0 && argvec.used - i > 1)
+    for (int idx = i; idx < argvec->used; ++idx) {
+        if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - i > 1)
             return elog(1, "alias '-' is used alone");
     }
 
     /* Resolve alias '-' to switch to previous task ID.  */
-    if (argvec.argv[i] && strcmp("-", argvec.argv[i]) == 0) {
+    if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {
         if ((status = toggle_task_get_prev(teccfg.base.task, &args)))
             return elog(1, errfmt, "PREV", "no previous task ID");
-        argvec_replace(&argvec, i, args.taskid, IDSIZ);
+        argvec_replace(argvec, i, args.taskid, IDSIZ);
     }
 
     do {
-        args.taskid = argvec.argv[i];
+        args.taskid = argvec->argv[i];
         if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = hook_action(&args, "cd"))) {
@@ -85,11 +82,10 @@ int tec_cli_cd(int argc, const char **argv, tec_ctx_t *ctx)
             }
         }
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && opt_cd_dir)
         retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
 
-    argvec_free(&argvec);
     return retcode;
 }

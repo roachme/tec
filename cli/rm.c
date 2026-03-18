@@ -58,11 +58,10 @@ static int update_toggles_and_cwd(tec_arg_t *args)
     return status;
 }
 
-int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
     const char *errfmt;
-    tec_argvec_t argvec;
     int c, i, retcode, status;
     int opt_quiet, opt_help, opt_verbose;
     int opt_ask_once, opt_ask_every;
@@ -74,9 +73,7 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
     args.env = args.desk = args.taskid = NULL;
     opt_quiet = opt_help = opt_verbose = false;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:e:fihqvI")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:e:fihqvI")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -131,7 +128,7 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
     }
 
     do {
-        args.taskid = argvec.argv[i];
+        args.taskid = argvec->argv[i];
 
         if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
@@ -154,7 +151,7 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
         } else if (opt_verbose == true)
             llog(0, "removed task '%s'", args.taskid);
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && change_dir) {
         args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
@@ -163,6 +160,5 @@ int tec_cli_rm(int argc, const char **argv, tec_ctx_t *ctx)
         retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
     }
 
-    argvec_free(&argvec);
     return retcode;
 }

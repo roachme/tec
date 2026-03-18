@@ -17,7 +17,7 @@ static void argument_keys_init(keyvec_t *vec)
     int size = 2;
 
     if ((vec->keys = malloc(size * sizeof(vec->keys))) == NULL) {
-        elog(1, "malloc failed");
+        elog(1, "'%s': memory allocation failed", __FUNCTION__);
         exit(1);
     }
 
@@ -31,7 +31,7 @@ static int argument_keys_add(keyvec_t *vec, char *key)
         vec->size *= 2;
         if ((vec->keys =
              realloc(vec->keys, vec->size * sizeof(char *))) == NULL) {
-            elog(1, "realloc failed");
+            elog(1, "'%s': memory allocation failed", __FUNCTION__);
             exit(1);
         }
     }
@@ -115,11 +115,10 @@ static int show_keys(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn)
     return 0;
 }
 
-int tec_cli_cat(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     keyvec_t vec;
     tec_arg_t args;
-    tec_argvec_t argvec;
     tec_unit_t *unitpgn;
     int opt_quiet, opt_help;
     int c, i, retcode, status;
@@ -131,10 +130,8 @@ int tec_cli_cat(int argc, const char **argv, tec_ctx_t *ctx)
     opt_show_specific_key = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
     argument_keys_init(&vec);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:e:hk:q")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:e:hk:q")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -169,7 +166,7 @@ int tec_cli_cat(int argc, const char **argv, tec_ctx_t *ctx)
         return status;
 
     do {
-        args.taskid = argvec.argv[i];
+        args.taskid = argvec->argv[i];
 
         if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
             ;
@@ -195,9 +192,8 @@ int tec_cli_cat(int argc, const char **argv, tec_ctx_t *ctx)
         unitpgn = tec_unit_free(unitpgn);
         ctx->units = tec_unit_free(ctx->units);
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
-    argvec_free(&argvec);
     argument_keys_free(&vec);
     return retcode;
 }

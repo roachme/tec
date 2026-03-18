@@ -34,43 +34,37 @@ static int _ls_hooks(struct tec_hook *hooks)
 
 }
 
-static int _cfg_get(int argc, const char **argv, tec_ctx_t *ctx)
+static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    tec_argvec_t argvec;
-
-    if (argc == 0)
+    if (argvec->used == 0)
         return elog(1, "wrong number of arguments, should at least 1");
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-
-    for (int i = 0; i < argvec.used; ++i) {
-        if (strcmp("taskbase", argvec.argv[i]) == 0)
+    for (int i = 0; i < argvec->used; ++i) {
+        if (strcmp("taskbase", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.base.task);
-        else if (strcmp("pgnbase", argvec.argv[i]) == 0)
+        else if (strcmp("pgnbase", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.base.pgn);
-        else if (strcmp("opts.color", argvec.argv[i]) == 0)
+        else if (strcmp("opts.color", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.opts.color ? "true" : "false");
-        else if (strcmp("opts.debug", argvec.argv[i]) == 0)
+        else if (strcmp("opts.debug", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.opts.debug ? "true" : "false");
-        else if (strcmp("opts.hook", argvec.argv[i]) == 0)
+        else if (strcmp("opts.hook", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.opts.hook ? "true" : "false");
-        else if (strcmp("hook.cat", argvec.argv[i]) == 0)
+        else if (strcmp("hook.cat", argvec->argv[i]) == 0)
             _cat_hooks(teccfg.hooks);
-        else if (strcmp("hook.ls", argvec.argv[i]) == 0)
+        else if (strcmp("hook.ls", argvec->argv[i]) == 0)
             _ls_hooks(teccfg.hooks);
-        else if (strcmp("hook.act", argvec.argv[i]) == 0)
+        else if (strcmp("hook.act", argvec->argv[i]) == 0)
             _act_hooks(teccfg.hooks);
         else
-            elog(1, "'%s': no such config value", argvec.argv[i]);
+            elog(1, "'%s': no such config value", argvec->argv[i]);
     }
 
-    argvec_free(&argvec);
     return 0;
 }
 
 // TODO: show config values from config file. Not option set via CLI
-static int _cfg_ls(int argc, const char **argv, tec_ctx_t *ctx)
+static int _cfg_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     struct tec_hook *hook;
 
@@ -87,7 +81,7 @@ static int _cfg_ls(int argc, const char **argv, tec_ctx_t *ctx)
     return 0;
 }
 
-static int _cfg_set(int argc, const char **argv, tec_ctx_t *ctx)
+static int _cfg_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     return 0;
 }
@@ -98,13 +92,16 @@ static const builtin_t cfg_commands[] = {
     {.name = "set",.func = &_cfg_set},
 };
 
-int tec_cli_cfg(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_cfg(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argv[1] != NULL ? argv[1] : "ls";
+    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i)
-        if (strcmp(cmd, cfg_commands[i].name) == 0)
-            return cfg_commands[i].func(argc - 2, argv + 2, ctx);
+        if (strcmp(cmd, cfg_commands[i].name) == 0) {
+            if (cmd == argvec->argv[1])
+                argvec_offset(argvec, 1);       /* Shift cfg subcommand.  */
+            return cfg_commands[i].func(argvec, ctx);
+        }
 
     return elog(1, "'%s': no such cfg command", cmd);
 }

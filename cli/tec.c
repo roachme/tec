@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -6,6 +7,11 @@
 #include "tec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
+
+#define tec_getopt_unset()  \
+    do {                    \
+        optind = 0;         \
+    } while (0)             \
 
 /*
 typedef struct tec_cli_status {
@@ -75,24 +81,26 @@ static int is_plugin(char *pgndir, const char *pgname)
     return true;
 }
 
-static int run_builtin(int argc, const char **argv, builtin_t *cmd)
+static int run_builtin(tec_argvec_t *argvec, builtin_t *cmd)
 {
     int status;
     tec_ctx_t ctx = CTX_INIT;
 
     if ((status = tec_setup(cmd->option)) != LIBTEC_OK)
         return elog(status, "setup failed: %s", tec_strerror(status));
-    return cmd->func(argc, argv, &ctx);
+
+    return cmd->func(argvec, &ctx);
 }
 
-static int run_plugin(int argc, const char **argv)
+static int run_plugin(tec_argvec_t *argvec)
 {
     int status;
     tec_ctx_t ctx = CTX_INIT;
 
     if ((status = tec_setup(TEC_SETUP_HARD)) != LIBTEC_OK)
         return elog(status, "setup failed: %s", tec_strerror(status));
-    return tec_cli_pgn(argc, argv, &ctx);
+
+    return tec_cli_pgn(argvec, &ctx);
 }
 
 static int valid_toggle(char *tog)
@@ -109,7 +117,7 @@ void argvec_init(tec_argvec_t *vec)
     int size = 2;
 
     if ((vec->argv = malloc(size * sizeof(vec->argv))) == NULL) {
-        elog(1, "malloc failed");
+        elog(1, "'%s': memory allocation failed", __FUNCTION__);
         exit(1);
     }
 
@@ -119,6 +127,7 @@ void argvec_init(tec_argvec_t *vec)
         vec->argv[i] = NULL;
 
     vec->used = 0;
+    vec->offset = 0;
     vec->size = size;
 }
 
@@ -130,7 +139,7 @@ void argvec_add(tec_argvec_t *vec, const char *arg)
         vec->size *= 2;
         if ((vec->argv =
              realloc(vec->argv, vec->size * sizeof(char *))) == NULL) {
-            elog(1, "realloc failed");
+            elog(1, "'%s': memory allocation failed", __FUNCTION__);
             exit(1);
         }
 
@@ -152,14 +161,23 @@ void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg, int argsiz)
 {
     free(vec->argv[vec_idx]);   /* free previous key value.  */
     if ((vec->argv[vec_idx] = strndup(arg, argsiz)) == NULL) {
-        elog(1, "strndup failed");
+        elog(1, "'%s': memory allocation failed", __FUNCTION__);
         exit(1);
     }
 }
 
+void argvec_offset(tec_argvec_t *vec, int offset)
+{
+    assert((vec->used - offset) >= 0);
+    vec->offset += offset;
+    vec->used -= offset;
+    vec->argv += offset;
+}
+
 void argvec_free(tec_argvec_t *vec)
 {
-    for (int i = 0; i < vec->used; ++i)
+    vec->argv = vec->argv - vec->offset;        /* Restore pointer to first element.  */
+    for (int i = 0; i < vec->size; ++i)
         free(vec->argv[i]);
     free(vec->argv);
 }
@@ -346,20 +364,25 @@ int llog(int status, const char *fmt, ...)
 int main(int argc, const char **argv)
 {
     tec_opt_t opts;
+    const char *cmd;
     tec_base_t base;
     builtin_t *builtin;
-    int c, i, status, showhelp, showversion;
-    const char *cmd;
+    tec_argvec_t argvec;
     char *option, *togfmt;
+    int c, i, status, showhelp, showversion;
 
     cmd = NULL;
+    status = LIBTEC_OK;
     showhelp = showversion = false;
-    opts.color = opts.debug = opts.hook = NONEBOOL;
     base.pgn = base.task = option = NULL;
+    opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";
 
+    argvec_init(&argvec);
+    argvec_parse(&argvec, argc, argv);
+
     /* Parse util itself options.  */
-    while ((c = getopt(argc, (char **)argv, "+:hC:D:F:H:P:T:V")) != -1) {
+    while ((c = getopt(argvec.used, argvec.argv, "+:hC:D:F:H:P:T:V")) != -1) {
         switch (c) {
         case 'h':
             showhelp = true;
@@ -395,19 +418,18 @@ int main(int argc, const char **argv)
     }
 
     i = optind;
-    optind = 0;                 /* Unset option index cuz subcommands use getopt too.  */
     tec_pwd_unset();
+    tec_getopt_unset();         /* Unset option index cuz subcommands use getopt too.  */
 
-    cmd = argv[i];
-
-    if (showhelp == true)
+    if (showhelp == true) {
         cmd = "help";
-    else if (showversion == true)
-        return show_version();
-    else if (cmd == NULL) {
-        /* The user didn't specify a command; give them help */
+    } else if (showversion == true) {
+        show_version();
+        goto err;
+    } else if ((cmd = argvec.argv[i]) == NULL) {
+        status = 1;
         help_list_pretty_commands();
-        exit(1);
+        goto err;
     }
 
     if (tec_config_init(&teccfg))
@@ -419,13 +441,18 @@ int main(int argc, const char **argv)
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
-    if (is_plugin(teccfg.base.pgn, cmd) == true)
-        status = run_plugin(argc - i, argv + i);
-    else if ((builtin = is_builtin(cmd)) != NULL)
-        status = run_builtin(argc - i, argv + i, builtin);
-    else
+    argvec_offset(&argvec, i);
+    if (is_plugin(teccfg.base.pgn, cmd) == true) {
+        status = run_plugin(&argvec);
+    } else if ((builtin = is_builtin(cmd)) != NULL) {
+        status = run_builtin(&argvec, builtin);
+    } else {
         status = elog(1, "'%s': no such command or plugin", cmd);
+    }
+
+ err:
 
     tec_config_destroy(&teccfg);
+    argvec_free(&argvec);
     return status;
 }

@@ -50,10 +50,9 @@ static int valid_desc(const char *val)
 }
 
 // TODO: Find a good error message in case option fails.  */
-int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
-    tec_argvec_t argvec;
     int c, i, retcode, status;
     int opt_help, opt_interactive, opt_quiet;
     const char *errfmt = "cannot set task units '%s': %s";
@@ -62,9 +61,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
     opt_help = opt_interactive = opt_quiet = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":d:e:hiqD:T:P:")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:e:hiqD:T:P:")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -126,7 +123,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
         return status;
 
     do {
-        args.taskid = argvec.argv[i];
+        args.taskid = argvec->argv[i];
 
         if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
             ;
@@ -141,8 +138,7 @@ int tec_cli_set(int argc, const char **argv, tec_ctx_t *ctx)
 
         ctx->units = tec_unit_free(ctx->units);
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
-    argvec_free(&argvec);
     return retcode;
 }

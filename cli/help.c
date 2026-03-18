@@ -672,18 +672,15 @@ int help_lookup(const char *cmd)
     return found == true ? 0 : 1;
 }
 
-int tec_cli_help(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_help(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     int c, i, status;
     int opt_list_cmds;
-    tec_argvec_t argvec;
 
     status = LIBTEC_OK;
     opt_list_cmds = false;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":dls")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":dls")) != -1) {
         switch (c) {
         case 'd':
             helpctx.desc_short = true;
@@ -708,12 +705,12 @@ int tec_cli_help(int argc, const char **argv, tec_ctx_t *ctx)
     // FIXME: at exit argvec not freed
     if (opt_list_cmds)
         return help_list_short_commands();
-    else if (optind == argc)
+    else if (optind == argvec->used)
         return help_list_pretty_commands();
 
-    for (i = optind; i < argc; ++i)
-        if ((status = help_lookup(argvec.argv[i])))
-            elog(1, "'%s': no such builtin command", argv[i]);
+    for (i = optind; i < argvec->used; ++i)
+        if ((status = help_lookup(argvec->argv[i])))
+            elog(1, "'%s': no such builtin command", argvec->argv[i]);
 
     return status;
 }

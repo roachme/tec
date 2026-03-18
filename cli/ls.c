@@ -95,19 +95,16 @@ static void show_rows(tec_ctx_t *ctx, tec_arg_t *args,
 }
 
 // TODO: Find a good error message in case option fails.  */
-int tec_cli_ls(int argc, const char **argv, tec_ctx_t *ctx)
+int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     char c;
     tec_arg_t args;
-    tec_argvec_t argvec;
     int i, quiet, show_headers, status;
 
     quiet = show_headers = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argvec_init(&argvec);
-    argvec_parse(&argvec, argc, argv);
-    while ((c = getopt(argvec.used, argvec.argv, ":ad:hqvtH")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":ad:hqvtH")) != -1) {
         switch (c) {
         case 'a':
             filter.all = true;
@@ -140,7 +137,7 @@ int tec_cli_ls(int argc, const char **argv, tec_ctx_t *ctx)
 
     i = optind;
     do {
-        args.env = argvec.argv[i];
+        args.env = argvec->argv[i];
 
         if ((status = check_arg_env(&args, errfmt, quiet)))
             continue;
@@ -166,8 +163,7 @@ int tec_cli_ls(int argc, const char **argv, tec_ctx_t *ctx)
         }
 
         ctx->list = tec_list_free(ctx->list);
-    } while (++i < argvec.used);
+    } while (++i < argvec->used);
 
-    argvec_free(&argvec);
     return status;
 }

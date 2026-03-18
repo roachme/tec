@@ -49,12 +49,13 @@ typedef struct argvec {
     int i;                      /* index of current argument */
     int used;                   /* argument copied */
     int size;                   /* argument size */
+    int offset;                 /* offset in dynamic array of arguments */
     char **argv;                /* argument vector */
 } tec_argvec_t;
 
 typedef struct builtin {
     const char *name;
-    int (*func)(int argc, const char **argv, tec_ctx_t * ctx);
+    int (*func)(tec_argvec_t * argvec, tec_ctx_t * ctx);
     unsigned int option;
 } builtin_t;
 
@@ -62,10 +63,11 @@ extern char *unitkeys[];
 extern unsigned int nunitkey;
 
 void argvec_init(tec_argvec_t * vec);
+void argvec_free(tec_argvec_t * vec);
+void argvec_offset(tec_argvec_t * vec, int offset);
 void argvec_add(tec_argvec_t * vec, const char *arg);
 void argvec_parse(tec_argvec_t * vec, int argc, const char **argv);
 void argvec_replace(tec_argvec_t * vec, int vec_idx, char *arg, int argsiz);
-void argvec_free(tec_argvec_t * vec);
 
 int is_valid_length(const char *obj, int len);
 int check_arg_env(tec_arg_t * args, const char *errfmt, int quiet);
@@ -88,19 +90,18 @@ int llog(int status, const char *fmt, ...);
 
 // NOTE: maybe use 'prefix' like in git?
 // int cmd_add(int argc, const char **argv, const char *prefix, struct repository *repo);
-
-int tec_cli_add(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_cat(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_cd(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_cfg(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_env(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_desk(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_help(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_init(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_ls(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_mv(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_pgn(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_rm(int argc, const char **argv, tec_ctx_t * ctx);
-int tec_cli_set(int argc, const char **argv, tec_ctx_t * ctx);
+int tec_cli_add(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_cat(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_cd(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_cfg(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_env(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_desk(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_help(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_init(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_ls(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_mv(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_pgn(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_rm(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_set(tec_argvec_t * argvec, tec_ctx_t * ctx);
 
 #endif
