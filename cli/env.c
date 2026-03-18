@@ -495,7 +495,7 @@ static int _env_cat(int argc, const char **argv, tec_ctx_t *ctx)
             printf("%-7s : %s\n", unitbin->key, unitbin->val);
 
         // TODO: add plugin output
-        // FIXME: free unit structure
+        ctx->units = tec_unit_free(ctx->units);
     } while (++i < argvec.used);
 
     argvec_free(&argvec);
