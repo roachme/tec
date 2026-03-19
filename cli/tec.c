@@ -420,13 +420,14 @@ int main(int argc, const char **argv)
     i = optind;
     tec_pwd_unset();
     tec_getopt_unset();         /* Unset option index cuz subcommands use getopt too.  */
+    argvec_offset(&argvec, i);
 
     if (showhelp == true) {
         cmd = "help";
     } else if (showversion == true) {
         show_version();
         goto err;
-    } else if ((cmd = argvec.argv[i]) == NULL) {
+    } else if ((cmd = argvec.argv[0]) == NULL) {
         status = 1;
         help_list_pretty_commands();
         goto err;
@@ -441,7 +442,6 @@ int main(int argc, const char **argv)
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
-    argvec_offset(&argvec, i);
     if (is_plugin(teccfg.base.pgn, cmd) == true) {
         status = run_plugin(&argvec);
     } else if ((builtin = is_builtin(cmd)) != NULL) {
@@ -451,7 +451,6 @@ int main(int argc, const char **argv)
     }
 
  err:
-
     tec_config_destroy(&teccfg);
     argvec_free(&argvec);
     return status;
