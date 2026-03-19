@@ -88,6 +88,15 @@ hooks = {
     );
     list = ();
 };
+
+/* Alias can be used for plugin commands as well.
+ * Tho for rn there is no support for nested aliases, i.e. alias
+ * can be either builtin command or plugin.  */
+alias = {
+    dir = "ls";
+    els = "env ls";
+    dcat = "desk cat";
+};
 ```
 
 ## ⇁  Tec builtin commands
