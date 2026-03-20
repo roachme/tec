@@ -10,11 +10,6 @@
 #include "aux/argvec.h"
 #include "../lib/libtec.h"
 
-#define PROGRAM     "tec"
-
-// TODO: Get rid of it (set options with default boolean values)
-#define NONEBOOL        -1      /* Not yet set boolean value */
-
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 #define xstr(s) str(s)

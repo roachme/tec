@@ -10,6 +10,7 @@
 
 - `cli/cat`: Change error message if unit key not found
 - `cli/aux/argvec`: Move argvec to separate module
+- `cli`: Move log to separate module
 
 ### Fixed
 

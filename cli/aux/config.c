@@ -5,6 +5,7 @@
 #include <libconfig.h>
 
 #include "../../lib/osdep.h"
+#include "log.h"
 #include "config.h"
 #include "../tec.h"
 

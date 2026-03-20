@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "tec.h"
+#include "aux/log.h"
 
 #define PADDING     "    "
 #define SYSTEM      "system"
