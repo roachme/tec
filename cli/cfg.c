@@ -66,6 +66,7 @@ static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
 // TODO: show config values from config file. Not option set via CLI
 static int _cfg_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
+    tec_alias_t *alias;
     struct tec_hook *hook;
 
     printf("Paths:\n");
@@ -78,6 +79,9 @@ static int _cfg_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
     printf("\nHooks:\n");
     for (hook = teccfg.hooks; hook; hook = hook->next)
         printf("  %s\t\t: %s\t%s\n", hook->cmd, hook->pgname, hook->pgncmd);
+    printf("\nAliases:\n");
+    for (alias = teccfg.alias; alias; alias = alias->next)
+        printf("  %s\t\t: %s\n", alias->name, alias->cmd);
     return 0;
 }
 
