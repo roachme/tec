@@ -43,13 +43,8 @@ static builtin_t builtins[] = {
     {.name = "mv",.func = &tec_cli_mv,.option = TEC_SETUP_HARD},
     {.name = "rm",.func = &tec_cli_rm,.option = TEC_SETUP_HARD},
     {.name = "set",.func = &tec_cli_set,.option = TEC_SETUP_HARD},
+    {.name = "version",.func = &tec_cli_version,.option = TEC_SETUP_HARD},
 };
-
-static int show_version(void)
-{
-    printf("%s version %s\n", PROGRAM, VERSION);
-    return 0;
-}
 
 static int tec_setup(int setuplvl)
 {
@@ -182,7 +177,7 @@ void argvec_init(tec_argvec_t *vec)
 void argvec_show(tec_argvec_t *vec)
 {
     for (int i = 0; i < vec->used; ++i) {
-        printf("argvec_show: %s\n", vec->argv[i]);
+        printf("argvec_show: %s[%d] - used: %d\n", vec->argv[i], i, vec->used);
     }
 }
 
@@ -498,14 +493,13 @@ int main(int argc, const char **argv)
     i = optind;
     tec_pwd_unset();
     tec_getopt_unset();         /* Unset option index cuz subcommands use getopt too.  */
-    argvec_offset(&argvec, i);
 
     if (showhelp == true) {
-        cmd = "help";
+        argvec_replace(&argvec, argvec.used - 1, "help", strlen("help"));
     } else if (showversion == true) {
-        show_version();
-        goto err;
-    } else if ((cmd = argvec.argv[0]) == NULL) {
+        argvec_replace(&argvec, argvec.used - 1, "version", strlen("version"));
+    }
+    if ((cmd = argvec.argv[i]) == NULL) {
         status = 1;
         help_list_pretty_commands();
         goto err;
@@ -520,6 +514,7 @@ int main(int argc, const char **argv)
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
+    argvec_offset(&argvec, i + 1);
     if (is_alias(teccfg.base.pgn, cmd) == true) {
         status = run_alias(&argvec);
     } else if (is_plugin(teccfg.base.pgn, cmd) == true) {

@@ -498,11 +498,11 @@ static const builtin_t desk_commands[] = {
 
 int tec_cli_desk(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
+    const char *cmd = argvec->argv[0] != NULL ? argvec->argv[0] : "ls";
 
     for (int i = 0; i < ARRAY_SIZE(desk_commands); ++i)
         if (strcmp(cmd, desk_commands[i].name) == 0) {
-            if (cmd == argvec->argv[1])
+            if (cmd == argvec->argv[0])
                 argvec_offset(argvec, 1);       /* Shift desk subcommand.  */
             return desk_commands[i].func(argvec, ctx);
         }

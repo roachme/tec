@@ -45,9 +45,6 @@ static int _ls_hooks(struct tec_hook *hooks)
 
 static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    /* Hotfix: otherwise logic fails.  */
-    argvec_offset(argvec, 1);
-
     if (argvec->used == 0)
         return elog(1, "wrong number of arguments, should at least 1");
 
@@ -112,12 +109,12 @@ static const builtin_t cfg_commands[] = {
 
 int tec_cli_cfg(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
+    const char *cmd = argvec->argv[0] != NULL ? argvec->argv[0] : "ls";
 
     for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i)
         if (strcmp(cmd, cfg_commands[i].name) == 0) {
-            if (cmd == argvec->argv[1])
-                argvec_offset(argvec, 1);       /* Shift cfg subcommand.  */
+            if (cmd == argvec->argv[0])
+                argvec_offset(argvec, 1);       /* Shift cfg and subcommand.  */
             return cfg_commands[i].func(argvec, ctx);
         }
 
