@@ -5,6 +5,7 @@
 #include <limits.h>
 
 #include "tec.h"
+#include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
 
@@ -153,106 +154,6 @@ static int valid_toggle(char *tog)
     else if (strcmp(tog, "off") == 0)
         return false;
     return -1;
-}
-
-void argvec_init(tec_argvec_t *vec)
-{
-    int size = 2;
-
-    if ((vec->argv = malloc(size * sizeof(vec->argv))) == NULL) {
-        elog(1, "'%s': memory allocation failed", __FUNCTION__);
-        exit(1);
-    }
-
-    /* Prevent invalid pointer dereference. Used in case when default
-     * env name, desk name, task ID used.  */
-    for (int i = 0; i < size; ++i)
-        vec->argv[i] = NULL;
-
-    vec->used = 0;
-    vec->offset = 0;
-    vec->size = size;
-}
-
-void argvec_show(tec_argvec_t *vec)
-{
-    for (int i = 0; i < vec->used; ++i) {
-        printf("argvec_show: %s[%d] - used: %d\n", vec->argv[i], i, vec->used);
-    }
-}
-
-void argvec_add(tec_argvec_t *vec, const char *arg)
-{
-    /* The last element is never used that's why minus one.
-     * It is a NULL terminator to mimic C argv.  */
-    if (vec->used >= vec->size - 1) {
-        vec->size *= 2;
-        if ((vec->argv =
-             realloc(vec->argv, vec->size * sizeof(char *))) == NULL) {
-            elog(1, "'%s': memory allocation failed", __FUNCTION__);
-            exit(1);
-        }
-
-        /* Prevent invalid pointer dereference. Used in case when default
-         * env name, desk name, task ID used.  */
-        for (int i = vec->used; i < vec->size; ++i)
-            vec->argv[i] = NULL;
-    }
-    vec->argv[vec->used++] = strdup(arg);
-}
-
-void argvec_parse(tec_argvec_t *vec, int argc, const char **argv)
-{
-    for (int i = 0; i < argc; i++)
-        argvec_add(vec, argv[i]);
-}
-
-void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg, int argsiz)
-{
-    free(vec->argv[vec_idx]);   /* free previous key value.  */
-    if ((vec->argv[vec_idx] = strndup(arg, argsiz)) == NULL) {
-        elog(1, "'%s': memory allocation failed", __FUNCTION__);
-        exit(1);
-    }
-}
-
-void argvec_offset(tec_argvec_t *vec, int offset)
-{
-    assert((vec->used - offset) >= 0);
-    vec->offset += offset;
-    vec->used -= offset;
-    vec->argv += offset;
-}
-
-void argvec_free(tec_argvec_t *vec)
-{
-    vec->argv = vec->argv - vec->offset;        /* Restore pointer to first element.  */
-    for (int i = 0; i < vec->size; ++i)
-        free(vec->argv[i]);
-    free(vec->argv);
-}
-
-void argvec_remove(tec_argvec_t *vec, int index)
-{
-    /* Validate index */
-    if (index < 0 || index >= vec->used) {
-        elog(1, "argvec_remove: index out of range");
-        return;
-    }
-
-    /* Free the string at the specified index */
-    free(vec->argv[index]);
-
-    /* Shift all remaining elements left by one */
-    for (int i = index; i < vec->used - 1; i++) {
-        vec->argv[i] = vec->argv[i + 1];
-    }
-
-    /* Decrement used count */
-    vec->used--;
-
-    /* Set the now-unused last element to NULL */
-    vec->argv[vec->used] = NULL;
 }
 
 bool tec_cli_get_user_choice(void)
@@ -527,6 +428,6 @@ int main(int argc, const char **argv)
 
  err:
     tec_config_destroy(&teccfg);
-    argvec_free(&argvec);
+    argvec_deinit(&argvec);
     return status;
 }

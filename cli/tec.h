@@ -7,6 +7,7 @@
 
 #include "aux/hook.h"
 #include "aux/color.h"
+#include "aux/argvec.h"
 #include "../lib/libtec.h"
 
 #define PROGRAM     "tec"
@@ -45,30 +46,14 @@ enum tec_setup_level {
     TEC_SETUP_HARD,
 };
 
-typedef struct argvec {
-    int i;                      /* index of current argument */
-    int used;                   /* argument copied */
-    int size;                   /* argument size */
-    int offset;                 /* offset in dynamic array of arguments */
-    char **argv;                /* argument vector */
-} tec_argvec_t;
-
 typedef struct builtin {
     const char *name;
     int (*func)(tec_argvec_t * argvec, tec_ctx_t * ctx);
     unsigned int option;
-} builtin_t;
+} tec_builtin_t;
 
 extern char *unitkeys[];
 extern unsigned int nunitkey;
-
-void argvec_init(tec_argvec_t * vec);
-void argvec_free(tec_argvec_t * vec);
-void argvec_offset(tec_argvec_t * vec, int offset);
-void argvec_add(tec_argvec_t * vec, const char *arg);
-void argvec_parse(tec_argvec_t * vec, int argc, const char **argv);
-void argvec_replace(tec_argvec_t * vec, int vec_idx, char *arg, int argsiz);
-void argvec_show(tec_argvec_t * vec);
 
 int is_valid_length(const char *obj, int len);
 int check_arg_env(tec_arg_t * args, const char *errfmt, int quiet);
