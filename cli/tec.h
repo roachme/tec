@@ -8,6 +8,7 @@
 #include "aux/hook.h"
 #include "aux/color.h"
 #include "aux/argvec.h"
+#include "aux/aux.h"
 #include "../lib/libtec.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -84,6 +85,6 @@ int tec_cli_mv(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_pgn(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_rm(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_set(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_version(tec_argvec_t *argvec, tec_ctx_t *ctx);
+int tec_cli_version(tec_argvec_t * argvec, tec_ctx_t * ctx);
 
 #endif

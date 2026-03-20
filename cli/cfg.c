@@ -7,7 +7,7 @@ static int _show_aliases(tec_alias_t *aliases)
     tec_alias_t *alias;
 
     for (alias = aliases; alias; alias = alias->next)
-        printf("  %s\t\t: %s\n", alias->name, alias->cmd);
+        printf("%s\t\t: %s\n", alias->name, alias->cmd);
     return 0;
 }
 
@@ -48,7 +48,8 @@ static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (argvec->used == 0)
         return elog(1, "wrong number of arguments, should at least 1");
 
-    for (int i = 0; i < argvec->used; ++i) {
+    /* Skip first argument because it's subcommand name, i.e. get.   */
+    for (int i = 1; i < argvec->used; ++i) {
         if (strcmp("taskbase", argvec->argv[i]) == 0)
             printf("%s\n", teccfg.base.task);
         else if (strcmp("pgnbase", argvec->argv[i]) == 0)
@@ -109,14 +110,13 @@ static const tec_builtin_t cfg_commands[] = {
 
 int tec_cli_cfg(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argvec->argv[0] != NULL ? argvec->argv[0] : "ls";
+    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
-    for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i)
+    argvec_offset(argvec, 1);   /* Skip cfg from argvec.  */
+    for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i) {
         if (strcmp(cmd, cfg_commands[i].name) == 0) {
-            if (cmd == argvec->argv[0])
-                argvec_offset(argvec, 1);       /* Shift cfg and subcommand.  */
             return cfg_commands[i].func(argvec, ctx);
         }
-
+    }
     return elog(1, "'%s': no such cfg command", cmd);
 }

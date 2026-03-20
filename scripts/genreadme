@@ -1,5 +1,5 @@
 define(MACRO_TECAME, tec)dnl
-define(MACRO_USAGE, `esyscmd(./_tec)')dnl
+define(MACRO_USAGE, `esyscmd(./_tec help)')dnl
 define(MACRO_CODE, changequote([,])[changequote([,])```changequote(`,')]changequote(`,'))dnl
 define(MACRO_INLINE_CODE, changequote([,])[changequote([,])`changequote(`,')]changequote(`,'))dnl
 <div align="center">

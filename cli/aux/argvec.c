@@ -59,7 +59,7 @@ void argvec_parse(tec_argvec_t *vec, int argc, const char **argv)
 
 void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg, int argsiz)
 {
-    assert(vec_idx > 0 && vec_idx < vec->used - vec->offset);
+    assert(vec_idx >= 0 && vec_idx < vec->used);
     free(vec->argv[vec_idx]);   /* free previous key value.  */
     if ((vec->argv[vec_idx] = strndup(arg, argsiz)) == NULL) {
         elog(1, "'%s': memory allocation failed", __FUNCTION__);

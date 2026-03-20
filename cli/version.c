@@ -1,4 +1,5 @@
 #include "tec.h"
+#include "aux/log.h"
 
 int tec_cli_version(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
