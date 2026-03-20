@@ -36,6 +36,9 @@ static int _ls_hooks(struct tec_hook *hooks)
 
 static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
+    /* Hotfix: otherwise logic fails.  */
+    argvec_offset(argvec, 1);
+
     if (argvec->used == 0)
         return elog(1, "wrong number of arguments, should at least 1");
 
