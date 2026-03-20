@@ -486,7 +486,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return retcode;
 }
 
-static const builtin_t desk_commands[] = {
+static const tec_builtin_t desk_commands[] = {
     {.name = "add",.func = &_desk_add},
     {.name = "cat",.func = &_desk_cat},
     {.name = "cd",.func = &_desk_cd},

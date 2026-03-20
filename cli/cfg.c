@@ -101,7 +101,7 @@ static int _cfg_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return 0;
 }
 
-static const builtin_t cfg_commands[] = {
+static const tec_builtin_t cfg_commands[] = {
     {.name = "get",.func = &_cfg_get},
     {.name = "ls",.func = &_cfg_ls},
     {.name = "set",.func = &_cfg_set},

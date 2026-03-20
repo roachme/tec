@@ -559,7 +559,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return retcode;
 }
 
-static const builtin_t env_commands[] = {
+static const tec_builtin_t env_commands[] = {
     {.name = "add",.func = &_env_add},
     {.name = "cat",.func = &_env_cat},
     {.name = "cd",.func = &_env_cd},

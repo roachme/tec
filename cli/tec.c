@@ -32,7 +32,7 @@ char *unitkeys[] = { "prio", "type", "date", "desc", };
 
 unsigned int nunitkey = sizeof(unitkeys) / sizeof(unitkeys[0]);
 
-static builtin_t builtins[] = {
+static tec_builtin_t builtins[] = {
     {.name = "add",.func = &tec_cli_add,.option = TEC_SETUP_HARD},
     {.name = "cat",.func = &tec_cli_cat,.option = TEC_SETUP_HARD},
     {.name = "cd",.func = &tec_cli_cd,.option = TEC_SETUP_HARD},
@@ -77,7 +77,7 @@ static int is_alias(char *pgndir, const char *cmd)
     return false;
 }
 
-static builtin_t *is_builtin(const char *cmd)
+static tec_builtin_t *is_builtin(const char *cmd)
 {
     for (int idx = 0; idx < ARRAY_SIZE(builtins); ++idx)
         if (strcmp(cmd, builtins[idx].name) == 0)
@@ -98,7 +98,7 @@ static int is_plugin(char *pgndir, const char *pgname)
     return true;
 }
 
-static int run_builtin(tec_argvec_t *argvec, builtin_t *cmd)
+static int run_builtin(tec_argvec_t *argvec, tec_builtin_t *cmd)
 {
     int status;
     tec_ctx_t ctx = CTX_INIT;
@@ -305,9 +305,9 @@ int main(int argc, const char **argv)
     tec_opt_t opts;
     const char *cmd;
     tec_base_t base;
-    builtin_t *builtin;
     tec_argvec_t argvec;
     char *option, *togfmt;
+    tec_builtin_t *builtin;
     int c, i, status, showhelp, showversion;
 
     cmd = NULL;
