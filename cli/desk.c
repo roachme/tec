@@ -248,9 +248,9 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     i = optind;
     do {
-        args.desk = argvec->argv[i];
+        args.env = argvec->argv[i];
 
-        if (check_arg_desk(&args, errfmt, opt_quiet))
+        if (check_arg_env(&args, errfmt, opt_quiet))
             continue;
         if ((status = tec_desk_list(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
@@ -259,6 +259,7 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
         }
 
         for (tec_list_t * obj = ctx->list; obj != NULL; obj = obj->next) {
+            args.desk = obj->name;
             if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
                 continue;
             }

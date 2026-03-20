@@ -19,6 +19,7 @@
 - `cli/add`: Fix return code in case of invalid task ID
 - `cli/env`: Fix memory leak
 - `cli`: Use dynamic array of arguments for API functions
+- `cli/desk`: Fix desk list command
 
 ### Deleted
 
