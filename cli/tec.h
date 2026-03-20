@@ -10,6 +10,7 @@
 #include "aux/hook.h"
 #include "aux/color.h"
 #include "aux/argvec.h"
+#include "aux/aux.h"
 #include "../lib/libtec.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
