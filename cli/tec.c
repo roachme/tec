@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <string.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <limits.h>
 
 #include "tec.h"
@@ -14,9 +13,6 @@
     do {                    \
         optind = 0;         \
     } while (0)             \
-
-static char alias_name[20];
-static char alias_cmd[20];
 
 /*
 typedef struct tec_cli_status {
@@ -60,22 +56,26 @@ static int tec_setup(int setuplvl)
     return status;
 }
 
-static int is_alias(char *pgndir, const char *cmd)
+// TODO: return tec_alias_t *. This way no need for static variables in the file
+static tec_alias_t *is_alias(char *pgndir, const char *cmd)
 {
     struct tec_alias *head;
 
-    for (head = teccfg.alias; head != NULL;) {
+    for (head = teccfg.alias; head != NULL; head = head->next) {
         if (strcmp(cmd, head->name) == 0) {
-            //printf("-> alias found\n");
-            strcpy(alias_name, head->name);
-            strcpy(alias_cmd, head->cmd);
-            return true;
+            return head;
         }
-        //printf("--- '%s' : '%s' - '%s'\n", cmd, head->name, head->cmd);
-        head = head->next;
     }
-    return false;
+    return NULL;
 }
+
+// Resolve nested alias
+/*
+static int alias_resolve()
+{
+    return 0;
+}
+*/
 
 static tec_builtin_t *is_builtin(const char *cmd)
 {
@@ -121,29 +121,24 @@ static int run_plugin(tec_argvec_t *argvec)
 }
 
 /* TODO: add support to include alias into alias (i.e. recursive aliases).  */
-static int run_alias(tec_argvec_t *argvec)
+static int run_alias(tec_argvec_t *argvec, tec_alias_t *alias)
 {
-    char *tok;
+    char *tok, *cmd;
     int status = LIBTEC_OK;
 
-    tok = strtok(alias_cmd, " ");
+    tok = cmd = strtok(alias->cmd, " ");
+    argvec_replace(argvec, 0, tok, strlen(tok));
 
-    if (is_plugin(teccfg.base.pgn, tok) == true) {
-        dlog(1, "alias execute as plugin: '%s'", alias_name);
-        argvec_replace(argvec, 0, tok, strlen(tok));
+    while ((tok = strtok(NULL, " ")) != NULL) {
+        argvec_add(argvec, tok);
+    }
 
-        while ((tok = strtok(NULL, " ")) != NULL) {
-            argvec_add(argvec, tok);
-        }
+    if (is_plugin(teccfg.base.pgn, cmd) == true) {
+        dlog(1, "alias execute as plugin: '%s'", alias->name);
         status = run_plugin(argvec);
     } else {
-        dlog(1, "alias execute as builtin: '%s'", alias_name);
-        argvec_replace(argvec, 0, tok, strlen(tok));
-
-        while ((tok = strtok(NULL, " ")) != NULL) {
-            argvec_add(argvec, tok);
-        }
-        status = run_builtin(argvec, is_builtin(alias_cmd));
+        dlog(1, "alias execute as builtin: '%s'", alias->name);
+        status = run_builtin(argvec, is_builtin(alias->cmd));
     }
     return status;
 }
@@ -305,6 +300,7 @@ int main(int argc, const char **argv)
     tec_opt_t opts;
     const char *cmd;
     tec_base_t base;
+    tec_alias_t *alias;
     tec_argvec_t argvec;
     char *option, *togfmt;
     tec_builtin_t *builtin;
@@ -358,14 +354,16 @@ int main(int argc, const char **argv)
 
     i = optind;
     tec_pwd_unset();
-    tec_getopt_unset();         /* Unset option index cuz subcommands use getopt too.  */
+    tec_getopt_unset();
+    argvec_offset(&argvec, i);  /* Skip program name and options if any.  */
 
     if (showhelp == true) {
-        argvec_replace(&argvec, argvec.used - 1, "help", strlen("help"));
+        argvec_add(&argvec, "help");
     } else if (showversion == true) {
-        argvec_replace(&argvec, argvec.used - 1, "version", strlen("version"));
+        argvec_add(&argvec, "version");
     }
-    if ((cmd = argvec.argv[i]) == NULL) {
+
+    if ((cmd = argvec.argv[0]) == NULL) {
         status = 1;
         help_list_pretty_commands();
         goto err;
@@ -380,9 +378,8 @@ int main(int argc, const char **argv)
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
-    argvec_offset(&argvec, i + 1);
-    if (is_alias(teccfg.base.pgn, cmd) == true) {
-        status = run_alias(&argvec);
+    if ((alias = is_alias(teccfg.base.pgn, cmd)) != NULL) {
+        status = run_alias(&argvec, alias);
     } else if (is_plugin(teccfg.base.pgn, cmd) == true) {
         status = run_plugin(&argvec);
     } else if ((builtin = is_builtin(cmd)) != NULL) {

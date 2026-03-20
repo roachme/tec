@@ -5,6 +5,8 @@
 #include <getopt.h>
 #include <stdbool.h>
 
+#include "aux/aux.h"
+#include "aux/log.h"
 #include "aux/hook.h"
 #include "aux/color.h"
 #include "aux/argvec.h"
@@ -15,17 +17,17 @@
 #define xstr(s) str(s)
 #define str(s) #s
 
-#define IDSIZ           8
-#define DESKSIZ         10
-#define ENVSIZ          10
-#define CMDSIZ          10
+#define IDSIZ               8
+#define DESKSIZ             10
+#define ENVSIZ              10
+#define CMDSIZ              10
 
-#define xstr(s)     str(s)
-#define str(s)      #s
+#define xstr(s)             str(s)
+#define str(s)              #s
 
-#define IDLIMIT     9999999
-#define IDFMT       "%0" xstr(IDSIZ) "u"
-#define PADDING_UNIT     6
+#define IDLIMIT             9999999
+#define IDFMT               "%0" xstr(IDSIZ) "u"
+#define PADDING_UNIT        6
 
 #define LIST_OBJ_UNITS(_obj, _pgnout, _desc) do {\
     color_print_str("%-" xstr(IDSIZ) "s ", (_obj), BBLU); \
@@ -65,9 +67,6 @@ int tec_pwd_unset(void);
 int tec_pwd_task(tec_arg_t * args);
 int tec_pwd_desk(tec_arg_t * args);
 int tec_pwd_env(tec_arg_t * args);
-int elog(int status, const char *fmt, ...);
-int dlog(int level, const char *fmt, ...);
-int llog(int status, const char *fmt, ...);
 
 // NOTE: maybe use 'prefix' like in git?
 // int cmd_add(int argc, const char **argv, const char *prefix, struct repository *repo);
@@ -84,6 +83,6 @@ int tec_cli_mv(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_pgn(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_rm(tec_argvec_t * argvec, tec_ctx_t * ctx);
 int tec_cli_set(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_version(tec_argvec_t *argvec, tec_ctx_t *ctx);
+int tec_cli_version(tec_argvec_t * argvec, tec_ctx_t * ctx);
 
 #endif

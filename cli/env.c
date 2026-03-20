@@ -86,9 +86,9 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     if (showhelp)
         return help_usage("env-add");
-
-    if (optind == argvec->used)
+    if (optind == argvec->used) {
         return elog(1, "env name required");
+    }
 
     /* Set default desk name to create.  */
     if (args.desk == NULL)
@@ -571,14 +571,13 @@ static const tec_builtin_t env_commands[] = {
 
 int tec_cli_env(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    const char *cmd = argvec->argv[0] != NULL ? argvec->argv[0] : "ls";
+    const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
-    for (int i = 0; i < ARRAY_SIZE(env_commands); ++i)
+    argvec_offset(argvec, 1);   /* Skip env from argvec.  */
+    for (int i = 0; i < ARRAY_SIZE(env_commands); ++i) {
         if (strcmp(cmd, env_commands[i].name) == 0) {
-            if (cmd == argvec->argv[0])
-                argvec_offset(argvec, 1);       /* Shift env subcommand.  */
             return env_commands[i].func(argvec, ctx);
         }
-
+    }
     return elog(1, "'%s': no such env command", cmd);
 }

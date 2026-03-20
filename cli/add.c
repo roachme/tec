@@ -2,8 +2,8 @@
 #include <time.h>
 #include <string.h>
 
-#include "aux/argvec.h"
 #include "tec.h"
+#include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
 

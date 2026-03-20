@@ -7,7 +7,7 @@
 #include "../../lib/osdep.h"
 #include "log.h"
 #include "config.h"
-#include "../tec.h"
+#include "hook.h"
 
 // TODO: gotta add config checker so a program doesn't fail.
 

@@ -23,6 +23,7 @@
 - `cli/env`: Fix memory leak
 - `cli`: Use dynamic array of arguments for API functions
 - `cli/desk`: Fix desk list command
+- `cli`: Fix argvec logic
 
 ### Deleted
 
