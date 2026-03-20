@@ -2,6 +2,15 @@
 #include "tec.h"
 #include "aux/config.h"
 
+static int _show_aliases(tec_alias_t *aliases)
+{
+    tec_alias_t *alias;
+
+    for (alias = aliases; alias; alias = alias->next)
+        printf("  %s\t\t: %s\n", alias->name, alias->cmd);
+    return 0;
+}
+
 static int _act_hooks(struct tec_hook *hooks)
 {
     struct tec_hook *hook;
@@ -59,6 +68,8 @@ static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
             _ls_hooks(teccfg.hooks);
         else if (strcmp("hook.act", argvec->argv[i]) == 0)
             _act_hooks(teccfg.hooks);
+        else if (strcmp("alias", argvec->argv[i]) == 0)
+            _show_aliases(teccfg.alias);
         else
             elog(1, "'%s': no such config value", argvec->argv[i]);
     }
