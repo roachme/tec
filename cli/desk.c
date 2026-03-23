@@ -74,6 +74,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
         case 'N':
             opt_cd_dir = false;
             opt_cd_toggle = false;
+            break;
         case ':':
             return elog(1, "option `-%c' requires an argument", optopt);
         default:
