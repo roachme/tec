@@ -5,6 +5,7 @@
 - `cli`: Add support to show description for env and desk
 - `cli`: Add support for alias commands
 - `cli/cfg`: Show aliases
+- `tests`: Add valgrind memory leak tests
 
 ### Changed
 

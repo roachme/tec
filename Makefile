@@ -66,6 +66,9 @@ style:
 	find . -name '*.[ch]' | xargs indent -nut -nbad -bap -nbc -bbo -hnl -br -brs -c33 -cd33 -ncdb -ce -ci4 -cli0 -d0 -di1 -nfc1 -i4 -ip0 -l80 -lp -npcs -nprs -npsl -sai -saf -saw -ncs -nsc -sob -nfca -cp33 -ss -ts8 -il1
 	find . -name '*.[ch]\~' | xargs	rm
 
+test:
+	./tests/memleak/memcheck
+
 # Build project in debug configuration into ./artifacts/build/debug
 .PHONY: build_debug
 build_debug:

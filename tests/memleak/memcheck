@@ -1,0 +1,35 @@
+#!/bin/env bash
+
+# TODO: there is no difference between memory leak and failure return code
+
+TASKBASE="/tmp/tec_memcheck"
+PROGRAM="./_tec -T $TASKBASE"
+VALGRIND="valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all -q --error-exitcode=1"
+
+function memcheck()
+{
+    local msg="$1"; shift
+    local cmd="$@"
+
+    if $VALGRIND $PROGRAM $@ > /dev/null 2>&1; then
+        echo "[ OK] cmd '$cmd' passed"
+    else
+        echo "[ERR] cmd '$cmd' failed"
+    fi
+}
+
+# Remove all task directory
+rm -rf "$TASKBASE"
+
+memcheck "msg" "init"
+memcheck "msg" "env add test"
+memcheck "msg" "desk add -N desk1"
+memcheck "msg" "add"
+memcheck "msg" "add task1"
+memcheck "msg" "add task2"
+memcheck "msg" "ls"
+memcheck "msg" "cat"
+memcheck "msg" "cd task1"
+memcheck "msg" "rm -f task1"
+memcheck "msg" "desk rm -f desk1"
+memcheck "msg" "env rm -f test"
