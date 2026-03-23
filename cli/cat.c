@@ -46,6 +46,11 @@ static void argument_keys_free(keyvec_t *vec)
     free(vec->keys);
 }
 
+static bool argument_keys_is_empty(keyvec_t *vec)
+{
+    return vec->used == 0;
+}
+
 static int valid_unitkeys(tec_unit_t *units)
 {
     for (int i = 0; units && i < nunitkey; units = units->next) {
@@ -121,12 +126,10 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
     tec_unit_t *unitpgn;
     int opt_quiet, opt_help;
     int c, i, retcode, status;
-    int opt_show_specific_key;
 
     unitpgn = NULL;
     retcode = LIBTEC_OK;
     opt_quiet = opt_help = false;
-    opt_show_specific_key = false;
     args.env = args.desk = args.taskid = NULL;
 
     argument_keys_init(&vec);
@@ -142,7 +145,6 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_help = true;
             break;
         case 'k':
-            opt_show_specific_key = true;
             argument_keys_add(&vec, optarg);
             break;
         case 'q':
@@ -182,7 +184,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         }
 
-        else if (opt_show_specific_key == true) {
+        else if (argument_keys_is_empty(&vec) == false) {
             if ((status =
                  show_key(args.taskid, ctx->units, unitpgn, &vec, opt_quiet))) {
                 ;
