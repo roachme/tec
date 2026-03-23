@@ -88,12 +88,11 @@ static int show_key(char *task, tec_unit_t *unitbin,
 {
     int status;
     int retcode = LIBTEC_OK;
-    const char *errfmt = "cannot show unit key '%s': no such key";
 
     for (int i = 0; i < vec->used; i++) {
         if ((status = _show_key(task, unitbin, unitpgn, vec->keys[i]))) {
             if (quiet == false)
-                elog(1, errfmt, vec->keys[i]);
+                elog(1, errfmt, vec->keys[i], "no such key");
             retcode = status == LIBTEC_OK ? retcode : status;
         }
     }
