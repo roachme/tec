@@ -100,18 +100,6 @@ static char *task_get_prev(char *base, tec_arg_t *args)
     return _get_toggle(path_task_toggle(base, args), task_prev, IDSIZ, "prev");
 }
 
-/*
-static int task_set_curr(char *base, tec_arg_t * args)
-{
-    return 0;
-}
-
-static int task_set_prev(char *base, tec_arg_t * args)
-{
-    return 0;
-}
-*/
-
 /* Toggles: env scope: BEGIN.   */
 int toggle_env_get_curr(char *base, tec_arg_t *args)
 {
@@ -223,7 +211,6 @@ int toggle_desk_set_curr(char *base, tec_arg_t *args)
     }
     tec_unit_free(toggles);
     return 0;
-
 }
 
 int toggle_task_set_curr(char *base, tec_arg_t *args)
@@ -288,60 +275,6 @@ int toggle_task_unset_prev(char *base, tec_arg_t *args)
     status = tec_unit_save(path_task_toggle(base, args), toggles);
     tec_unit_free(toggles);
     return status;
-}
-
-int toggle_env_swap(char *base, tec_arg_t *args)
-{
-    char *curr, *prev;
-    tec_unit_t *toggles;
-
-    toggles = NULL;
-    curr = env_get_curr(base, args);
-    prev = env_get_prev(base, args);
-
-    if (curr == NULL || prev == NULL)
-        return 1;
-
-    toggles = tec_unit_add(toggles, "curr", prev);
-    toggles = tec_unit_add(toggles, "prev", curr);
-
-    return tec_unit_save(path_env_toggle(base, args), toggles);
-}
-
-int toggle_desk_swap(char *base, tec_arg_t *args)
-{
-    char *curr, *prev;
-    tec_unit_t *toggles;
-
-    toggles = NULL;
-    curr = desk_get_curr(base, args);
-    prev = desk_get_prev(base, args);
-
-    if (curr == NULL || prev == NULL)
-        return 1;
-
-    toggles = tec_unit_add(toggles, "curr", prev);
-    toggles = tec_unit_add(toggles, "prev", curr);
-
-    return tec_unit_save(path_desk_toggle(base, args), toggles);
-}
-
-int toggle_task_swap(char *base, tec_arg_t *args)
-{
-    char *curr, *prev;
-    tec_unit_t *toggles;
-
-    toggles = NULL;
-    curr = task_get_curr(base, args);
-    prev = task_get_prev(base, args);
-
-    if (curr == NULL || prev == NULL)
-        return 1;
-
-    toggles = tec_unit_add(toggles, "curr", prev);
-    toggles = tec_unit_add(toggles, "prev", curr);
-
-    return tec_unit_save(path_task_toggle(base, args), toggles);
 }
 
 /*

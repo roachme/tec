@@ -3,17 +3,14 @@
 
 #include "../tec.h"
 
-int toggle_env_swap(char *base, tec_arg_t * args);
 int toggle_env_get_curr(char *base, tec_arg_t * args);
-int toggle_env_set_curr(char *base, tec_arg_t * args);
 int toggle_env_get_prev(char *base, tec_arg_t * args);
+int toggle_env_set_curr(char *base, tec_arg_t * args);
 
-int toggle_desk_swap(char *base, tec_arg_t * args);
 int toggle_desk_get_curr(char *base, tec_arg_t * args);
 int toggle_desk_get_prev(char *base, tec_arg_t * args);
 int toggle_desk_set_curr(char *base, tec_arg_t * args);
 
-int toggle_task_swap(char *base, tec_arg_t * args);
 int toggle_task_get_curr(char *base, tec_arg_t * args);
 int toggle_task_get_prev(char *base, tec_arg_t * args);
 int toggle_task_set_curr(char *base, tec_arg_t * args);
