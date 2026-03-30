@@ -161,20 +161,22 @@ int toggle_task_get_prev(char *base, tec_arg_t *args)
 
 bool toggle_task_is_curr(char *base, tec_arg_t *args)
 {
-    char tmp[IDSIZ + 1] = { 0 };
+    char *taskid;
 
-    if (_get_toggle(path_task_toggle(base, args), tmp, IDSIZ, "curr"))
-        return true;
-    return false;
+    /* There is no current task ID - immediately return false.  */
+    if ((taskid = task_get_curr(base, args)) == NULL)
+        return false;
+    return !strcmp(taskid, args->taskid);
 }
 
 bool toggle_task_is_prev(char *base, tec_arg_t *args)
 {
-    char tmp[IDSIZ + 1] = { 0 };
+    char *taskid;
 
-    if (_get_toggle(path_task_toggle(base, args), tmp, IDSIZ, "prev"))
-        return true;
-    return false;
+    /* There is no previous task ID - immediately return false.  */
+    if ((taskid = task_get_prev(base, args)) == NULL)
+        return false;
+    return !strcmp(taskid, args->taskid);
 }
 
 int toggle_env_set_curr(char *base, tec_arg_t *args)

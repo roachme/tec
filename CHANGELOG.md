@@ -26,6 +26,7 @@
 - `cli/desk`: Fix desk list command
 - `cli`: Fix argvec logic
 - `cli/desk`: Fix switch statement
+- `cli/aux/toggle`: Fix toggle function to check toggles
 
 ### Deleted
 
