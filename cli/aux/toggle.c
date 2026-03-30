@@ -18,7 +18,7 @@ static char *path_env_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base);
-    //printf("path.c: %s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
     return pathname;
 }
 
@@ -27,7 +27,7 @@ static char *path_desk_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env);
-    //printf("path.c: %s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
     return pathname;
 }
 
@@ -36,7 +36,7 @@ static char *path_task_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env, args->desk);
-    //printf("path.c: %s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
     return pathname;
 }
 
@@ -70,34 +70,38 @@ static char *_get_toggle(const char *fname, char *buf, int bufsiz,
 
 static char *env_get_curr(char *base, tec_arg_t *args)
 {
-    return _get_toggle(path_env_toggle(base, args), env_curr, ENVSIZ, "curr");
-}
-
-static char *desk_get_curr(char *base, tec_arg_t *args)
-{
-    return _get_toggle(path_desk_toggle(base, args), desk_curr, DESKSIZ,
-                       "curr");
-}
-
-static char *task_get_curr(char *base, tec_arg_t *args)
-{
-    return _get_toggle(path_task_toggle(base, args), task_curr, IDSIZ, "curr");
+    char *path = path_env_toggle(base, args);
+    return _get_toggle(path, env_curr, ENVSIZ, "curr");
 }
 
 static char *env_get_prev(char *base, tec_arg_t *args)
 {
-    return _get_toggle(path_env_toggle(base, args), env_prev, ENVSIZ, "prev");
+    char *path = path_env_toggle(base, args);
+    return _get_toggle(path, env_prev, ENVSIZ, "prev");
+}
+
+static char *desk_get_curr(char *base, tec_arg_t *args)
+{
+    char *path = path_desk_toggle(base, args);
+    return _get_toggle(path, desk_curr, DESKSIZ, "curr");
 }
 
 static char *desk_get_prev(char *base, tec_arg_t *args)
 {
-    return _get_toggle(path_desk_toggle(base, args), desk_prev, DESKSIZ,
-                       "prev");
+    char *path = path_desk_toggle(base, args);
+    return _get_toggle(path, desk_prev, DESKSIZ, "prev");
+}
+
+static char *task_get_curr(char *base, tec_arg_t *args)
+{
+    char *path = path_task_toggle(base, args);
+    return _get_toggle(path, task_curr, IDSIZ, "curr");
 }
 
 static char *task_get_prev(char *base, tec_arg_t *args)
 {
-    return _get_toggle(path_task_toggle(base, args), task_prev, IDSIZ, "prev");
+    char *path = path_task_toggle(base, args);
+    return _get_toggle(path, task_prev, IDSIZ, "prev");
 }
 
 /* Toggles: env scope: BEGIN.   */
