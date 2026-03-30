@@ -53,7 +53,7 @@ static int update_toggles_and_cwd(tec_arg_t *args)
     if (toggle_task_is_curr(teccfg.base.task, args)) {
         toggle_task_unset_curr(teccfg.base.task, args);
     } else if (toggle_task_is_prev(teccfg.base.task, args)) {
-        toggle_task_unset_curr(teccfg.base.task, args);
+        toggle_task_unset_prev(teccfg.base.task, args);
     }
     return status;
 }

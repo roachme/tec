@@ -28,6 +28,7 @@
 - `cli/desk`: Fix switch statement
 - `cli/aux/toggle`: Fix toggle function to check toggles
 - `cli/ls`: Add task ID directory check for toggles
+- `cli/rm`: Fix previous task ID deletion
 
 ### Deleted
 
