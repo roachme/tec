@@ -65,21 +65,30 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
 {
     int status;
     tec_list_t obj;
+    int opt_quiet = 0;          /* TODO: sync it with option passed to CLI.  */
 
     args->taskid = NULL;
     if ((status = toggle_task_get_curr(teccfg.base.task, args)) == 0) {
-        obj.next = NULL;
-        obj.status = LIBTEC_OK;
-        obj.name = args->taskid;
-        show_row(ctx, args, &obj, false);
+        if ((status = check_arg_task(args, errfmt, opt_quiet))) {
+            ;
+        } else {
+            obj.next = NULL;
+            obj.status = LIBTEC_OK;
+            obj.name = args->taskid;
+            show_row(ctx, args, &obj, false);
+        }
     }
 
     args->taskid = NULL;
     if ((status = toggle_task_get_prev(teccfg.base.task, args)) == 0) {
-        obj.next = NULL;
-        obj.status = LIBTEC_OK;
-        obj.name = args->taskid;
-        show_row(ctx, args, &obj, false);
+        if ((status = check_arg_task(args, errfmt, opt_quiet))) {
+            ;
+        } else {
+            obj.next = NULL;
+            obj.status = LIBTEC_OK;
+            obj.name = args->taskid;
+            show_row(ctx, args, &obj, false);
+        }
     }
     return status;
 }
