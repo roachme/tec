@@ -106,6 +106,27 @@ tec_unit_t *unit_add(tec_unit_t *head, const char *key, const char *val)
     return head;
 }
 
+/**
+ * Join two linked lists into one without copying data.
+ */
+tec_unit_t *unit_join(tec_unit_t *head, tec_unit_t *body)
+{
+    tec_unit_t *units, *tmp;
+
+    units = tmp = NULL;
+
+    units = head;
+    tmp = units;
+
+    while (units->next) {
+        units = units->next;
+    }
+
+    units->next = body;
+
+    return tmp;
+}
+
 /*
  * Set units one at a time.
 */

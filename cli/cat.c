@@ -10,8 +10,6 @@ typedef struct keyvec {
     size_t size;
 } keyvec_t;
 
-static const char *errfmt = "cannot show units '%s': %s";
-
 static void argument_keys_init(keyvec_t *vec)
 {
     int size = 2;
@@ -61,74 +59,19 @@ static int valid_unitkeys(tec_unit_t *units)
     return 0;
 }
 
-static int _show_key(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn,
-                     char *key)
-{
-    struct tec_unit *units;
-
-    if (strcmp(key, "id") == 0) {
-        printf("%s\n", task);
-        return 0;
-    }
-
-    for (units = unitbin; units; units = units->next) {
-        if (strcmp(key, units->key) == 0) {
-            printf("%s\n", units->val);
-            return 0;
-        }
-    }
-
-    for (units = unitpgn; units; units = units->next) {
-        if (strcmp(key, units->key) == 0) {
-            printf("%s\n", units->val);
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-static int show_key(char *task, tec_unit_t *unitbin,
-                    tec_unit_t *unitpgn, keyvec_t *vec, int quiet)
-{
-    int status;
-    int retcode = LIBTEC_OK;
-
-    for (int i = 0; i < vec->used; i++) {
-        if ((status = _show_key(task, unitbin, unitpgn, vec->keys[i]))) {
-            if (quiet == false)
-                elog(1, errfmt, vec->keys[i], "no such key");
-            retcode = status == LIBTEC_OK ? retcode : status;
-        }
-    }
-    return retcode;
-}
-
-static int show_keys(char *task, tec_unit_t *unitbin, tec_unit_t *unitpgn)
-{
-    const char *fmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
-
-    printf(fmt, "id", task);
-
-    for (struct tec_unit * units = unitbin; units; units = units->next)
-        printf(fmt, units->key, units->val);
-
-    for (; unitpgn; unitpgn = unitpgn->next)
-        printf(fmt, unitpgn->key, unitpgn->val);
-
-    return 0;
-}
-
 int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     keyvec_t vec;
     tec_arg_t args;
     tec_unit_t *unitpgn;
+    tec_unit_t *units;
     int opt_quiet, opt_help;
     int c, i, retcode, status;
+    const char *errfmt = "cannot show units '%s': %s";
+    const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
 
-    unitpgn = NULL;
     retcode = LIBTEC_OK;
+    units = unitpgn = NULL;
     opt_quiet = opt_help = false;
     args.env = args.desk = args.taskid = NULL;
 
@@ -177,24 +120,36 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
         } else if ((status = valid_unitkeys(ctx->units))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "invalid unit keys");
-        }
-
-        else if ((status = hook_show(&unitpgn, &args, "cat"))) {
+        } else if ((status = hook_cat(&unitpgn, &args, "cat"))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         }
 
-        else if (argument_keys_is_empty(&vec) == false) {
-            if ((status =
-                 show_key(args.taskid, ctx->units, unitpgn, &vec, opt_quiet))) {
-                ;
+        if (status == LIBTEC_OK) {
+            units = tec_unit_add(units, "id", args.taskid);
+            units = tec_unit_join(units, ctx->units);
+            units = tec_unit_join(units, unitpgn);
+
+            if (argument_keys_is_empty(&vec) == false) {
+                for (int i = 0; i < vec.used; i++) {
+                    int found;
+                    for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
+                        if ((found = strcmp(vec.keys[i], tmp->key)) == 0) {
+                            printf("%s\n", tmp->val);
+                            break;
+                        }
+                    }
+                    if (found && opt_quiet == false)
+                        elog(1, errfmt, vec.keys[i], "no such key");
+                    retcode = found == 0 ? retcode : 1;
+                }
+            } else {
+                for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
+                    printf(unitfmt, tmp->key, tmp->val);
             }
-        } else if ((status = show_keys(args.taskid, ctx->units, unitpgn))) {
-            if (opt_quiet == false)
-                elog(1, errfmt, args.taskid, "internal error");
         }
-        unitpgn = tec_unit_free(unitpgn);
-        ctx->units = tec_unit_free(ctx->units);
+
+        units = ctx->units = unitpgn = tec_unit_free(units);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 

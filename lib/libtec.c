@@ -256,6 +256,11 @@ tec_unit_t *tec_unit_add(struct tec_unit *head, char *key, char *val)
     return unit_add(head, key, val);
 }
 
+tec_unit_t *tec_unit_join(tec_unit_t *head, tec_unit_t *body)
+{
+    return unit_join(head, body);
+}
+
 int tec_unit_set(struct tec_unit *head, char *key, char *val)
 {
     // TODO: this will never fail, cuz in case of error it returns head.

@@ -74,6 +74,7 @@ char *tec_strerror(int errnum);
 
 /* Data structure for unit values.  */
 tec_unit_t *tec_unit_add(tec_unit_t * head, char *key, char *val);
+tec_unit_t *tec_unit_join(tec_unit_t * head, tec_unit_t * body);
 tec_unit_t *tec_unit_parse(struct tec_unit *head, const char *str);
 char *tec_unit_get(tec_unit_t * head, char *key);
 void *tec_unit_free(tec_unit_t * units);

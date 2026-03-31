@@ -15,7 +15,7 @@ struct tec_hook {
 };
 
 int hook_action(tec_arg_t * args, char *cmd);
-int hook_show(tec_unit_t ** units, tec_arg_t * args, char *cmd);
+int hook_cat(tec_unit_t ** units, tec_arg_t * args, char *cmd);
 /* TODO: under development.  */
 char *hook_list(struct tec_hook *hooks, char *pgnout, char *env, char *id);
 

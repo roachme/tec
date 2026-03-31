@@ -4,6 +4,7 @@
 #include "libtec.h"
 
 tec_unit_t *unit_load(const char *filename);
+tec_unit_t *unit_join(tec_unit_t * bin, tec_unit_t * pgn);
 tec_unit_t *unit_parse(tec_unit_t * head, const char *str);
 tec_unit_t *unit_add(tec_unit_t * head, const char *key, const char *val);
 tec_unit_t *unit_set(tec_unit_t * head, const char *key, const char *val);

@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `cli/cat`: Optimize unit show logic
+
+### Deleted
+
+
 ## [0.5.0] - (2026-03-30)
 
 ### Added

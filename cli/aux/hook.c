@@ -41,7 +41,7 @@ int hook_action(tec_arg_t *args, char *cmd)
     return retcode;
 }
 
-int hook_show(tec_unit_t **units, tec_arg_t *args, char *cmd)
+int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
 {
     FILE *pipe;
     int retcode, status;
