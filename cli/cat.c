@@ -87,16 +87,16 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
             if (argvec_is_empty(&vec) == false) {
                 for (int i = 0; i < vec.used; i++) {
-                    int found;
+                    int notfound;
                     for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
-                        if ((found = strcmp(vec.argv[i], tmp->key)) == 0) {
+                        if ((notfound = strcmp(vec.argv[i], tmp->key)) == 0) {
                             printf("%s\n", tmp->val);
                             break;
                         }
                     }
-                    if (found && opt_quiet == false)
+                    if (notfound && opt_quiet == false)
                         elog(1, keyfmt, args.taskid, vec.argv[i]);
-                    retcode = found == 0 ? retcode : 1;
+                    retcode = notfound == 0 ? retcode : 1;
                 }
             } else {
                 for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
