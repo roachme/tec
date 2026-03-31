@@ -7,6 +7,7 @@
 ### Fixed
 
 - `cli/cat`: Optimize unit show logic
+- `cli/cat`: Remove code duplicate
 
 ### Deleted
 

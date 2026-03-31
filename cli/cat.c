@@ -1,53 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "aux/argvec.h"
 #include "tec.h"
 #include "aux/config.h"
-
-typedef struct keyvec {
-    char **keys;
-    size_t used;
-    size_t size;
-} keyvec_t;
-
-static void argument_keys_init(keyvec_t *vec)
-{
-    int size = 2;
-
-    if ((vec->keys = malloc(size * sizeof(vec->keys))) == NULL) {
-        elog(1, "'%s': memory allocation failed", __FUNCTION__);
-        exit(1);
-    }
-
-    vec->used = 0;
-    vec->size = size;
-}
-
-static int argument_keys_add(keyvec_t *vec, char *key)
-{
-    if (vec->used >= vec->size) {
-        vec->size *= 2;
-        if ((vec->keys =
-             realloc(vec->keys, vec->size * sizeof(char *))) == NULL) {
-            elog(1, "'%s': memory allocation failed", __FUNCTION__);
-            exit(1);
-        }
-    }
-    vec->keys[vec->used++] = strdup(key);
-    return 0;
-}
-
-static void argument_keys_free(keyvec_t *vec)
-{
-    for (size_t i = 0; i < vec->used; ++i)
-        free(vec->keys[i]);
-    free(vec->keys);
-}
-
-static bool argument_keys_is_empty(keyvec_t *vec)
-{
-    return vec->used == 0;
-}
 
 static int valid_unitkeys(tec_unit_t *units)
 {
@@ -61,8 +17,8 @@ static int valid_unitkeys(tec_unit_t *units)
 
 int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    keyvec_t vec;
     tec_arg_t args;
+    tec_argvec_t vec;
     tec_unit_t *unitpgn;
     tec_unit_t *units;
     int opt_quiet, opt_help;
@@ -75,7 +31,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
     opt_quiet = opt_help = false;
     args.env = args.desk = args.taskid = NULL;
 
-    argument_keys_init(&vec);
+    argvec_init(&vec);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hk:q")) != -1) {
         switch (c) {
         case 'd':
@@ -88,7 +44,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_help = true;
             break;
         case 'k':
-            argument_keys_add(&vec, optarg);
+            argvec_add(&vec, optarg);
             break;
         case 'q':
             opt_quiet = true;
@@ -130,17 +86,17 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             units = tec_unit_join(units, ctx->units);
             units = tec_unit_join(units, unitpgn);
 
-            if (argument_keys_is_empty(&vec) == false) {
+            if (argvec_is_empty(&vec) == false) {
                 for (int i = 0; i < vec.used; i++) {
                     int found;
                     for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
-                        if ((found = strcmp(vec.keys[i], tmp->key)) == 0) {
+                        if ((found = strcmp(vec.argv[i], tmp->key)) == 0) {
                             printf("%s\n", tmp->val);
                             break;
                         }
                     }
                     if (found && opt_quiet == false)
-                        elog(1, errfmt, vec.keys[i], "no such key");
+                        elog(1, errfmt, vec.argv[i], "no such key");
                     retcode = found == 0 ? retcode : 1;
                 }
             } else {
@@ -153,6 +109,6 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
-    argument_keys_free(&vec);
+    argvec_deinit(&vec);
     return retcode;
 }

@@ -31,6 +31,11 @@ void argvec_show(tec_argvec_t *vec)
     }
 }
 
+bool argvec_is_empty(tec_argvec_t *vec)
+{
+    return vec->used == 0;
+}
+
 void argvec_add(tec_argvec_t *vec, const char *arg)
 {
     /* The last element is never used that's why minus one.
