@@ -18,7 +18,7 @@ static char *path_env_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base);
-    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -27,7 +27,7 @@ static char *path_desk_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env);
-    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -36,7 +36,7 @@ static char *path_task_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env, args->desk);
-    dlog(1, "%s:pathname: '%s'\n", __func__, pathname);
+    dlog(1, "%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -350,7 +350,7 @@ int toggle_task_clear(char *base, tec_arg_t *args, const char *taskid)
     }
 
     if (!changed) {
-        printf("^###-- clear: NOT HAPPENED\n");
+        dlog(1, "%s: NOT HAPPENED\n", __func__);
         return 0;
     }
 

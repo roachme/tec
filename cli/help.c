@@ -190,13 +190,13 @@ struct help helptab[] = {
       -t DST  move all tasks to target desk (under development)\n\
     \n\
     Arguments:\n\
-      DST     destination task ID or destination desk\n\
-      SRC     source task ID\n\
+      DST     destination path\n\
+      SRC     source path\n\
     \n\
     Arguments structure:\n\
       SRC -> env/desk/taskid\n\
-      .   -> current task ID (if exists)\n\
-      ..  -> previous task ID (if exists)\n\
+      .   -> current task ID, desk name or env name\n\
+      ..  -> previous task ID, desk name or env name\n\
     \n\
     Exit status:\n\
     Under development\n"},
