@@ -6,6 +6,8 @@
 
 ### Changed
 
+- `cli/aux/pwd`: Move PWD logic to a module
+
 ### Fixed
 
 - `cli/cat`: Optimize unit show logic
