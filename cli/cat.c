@@ -1,6 +1,4 @@
 #include <string.h>
-#include <stdlib.h>
-
 #include "aux/argvec.h"
 #include "tec.h"
 #include "aux/config.h"
@@ -25,6 +23,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
     int c, i, retcode, status;
     const char *errfmt = "cannot show units '%s': %s";
     const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
+    const char *keyfmt = "cannot show units '%s': '%s' no such key";
 
     retcode = LIBTEC_OK;
     units = unitpgn = NULL;
@@ -96,7 +95,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
                         }
                     }
                     if (found && opt_quiet == false)
-                        elog(1, errfmt, vec.argv[i], "no such key");
+                        elog(1, keyfmt, args.taskid, vec.argv[i]);
                     retcode = found == 0 ? retcode : 1;
                 }
             } else {

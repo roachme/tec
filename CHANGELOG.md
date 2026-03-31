@@ -8,6 +8,7 @@
 
 - `cli/cat`: Optimize unit show logic
 - `cli/cat`: Remove code duplicate
+- `cli/cat`: Change key error message format
 
 ### Deleted
 
