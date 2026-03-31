@@ -17,18 +17,18 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     tec_arg_t args;
     tec_argvec_t vec;
-    tec_unit_t *unitpgn;
-    tec_unit_t *units;
     int opt_quiet, opt_help;
     int c, i, retcode, status;
-    const char *errfmt = "cannot show units '%s': %s";
-    const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
-    const char *keyfmt = "cannot show units '%s': '%s' no such key";
+    tec_unit_t *units, *unitpgn;
+    const char *errfmt, *unitfmt, *keyfmt;
 
     retcode = LIBTEC_OK;
     units = unitpgn = NULL;
     opt_quiet = opt_help = false;
     args.env = args.desk = args.taskid = NULL;
+    errfmt = "cannot show units '%s': %s";
+    unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
+    keyfmt = "cannot show units '%s': '%s' no such key";
 
     argvec_init(&vec);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hk:q")) != -1) {
@@ -85,6 +85,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             units = tec_unit_join(units, ctx->units);
             units = tec_unit_join(units, unitpgn);
 
+            /* Show specific keys only.  */
             if (argvec_is_empty(&vec) == false) {
                 for (int i = 0; i < vec.used; i++) {
                     int notfound;
@@ -98,7 +99,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
                         elog(1, keyfmt, args.taskid, vec.argv[i]);
                     retcode = notfound == 0 ? retcode : 1;
                 }
-            } else {
+            } else {            /* Show all keys.  */
                 for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
                     printf(unitfmt, tmp->key, tmp->val);
             }
