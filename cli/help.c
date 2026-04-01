@@ -40,10 +40,10 @@ struct help helptab[] = {
      .desc_long = "\n\
     Options:\n\
       -h      show this help and exit\n\
-      -C TOG  enbale colors (default: disabled)\n\
-      -D TOG  enbale debug mode (default: disabled)\n\
+      -C TOG  enable colors (default: disabled)\n\
+      -D TOG  enable debug mode (default: disabled)\n\
       -F DIR  path to the config file (under development)\n\
-      -H TOG  enbale hooks (default: disabled)\n\
+      -H TOG  enable hooks (default: disabled)\n\
       -P DIR  directory where plugins are stored\n\
       -T DIR  directory where tasks are stored\n\
       -V      show version and exit\n\
@@ -53,11 +53,11 @@ struct help helptab[] = {
       TOG     can be either 'on' or 'off'\n\
     \n\
     Notes:\n\
-    It's more convient to set options in config file. This way no need\n\
+    It's more convenient to set options in config file. This way no need\n\
     to type them every time.\n\
     \n\
     Exit status:\n\
-    Return status of builtin command or plugin. Failure if invaild builtin,\n\
+    Return status of builtin command or plugin. Failure if invalid builtin,\n\
     plugin command or option is given\n"},
     {
      .tag = TAGSYSTEM,
@@ -76,7 +76,7 @@ struct help helptab[] = {
       CMD     builtin command\n\
     \n\
     Exit status:\n\
-    Returns success unless PATTERN is not found or an invalid option is given.\n"},
+    Returns success unless CMD is not found or an invalid option is given.\n"},
     {
      .tag = TAGSYSTEM,
      .name = "init",
@@ -140,9 +140,9 @@ struct help helptab[] = {
      .synop = "Usage: " PROGRAM " cd [OPTION]... [ID]...\n",
      .desc_short = "Switch to task.\n",
      .desc_long = "\n\
-    Swtich to task ID. The default ID is the current task ID.\n\
+    Switch to task ID. The default ID is the current task ID.\n\
     If ID is \"-\", switch to previous task ID, if exists.\n\
-    Alias \"-\" cannot be used with other task IDs. Doudle \"-\"\n\
+    Alias \"-\" cannot be used with other task IDs. Double \"-\"\n\
     cannot be passed either.\n\
     \n\
     Options:\n\
@@ -154,9 +154,9 @@ struct help helptab[] = {
       -N      neither update toggles nor switch to task directory\n\
     \n\
     Arguments:\n\
-      DESK    desk name (default current)\n\
+      DESK    desk name (default is current)\n\
       ID      task ID (default is current)\n\
-      ENV     environment name (default current)\n\
+      ENV     environment name (default is current)\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option, argument or key is given,\n\
@@ -252,8 +252,8 @@ struct help helptab[] = {
       ENV     environment name (default is current)\n\
     \n\
     Values:\n\
-      Type    task, bugfix, feature, hotfix\n\
-      Prio    lowest, low, mid, high, highest\n\
+      Type     task, bugfix, feature, hotfix\n\
+      Priority lowest, low, mid, high, highest\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option or argument is given,\n\
@@ -318,7 +318,7 @@ struct help helptab[] = {
       ls      List desks\n\
       mv      Move (rename) desks\n\
       rm      Remove desk with all tasks\n\
-      set     Set desks vaules\n\
+      set     Set desks values\n\
     \n\
     Note:\n\
       Use '" PROGRAM " help desk-SUBCMD' to get help on subcommands. \n\
@@ -336,7 +336,7 @@ struct help helptab[] = {
     Options:\n\
       -e ENV  environment name (default is current)\n\
       -h      show this help and exit\n\
-      -n      do not switch to newly created environment\n\
+      -n      do not switch to newly created desk\n\
       -q      do not write anything to standard error output\n\
       -N      neither switch to task nor to desk directory\n\
     \n\
@@ -366,7 +366,7 @@ struct help helptab[] = {
      .tag = TAGOBJCMD,
      .name = "desk-mv",
      .synop = "Usage: " PROGRAM " desk mv [OPTION]... [SRC|DST]\n",
-     .desc_short = "Move or renome desk.\n",
+     .desc_short = "Move or rename desk.\n",
      .desc_long = "\n\
     Options:\n\
       -e ENV  environment name (default is current)\n\
@@ -444,9 +444,9 @@ struct help helptab[] = {
      .synop = "Usage: " PROGRAM " desk cd [OPTION]... [DESK]...\n",
      .desc_short = "Switch to desk.\n",
      .desc_long = "\n\
-    Swtich to desk. The default is the current desk.\n\
+    Switch to desk. The default is the current desk.\n\
     If desk is \"-\", switch to previous desk, if exists.\n\
-    Alias \"-\" cannot be used with other desks. Doudle \"-\"\n\
+    Alias \"-\" cannot be used with other desks. Double \"-\"\n\
     cannot be passed either.\n\
     \n\
     Options:\n\
@@ -481,7 +481,7 @@ struct help helptab[] = {
       ls      List environments\n\
       rename  Rename environment\n\
       rm      Remove environment with all desks and tasks\n\
-      set     Set environment vaules\n\
+      set     Set environment values\n\
     \n\
     Note:\n\
       Use '" PROGRAM " help env-SUBCMD' to get help on subcommands. \n\
@@ -521,7 +521,7 @@ struct help helptab[] = {
       -q      do not write anything to standard error output\n\
     \n\
     Arguments:\n\
-      NAME    environment name (default current)\n\
+      NAME    environment name (default is current)\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option, argument or key is given,\n\
@@ -532,9 +532,9 @@ struct help helptab[] = {
      .synop = "Usage: " PROGRAM " env cd [OPTION]... [NAME]...\n",
      .desc_short = "Switch to environment.\n",
      .desc_long = "\n\
-    Swtich to environment. The default is the current environment.\n\
+    Switch to environment. The default is the current environment.\n\
     If environment is \"-\", switch to previous environment, if exists.\n\
-    Alias \"-\" cannot be used with other environments. Doudle \"-\"\n\
+    Alias \"-\" cannot be used with other environments. Double \"-\"\n\
     cannot be passed either.\n\
     \n\
     Options:\n\
@@ -546,7 +546,7 @@ struct help helptab[] = {
     \n\
     Arguments:\n\
       DESK    desk name (default is current)\n\
-      NAME    environment name (default current)\n\
+      NAME    environment name (default is current)\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option, argument or key is given,\n\
@@ -597,7 +597,7 @@ struct help helptab[] = {
       -I      prompt once before removing more than one task ID\n\
     \n\
     Arguments:\n\
-      NAME    environment name (default current)\n\
+      NAME    environment name (default is current)\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option or argument is given,\n\
