@@ -8,6 +8,7 @@
 ### Changed
 
 - `cli/aux/pwd`: Move PWD logic to a module
+- `cli`: Change default description
 
 ### Fixed
 
