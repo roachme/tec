@@ -36,9 +36,10 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     /* Set custom description if provided.  */
     if (desc) {
         unitvals[ARRAY_SIZE(unitvals) - 1] = desc;
+    } else {                    /* Generate description.  */
+        strcat(_desc, args->taskid);
     }
 
-    strcat(_desc, args->taskid);
     strftime(date, BUFSIZ, timefmt, timeinfo);
 
     for (int i = 0; i < nunitkey; ++i)
