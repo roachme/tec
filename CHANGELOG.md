@@ -3,6 +3,7 @@
 ### Added
 
 - `cli/help`: Add return value descriptions
+- `cli/add`: Add support for custom description
 
 ### Changed
 
