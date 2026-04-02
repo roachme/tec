@@ -1,0 +1,13 @@
+Feature: Task Management # task_management.feature:1
+  As a developer using tec
+  I want to create, list, and view tasks
+  So that I can organize my work
+  Scenario: Add a new task with valid ID  # task_management.feature:6
+    When I run tec command "add 00000001" # steps/common_steps.py:36
+    Then the command should succeed       # steps/common_steps.py:53
+      Assertion Failed: Command failed with return code 1
+      STDERR: tec: cannot create task 'NOCURR': no current env
+      
+      STDOUT:
+
+
