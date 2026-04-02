@@ -23,7 +23,7 @@ static int generate_task(tec_arg_t *args, tec_argvec_t *argvec)
     return 1;
 }
 
-static int generate_units(tec_ctx_t *ctx, char *env, char *task, char *desc)
+static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
 {
     char date[BUFSIZ + 1];
     struct tec_unit *units = NULL;
@@ -38,7 +38,7 @@ static int generate_units(tec_ctx_t *ctx, char *env, char *task, char *desc)
         unitvals[ARRAY_SIZE(unitvals) - 1] = desc;
     }
 
-    strcat(_desc, task);
+    strcat(_desc, args->taskid);
     strftime(date, BUFSIZ, timefmt, timeinfo);
 
     for (int i = 0; i < nunitkey; ++i)
@@ -126,7 +126,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? retcode : !status;
             continue;
-        } else if ((status = generate_units(ctx, args.env, args.taskid, desc))) {
+        } else if ((status = generate_units(ctx, &args, desc))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.taskid, "unit generation failed");
             retcode = status == LIBTEC_OK ? retcode : status;
