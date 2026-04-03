@@ -76,6 +76,18 @@ style:
 memcheck:
 	./tests/memleak/memcheck
 
+# Behave BDD Tests
+.PHONY: test behave test_bdd
+
+behave: test_bdd
+test_bdd: user
+	@echo "Running Behave BDD tests..."
+	@cd tests/usage && behave --format progress --tags=-skip
+	@echo "All BDD tests passed!"
+
+test: memcheck test_bdd
+	@echo "All tests completed successfully!"
+
 
 #all_release: clean init check_style test_unit test_integration test_system test_e2e check_static check_security build_release docs_build ;
 #.PHONY: build_user
@@ -97,7 +109,7 @@ user: init $(PROGRAM)
 # Build project in release configuraiton into ./build/release
 release: CFLAGS := $(CFLAGS) -O3
 release: LFLAGS := $(LFLAGS)
-release: clean init style check $(PROGRAM) generate memcheck
+release: clean init style check $(PROGRAM) generate memcheck test_bdd
 
 # Build project in debug configuration into ./build/debug
 debug: CFLAGS := $(CFLAGS) -O0 -g3 -ggdb

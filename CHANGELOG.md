@@ -2,6 +2,8 @@
 
 ### Added
 
+- `tec`: Add BDD tests
+
 ### Changed
 
 - `tec`: Update help message

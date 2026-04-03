@@ -9,3 +9,4 @@ tec_prof
 repos/
 trash/
 core*
+__pycache__/
