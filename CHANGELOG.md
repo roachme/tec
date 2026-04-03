@@ -16,6 +16,7 @@
 - `cli/cat`: Remove code duplicate
 - `cli/cat`: Change key error message format
 - `cli/help`: Fix grammar errors
+- `completion`: Fix completion for zsh
 
 ### Deleted
 
