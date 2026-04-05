@@ -111,15 +111,15 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.taskid = argvec->argv[i];
 
-        if ((status = tec_task_valid(teccfg.base.task, &args))) {
-            if (opt_quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
-            continue;
-        } else if (is_valid_length(args.taskid, IDSIZ) == false) {
+        if (is_valid_length(args.taskid, IDSIZ) == false) {
             status = 1;
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "task ID is too long");
+            retcode = status == LIBTEC_OK ? retcode : status;
+            continue;
+        } else if ((status = tec_task_valid(teccfg.base.task, &args))) {
+            if (opt_quiet == false)
+                elog(status, errfmt, args.taskid, tec_strerror(status));
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_task_exist(teccfg.base.task, &args))) {
