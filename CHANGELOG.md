@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `tec/cli`: Fix command 'version' setup mode
+
+### Deleted
+
+
 ## [0.6.0] - (2026-04-05)
 
 ### Added

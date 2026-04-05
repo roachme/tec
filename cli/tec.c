@@ -42,7 +42,7 @@ static tec_builtin_t builtins[] = {
     {.name = "mv",.func = &tec_cli_mv,.option = TEC_SETUP_HARD},
     {.name = "rm",.func = &tec_cli_rm,.option = TEC_SETUP_HARD},
     {.name = "set",.func = &tec_cli_set,.option = TEC_SETUP_HARD},
-    {.name = "version",.func = &tec_cli_version,.option = TEC_SETUP_HARD},
+    {.name = "version",.func = &tec_cli_version,.option = TEC_SETUP_SOFT},
 };
 
 static int tec_setup(int setuplvl)
