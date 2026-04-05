@@ -7,6 +7,7 @@
 ### Fixed
 
 - `tec/cli`: Fix command 'version' setup mode
+- `tec/desk`: Add missing desk checks
 
 ### Deleted
 

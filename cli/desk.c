@@ -95,7 +95,24 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.desk = argvec->argv[i];
 
-        if (generate_units(ctx, args.desk)) {
+        if (is_valid_length(args.desk, DESKSIZ) == false) {
+            status = 1;
+            if (opt_quiet == false)
+                elog(status, errfmt, args.desk, "desk name is too long");
+            retcode = status == LIBTEC_OK ? retcode : status;
+            continue;
+        } else if ((status = tec_desk_valid(teccfg.base.task, &args))) {
+            if (opt_quiet == false)
+                elog(status, errfmt, args.desk, tec_strerror(status));
+            retcode = status == LIBTEC_OK ? retcode : status;
+            continue;
+        } else if (!(status = tec_desk_exist(teccfg.base.task, &args))) {
+            char *desk = args.desk;
+            if (opt_quiet == false)
+                elog(status, errfmt, desk, tec_strerror(LIBTEC_ARG_EXISTS));
+            retcode = !(status == LIBTEC_OK) ? retcode : !status;
+            continue;
+        } else if (generate_units(ctx, args.desk)) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.desk, "unit generation failed");
             retcode = status == LIBTEC_OK ? retcode : status;
