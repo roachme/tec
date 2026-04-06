@@ -242,16 +242,17 @@ int main(int argc, const char **argv)
 {
     tec_opt_t opts;
     tec_base_t base;
+    int c, i, status;
     tec_alias_t *alias;
     tec_argvec_t argvec;
     tec_builtin_t *builtin;
     const char *cmd, *togfmt;
-    int c, i, status, showhelp, showversion;
+    int opt_help, opt_version;
 
     cmd = NULL;
     status = LIBTEC_OK;
-    showhelp = showversion = false;
     base.pgn = base.task = NULL;
+    opt_help = opt_version = false;
     opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";
 
@@ -262,7 +263,7 @@ int main(int argc, const char **argv)
     while ((c = getopt(argvec.used, argvec.argv, "+:hC:D:F:H:P:T:V")) != -1) {
         switch (c) {
         case 'h':
-            showhelp = true;
+            opt_help = true;
             break;
         case 'C':
             if ((opts.color = valid_toggle(optarg)) == -1)
@@ -285,7 +286,7 @@ int main(int argc, const char **argv)
             base.task = optarg;
             break;
         case 'V':
-            showversion = true;
+            opt_version = true;
             break;
         case ':':
             return elog(1, "option `-%c' requires an argument", optopt);
@@ -299,9 +300,9 @@ int main(int argc, const char **argv)
     tec_getopt_unset();
     argvec_offset(&argvec, i);  /* Skip program name and options if any.  */
 
-    if (showhelp == true) {
+    if (opt_help == true) {
         argvec_add(&argvec, "help");
-    } else if (showversion == true) {
+    } else if (opt_version == true) {
         argvec_add(&argvec, "version");
     }
 
