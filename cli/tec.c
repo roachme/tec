@@ -241,18 +241,17 @@ int check_arg_task(tec_arg_t *args, const char *errfmt, int quiet)
 int main(int argc, const char **argv)
 {
     tec_opt_t opts;
-    const char *cmd;
     tec_base_t base;
     tec_alias_t *alias;
     tec_argvec_t argvec;
-    char *option, *togfmt;
     tec_builtin_t *builtin;
+    const char *cmd, *togfmt;
     int c, i, status, showhelp, showversion;
 
     cmd = NULL;
     status = LIBTEC_OK;
     showhelp = showversion = false;
-    base.pgn = base.task = option = NULL;
+    base.pgn = base.task = NULL;
     opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";
 
