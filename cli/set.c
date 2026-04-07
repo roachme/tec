@@ -117,15 +117,15 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("set");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
-    else if ((status = check_arg_desk(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
         return status;
 
     do {
         args.taskid = argvec->argv[i];
 
-        if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_task_set(teccfg.base.task, &args, ctx))) {
             args.taskid = args.taskid ? args.taskid : "NOCURR";

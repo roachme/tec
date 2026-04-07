@@ -69,7 +69,7 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
 
     args->taskid = NULL;
     if ((status = toggle_task_get_curr(teccfg.base.task, args)) == 0) {
-        if ((status = check_arg_task(args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
             ;
         } else {
             obj.next = NULL;
@@ -81,7 +81,7 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
 
     args->taskid = NULL;
     if ((status = toggle_task_get_prev(teccfg.base.task, args)) == 0) {
-        if ((status = check_arg_task(args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
             ;
         } else {
             obj.next = NULL;
@@ -148,9 +148,9 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.env = argvec->argv[i];
 
-        if ((status = check_arg_env(&args, errfmt, quiet)))
+        if ((status = tec_cli_check_env(&args, errfmt, quiet)))
             continue;
-        else if ((status = check_arg_desk(&args, errfmt, quiet)))
+        else if ((status = tec_cli_check_desk(&args, errfmt, quiet)))
             continue;
         else if ((status = tec_task_list(teccfg.base.task, &args, ctx))) {
             if (quiet == false)

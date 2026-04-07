@@ -98,9 +98,9 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("add");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
-    else if ((status = check_arg_desk(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
         return status;
     else if (optind == argvec->used && generate_task(&args, argvec)) {
         if (opt_quiet == false)
@@ -111,7 +111,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.taskid = argvec->argv[i];
 
-        if (is_valid_length(args.taskid, IDSIZ) == false) {
+        if (tec_cli_len_valid(args.taskid, IDSIZ) == false) {
             status = 1;
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "task ID is too long");

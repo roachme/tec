@@ -59,15 +59,15 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("cat");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
-    else if ((status = check_arg_desk(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
         return status;
 
     do {
         args.taskid = argvec->argv[i];
 
-        if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_task_get(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)

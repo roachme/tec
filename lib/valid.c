@@ -1,15 +1,7 @@
 #include <ctype.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include "valid.h"
-
-int is_valid_length(char *obj, int len)
-{
-    if (strlen(obj) <= len)
-        return true;
-    return false;
-}
 
 /* TODO: Maybe there's generic function to validate name.
  *       If so unify them all.  */

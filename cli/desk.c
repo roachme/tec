@@ -89,13 +89,13 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (optind == argvec->used)
         return elog(1, "desk name required");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     do {
         args.desk = argvec->argv[i];
 
-        if (is_valid_length(args.desk, DESKSIZ) == false) {
+        if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
             status = 1;
             if (opt_quiet == false)
                 elog(status, errfmt, args.desk, "desk name is too long");
@@ -190,7 +190,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help)
         return help_usage("desk-rm");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     if (opt_ask_once == true) {
@@ -203,7 +203,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.desk = argvec->argv[i];
 
-        if ((status = check_arg_desk(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (opt_ask_every == true) {
@@ -261,14 +261,14 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("desk-ls");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     i = optind;
     do {
         args.env = argvec->argv[i];
 
-        if (check_arg_env(&args, errfmt, opt_quiet))
+        if (tec_cli_check_env(&args, errfmt, opt_quiet))
             continue;
         if ((status = tec_desk_list(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
@@ -340,14 +340,14 @@ static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         return 1;
     }
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     i = optind;
     do {
         args.desk = argvec->argv[i];
 
-        if ((status = check_arg_desk(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_desk_set(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
@@ -396,12 +396,12 @@ static int _desk_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help)
         return help_usage("desk-cat");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     do {
         args.desk = argvec->argv[i];
-        if ((status = check_arg_desk(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_desk_get(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
@@ -465,7 +465,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("desk-cd");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
 
     /* Check that alias '-' is not passed with other desks nor duplicated.  */
@@ -484,7 +484,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.desk = argvec->argv[i];
 
-        if ((status = check_arg_desk(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = hook_action(&args, "desk-cd"))) {
             if (opt_quiet == false)

@@ -8,9 +8,9 @@
 #include "aux/aux.h"
 #include "aux/log.h"
 #include "aux/hook.h"
+#include "aux/valid.h"
 #include "aux/color.h"
 #include "aux/argvec.h"
-#include "aux/aux.h"
 #include "../lib/libtec.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -52,11 +52,6 @@ typedef struct builtin {
 
 extern char *unitkeys[];
 extern unsigned int nunitkey;
-
-int is_valid_length(const char *obj, int len);
-int check_arg_env(tec_arg_t * args, const char *errfmt, int quiet);
-int check_arg_desk(tec_arg_t * args, const char *errfmt, int quiet);
-int check_arg_task(tec_arg_t * args, const char *errfmt, int quiet);
 
 int help_list_pretty_commands(void);
 int help_usage(const char *cmd);

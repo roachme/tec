@@ -115,9 +115,9 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     else if ((user_cwd_ptr = get_user_cwd()) == NULL)
         return elog(1, errfmt, "TASK", "could not get user current directory");
 
-    if ((status = check_arg_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
-    else if ((status = check_arg_desk(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
         return status;
 
     if (opt_ask_once == true) {
@@ -130,7 +130,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.taskid = argvec->argv[i];
 
-        if ((status = check_arg_task(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (opt_ask_every == true) {

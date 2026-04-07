@@ -97,7 +97,7 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     for (i = optind; i < argvec->used; ++i) {
         args.env = argvec->argv[i];
 
-        if (is_valid_length(args.env, ENVSIZ) == false) {
+        if (tec_cli_len_valid(args.env, ENVSIZ) == false) {
             if (quiet == false)
                 elog(status, errfmt, args.env, "env name is too long");
             continue;
@@ -116,7 +116,7 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, tec_strerror(status));
             continue;
-        } else if (is_valid_length(args.desk, DESKSIZ) == false) {
+        } else if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, "desk name is too long");
             continue;
@@ -222,7 +222,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     do {
         args.env = argvec->argv[i];
-        if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (opt_ask_every == true) {
@@ -339,9 +339,9 @@ static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     /* TODO: trigger hooks if any */
 
-    if ((status = check_arg_env(&src, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&src, errfmt, opt_quiet)))
         return status;
-    else if ((status = check_arg_env(&src, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_env(&src, errfmt, opt_quiet)))
         return status;
     else if (!tec_env_exist(teccfg.base.task, &dst)) {
         if (opt_quiet == false)
@@ -410,7 +410,7 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
     do {
         args.env = argvec->argv[i];
 
-        if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_env_set(teccfg.base.task, &args, ctx))) {
             if (opt_quiet == false)
@@ -463,7 +463,7 @@ static int _env_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     do {
         args.env = argvec->argv[i];
-        if ((status = check_arg_env(&args, errfmt, quiet))) {
+        if ((status = tec_cli_check_env(&args, errfmt, quiet))) {
             continue;
         } else if ((status = tec_env_get(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
@@ -539,7 +539,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     do {
         args.env = argvec->argv[i];
-        if ((status = check_arg_env(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = hook_action(&args, "env-cd"))) {
             if (opt_quiet == false)
