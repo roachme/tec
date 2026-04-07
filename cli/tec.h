@@ -30,8 +30,8 @@
 #define IDFMT               "%0" xstr(IDSIZ) "u"
 #define PADDING_UNIT        6
 
-#define LIST_OBJ_UNITS(_obj, _pgnout, _desc) do {\
-    color_print_str("%-" xstr(IDSIZ) "s ", (_obj), BBLU); \
+#define LIST_OBJ_UNITS(_obj, _pgnout, _desc, padsiz) do {\
+    color_print_str("%-" xstr(padsiz) "s ", (_obj), BBLU); \
     color_print_str("%s ", (_pgnout), WHT); \
     color_print_str("%s\n", (_desc), WHT); \
 } while (0)

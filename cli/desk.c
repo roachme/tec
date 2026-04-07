@@ -281,7 +281,7 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
             if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
                 continue;
             }
-            LIST_OBJ_UNITS(obj->name, "", desc);
+            LIST_OBJ_UNITS(obj->name, "", desc, DESKSIZ);
             ctx->units = tec_unit_free(ctx->units);
         }
         ctx->list = tec_list_free(ctx->list);

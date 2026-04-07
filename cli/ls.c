@@ -56,7 +56,7 @@ static void show_row(tec_ctx_t *ctx, tec_arg_t *args, tec_list_t *obj,
         if ((desc = get_unit_desc(ctx, args, quiet)) == NULL)
             return;
 
-        LIST_OBJ_UNITS(obj->name, "", desc);
+        LIST_OBJ_UNITS(obj->name, "", desc, IDSIZ);
         ctx->units = tec_unit_free(ctx->units);
     }
 }
