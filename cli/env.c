@@ -50,11 +50,11 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     char c;
     tec_arg_t args;
     int switch_dir, switch_env;
-    int i, quiet, showhelp, status;
+    int i, quiet, showhelp, retcode, status;
     const char *errfmt = "cannot add env '%s': %s";
     const char *errfmt_desk = "cannot add desk '%s': %s";
 
-    status = LIBTEC_OK;
+    retcode = LIBTEC_OK;
     showhelp = quiet = false;
     switch_dir = switch_env = true;
     args.env = args.desk = args.taskid = NULL;
@@ -98,48 +98,59 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
         args.env = argvec->argv[i];
 
         if (tec_cli_len_valid(args.env, ENVSIZ) == false) {
+            status = 1;
             if (quiet == false)
                 elog(status, errfmt, args.env, "env name is too long");
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_env_valid(teccfg.base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt, args.env, tec_strerror(status));
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_env_exist(teccfg.base.task, &args))) {
             char *env = args.env;
             if (quiet == false)
                 elog(status, errfmt, env, tec_strerror(LIBTEC_ARG_EXISTS));
+            retcode = !(status == LIBTEC_OK) ? retcode : !status;
             continue;
         }
 
         if ((status = tec_desk_valid(teccfg.base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, tec_strerror(status));
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
+            status = 1;
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, "desk name is too long");
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_desk_exist(teccfg.base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk,
                      tec_strerror(LIBTEC_ARG_EXISTS));
+            retcode = !(status == LIBTEC_OK) ? retcode : !status;
             continue;
         }
 
         if (generate_units(ctx, args.env)) {
             if (quiet == false)
                 elog(1, errfmt, args.env, "unit generation failed");
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         }
 
         if ((status = tec_env_add(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_desk_add(teccfg.base.task, &args, ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
+            retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         }
         ctx->units = tec_unit_free(ctx->units);
@@ -157,10 +168,10 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
         return 1;
     }
 
-    if (status == LIBTEC_OK && switch_dir)
-        status = tec_pwd_env(&args) == LIBTEC_OK ? status : status;
+    if (retcode == LIBTEC_OK && switch_dir)
+        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
 
-    return status;
+    return retcode;
 }
 
 static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
