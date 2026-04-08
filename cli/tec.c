@@ -4,6 +4,7 @@
 #include <limits.h>
 
 #include "tec.h"
+#include "aux/aux.h"
 #include "aux/log.h"
 #include "aux/pwd.h"
 #include "aux/argvec.h"
@@ -151,16 +152,6 @@ static int valid_toggle(char *tog)
     else if (strcmp(tog, "off") == 0)
         return false;
     return -1;
-}
-
-bool tec_cli_get_user_choice(void)
-{
-    char choice[10] = { 0 };
-
-    fgets(choice, sizeof(choice), stdin);
-    if (choice[0] == 'y' || choice[0] == 'Y')
-        return true;
-    return false;
 }
 
 int main(int argc, const char **argv)

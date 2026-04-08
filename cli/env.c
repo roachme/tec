@@ -226,7 +226,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     if (opt_ask_once == true) {
         printf("Are you sure to remove environment(s)? [y/N] ");
-        if (tec_cli_get_user_choice() == false) {
+        if (yesno() == false) {
             return LIBTEC_OK;
         }
     }
@@ -238,7 +238,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove environment '%s'? [y/N] ", args.env);
-            if (tec_cli_get_user_choice() == false) {
+            if (yesno() == false) {
                 continue;
             }
         }

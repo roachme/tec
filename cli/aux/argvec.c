@@ -19,6 +19,7 @@ void argvec_init(tec_argvec_t *vec)
     for (int i = 0; i < size; ++i)
         vec->argv[i] = NULL;
 
+    vec->i = 0;
     vec->used = 0;
     vec->offset = 0;
     vec->size = size;

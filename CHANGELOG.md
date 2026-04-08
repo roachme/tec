@@ -4,6 +4,8 @@
 
 ### Changed
 
+- `cli`: Unify option structure for command rm
+
 ### Fixed
 
 - `tec/cli`: Fix command 'version' setup mode

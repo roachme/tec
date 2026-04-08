@@ -39,3 +39,13 @@ int llog(int status, const char *fmt, ...)
     va_end(arg);
     return 0;
 }
+
+int tec_cli_log_prompt(int status, const char *fmt, ...)
+{
+    va_list arg;
+    va_start(arg, fmt);
+    fprintf(stderr, PROGRAM ": ");
+    vfprintf(stderr, fmt, arg);
+    va_end(arg);
+    return status;
+}

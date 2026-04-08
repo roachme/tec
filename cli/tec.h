@@ -37,6 +37,7 @@
 } while (0)
 
 #define CTX_INIT { .units = NULL, .list = NULL }
+#define ARGS_INIT(args) { .env = NULL, .desk = NULL, .taskid = NULL }
 
 enum tec_setup_level {
     TEC_PAGER,
@@ -57,7 +58,7 @@ int help_list_pretty_commands(void);
 int help_usage(const char *cmd);
 int help_lookup(const char *cmd);
 
-bool tec_cli_get_user_choice(void);
+bool yesno(void);
 
 int tec_pwd_unset(void);
 int tec_pwd_task(tec_arg_t * args);

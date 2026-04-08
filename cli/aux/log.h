@@ -6,5 +6,6 @@
 int elog(int status, const char *fmt, ...);
 int dlog(int level, const char *fmt, ...);
 int llog(int status, const char *fmt, ...);
+int tec_cli_log_prompt(int status, const char *fmt, ...);
 
 #endif

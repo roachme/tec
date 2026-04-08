@@ -1,53 +1,27 @@
-/* TODO: Find a good error message in case option fails.
- *
- * 1. Add option `-d' - remove empty/done tasks (maybe???)...
- * */
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
+#include "rm.h"
 #include "tec.h"
+#include "aux/aux.h"
+#include "aux/osdep.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
 
-#ifdef __linux__
-#include <unistd.h>
-#endif
-
-static char *user_cwd_ptr;
-static int change_dir = false;
-
-#ifdef __linux__
-static char *OS_GETCWD(void)
+static int update_toggles_and_cwd(tec_arg_t *args, struct rm_options *opts)
 {
-    /* Get logical current working directory via shell variable, because
-     * user current working directory might a symlink.  */
-    return getenv("PWD");
-}
-#endif
+    char *home;
+    int status = LIBTEC_OK;
 
-static char *get_user_cwd(void)
-{
-    return OS_GETCWD();
-}
-
-static bool do_change_user_cwd(tec_arg_t *args)
-{
-    char *base = teccfg.base.task;
-    char buf[FILENAME_MAX + 1] = { 0 };
-
-    sprintf(buf, "%s/%s/%s/%s", base, args->env, args->desk, args->taskid);
-    return strcmp(buf, get_user_cwd()) == 0;
-}
-
-static int update_toggles_and_cwd(tec_arg_t *args)
-{
-    int status;
-
-    status = LIBTEC_OK;
-    if (do_change_user_cwd(args) == true)
-        change_dir = true;
+    /* Not to break shell session in case user CWD gets deleted.  */
+    if (do_change_user_cwd(args) == true) {
+        if ((home = tec_cli_osdep_getenv_home()) == NULL) {
+            elog(EXIT_FAILURE, "could not get env 'HOME' variable");
+            exit(EXIT_FAILURE);
+        } else if (tec_cli_osdep_chdir(home)) {
+            elog(EXIT_FAILURE, "could not change user CWD");
+            exit(EXIT_FAILURE);
+        }
+        opts->change_dir = true;
+    }
 
     /* Update current and previos toggles.  */
     if (toggle_task_is_curr(teccfg.base.task, args)) {
@@ -58,21 +32,26 @@ static int update_toggles_and_cwd(tec_arg_t *args)
     return status;
 }
 
+void rm_option_init(struct rm_options *opts)
+{
+    opts->help = false;
+    opts->quiet = false;
+    opts->verbose = false;
+    opts->change_dir = false;
+    opts->interactive = RMI_ALWAYS;
+}
+
 int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    tec_arg_t args;
-    const char *errfmt;
-    int c, i, retcode, status;
-    int opt_quiet, opt_help, opt_verbose;
-    int opt_ask_once, opt_ask_every;
+    int c;
+    int status;
+    int ntasks;
+    struct rm_options opts;
+    int retcode = LIBTEC_OK;
+    tec_arg_t args = ARGS_INIT();
+    const char *errfmt = "cannot remove task '%s': %s";
 
-    opt_ask_every = true;       /* prompt before every removal.  */
-    opt_ask_once = false;       /* prompt before once for all task IDs.  */
-    retcode = LIBTEC_OK;
-    errfmt = "cannot remove task '%s': %s";
-    args.env = args.desk = args.taskid = NULL;
-    opt_quiet = opt_help = opt_verbose = false;
-
+    rm_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:fihqvI")) != -1) {
         switch (c) {
         case 'd':
@@ -82,25 +61,22 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             args.env = optarg;
             break;
         case 'f':
-            opt_ask_every = false;
-            opt_ask_once = false;
+            opts.interactive = RMI_NEVER;
             break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'i':
-            opt_ask_every = true;
-            opt_ask_once = false;
+            opts.interactive = RMI_ALWAYS;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'v':
-            opt_verbose = true;
+            opts.verbose = true;
             break;
         case 'I':
-            opt_ask_every = false;
-            opt_ask_once = true;
+            opts.interactive = RMI_SOMETIMES;
             break;
         case ':':
             return elog(1, "option `-%c' requires an argument", optopt);
@@ -108,57 +84,55 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             return elog(1, "invalid option `-%c'", optopt);
         }
     }
-    i = optind;
+    argvec->i = optind;
+    ntasks = argvec->used - argvec->i;
 
-    if (opt_help == true)
+    if (opts.help == true)
         return help_usage("rm");
-    else if ((user_cwd_ptr = get_user_cwd()) == NULL)
-        return elog(1, errfmt, "TASK", "could not get user current directory");
+    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
+        return EXIT_FAILURE;
+    else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
+        return EXIT_FAILURE;
 
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
-        return status;
-    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
-        return status;
-
-    if (opt_ask_once == true) {
-        printf("Are you sure to remove task(s)? [y/N] ");
-        if (tec_cli_get_user_choice() == false) {
-            return LIBTEC_OK;
+    if (ntasks >= 3 && opts.interactive == RMI_SOMETIMES) {
+        tec_cli_log_prompt(0, "remove %d tasks? [y/N] ", ntasks);
+        if (yesno() == false) {
+            return EXIT_SUCCESS;
         }
     }
 
     do {
-        args.taskid = argvec->argv[i];
+        args.taskid = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
-        } else if (opt_ask_every == true) {
-            printf("Are you sure to remove task '%s'? [y/N] ", args.taskid);
-            if (tec_cli_get_user_choice() == false)
+        } else if (opts.interactive == RMI_ALWAYS) {
+            tec_cli_log_prompt(0, "remove task '%s'? [y/N] ", args.taskid);
+            if (!yesno())
                 continue;
         }
 
         if ((status = hook_action(&args, "rm"))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
-        } else if ((status = update_toggles_and_cwd(&args))) {
-            if (opt_quiet == false)
+        } else if ((status = update_toggles_and_cwd(&args, &opts))) {
+            if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "could not update toggles");
         } else if ((status = tec_task_del(teccfg.base.task, &args, ctx))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
-        } else if (opt_verbose == true)
+        } else if (opts.verbose == true)
             llog(0, "removed task '%s'", args.taskid);
         retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+    } while (++argvec->i < argvec->used);
 
-    if (retcode == LIBTEC_OK && change_dir) {
+    if (retcode == LIBTEC_OK && opts.change_dir) {
         args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
         if (toggle_task_get_curr(teccfg.base.task, &args))
             args.taskid = "";
         retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
     }
 
-    return retcode;
+    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
