@@ -221,7 +221,7 @@ struct help helptab[] = {
       -h      show this help and exit\n\
       -q      do not write anything to standard error output\n\
       -v      explain what is being done\n\
-      -I      prompt once before removing more than one task ID\n\
+      -I      prompt once before removing more than three task IDs\n\
     \n\
     Arguments:\n\
       DESK    desk name (default is current)\n\

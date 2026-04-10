@@ -11,6 +11,7 @@
 - `tec/cli`: Fix command 'version' setup mode
 - `tec/desk`: Add missing desk checks
 - `tec/add`: Fix task ID check order
+- `cli/help`: Fix documentation for rm command
 
 ### Deleted
 
