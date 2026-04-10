@@ -170,7 +170,7 @@ while getopts ":hv:" opt; do
             VERSION_NEW="$OPTARG"
             ;;
         :)
-            echo "option -$opt requires an argument"
+            echo "option '-$opt' requires an argument"
             exit 1
             ;;
         *)

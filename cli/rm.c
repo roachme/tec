@@ -79,9 +79,10 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opts.interactive = RMI_SOMETIMES;
             break;
         case ':':
-            return elog(1, "option `-%c' requires an argument", optopt);
+            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
+                        optopt);
         default:
-            return elog(1, "invalid option `-%c'", optopt);
+            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
         }
     }
     argvec->i = optind;

@@ -5,6 +5,7 @@
 ### Changed
 
 - `cli`: Unify option structure for command rm
+- `cli`: Make invalid option return code clearer
 
 ### Fixed
 

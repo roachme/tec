@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <getopt.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "aux/aux.h"

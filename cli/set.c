@@ -107,9 +107,10 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 ctx->units = tec_unit_add(ctx->units, "prio", optarg);
             break;
         case ':':
-            return elog(1, "option `-%c' requires an argument", optopt);
+            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
+                        optopt);
         default:
-            return elog(1, "invalid option `-%c'", optopt);
+            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
         }
     }
     i = optind;
