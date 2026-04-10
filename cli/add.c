@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 
 #include "tec.h"
+#include "add.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
@@ -48,21 +50,25 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     return 0;
 }
 
+void tec_cli_add_option_init(struct tec_cli_add_options *opts)
+{
+    opts->help = false;
+    opts->quiet = false;
+    opts->chdir = true;
+    opts->chtog = true;
+}
+
 int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
-    char *desc;
-    tec_arg_t args;
-    const char *errfmt;
-    int c, i, retcode, status;
-    int opt_quiet, opt_help, opt_cd_dir, opt_cd_toggle;
+    int c;
+    int status;
+    char *desc = NULL;
+    int retcode = LIBTEC_OK;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_cli_add_options opts;
+    const char *errfmt = "cannot create task '%s': %s";
 
-    desc = NULL;
-    retcode = LIBTEC_OK;
-    opt_quiet = opt_help = false;
-    opt_cd_dir = opt_cd_toggle = true;
-    args.env = args.desk = args.taskid = NULL;
-    errfmt = "cannot create task '%s': %s";
-
+    tec_cli_add_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnD:N")) != -1) {
         switch (c) {
         case 'd':
@@ -72,20 +78,20 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             args.env = optarg;
             break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'n':
-            opt_cd_toggle = false;
+            opts.chtog = false;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'D':
             desc = optarg;
             break;
         case 'N':
-            opt_cd_dir = false;
-            opt_cd_toggle = false;
+            opts.chdir = false;
+            opts.chtog = false;
             break;
         case ':':
             return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
@@ -93,65 +99,63 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
-    i = optind;
+    argvec->i = optind;
 
-    if (opt_help == true)
+    if (opts.help == true)
         return help_usage("add");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
-        return status;
-    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
-        return status;
+    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
+        return EXIT_FAILURE;
+    else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
+        return EXIT_FAILURE;
     else if (optind == argvec->used && generate_task(&args, argvec)) {
-        if (opt_quiet == false)
+        if (opts.quiet == false)
             elog(1, "could not generate task ID: limit is %d", IDLIMIT);
-        return 1;
+        return EXIT_FAILURE;
     }
 
     do {
-        args.taskid = argvec->argv[i];
+        args.taskid = argvec->argv[argvec->i];
 
         if (tec_cli_len_valid(args.taskid, IDSIZ) == false) {
             status = 1;
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, "task ID is too long");
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(teccfg.base.task, &args))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(teccfg.base.task, &args))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
-            retcode = !(status == LIBTEC_OK) ? retcode : !status;
+            retcode = !(status == LIBTEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(ctx, &args, desc))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "unit generation failed");
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_task_add(teccfg.base.task, &args, ctx))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
-        } else if (opt_cd_toggle == true) {
+        } else if (opts.chtog == true) {
             if ((status = toggle_task_set_curr(teccfg.base.task, &args))) {
-                if (opt_quiet == false)
+                if (opts.quiet == false)
                     elog(status, "could not update toggles");
             }
         }
         ctx->units = tec_unit_free(ctx->units);
-        retcode = status == LIBTEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+        retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    } while (++argvec->i < argvec->used);
 
-    if (retcode == LIBTEC_OK && opt_cd_dir)
-        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
-
-    return retcode;
+    if (retcode == LIBTEC_OK && opts.chdir)
+        retcode = tec_pwd_task(&args);
+    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
