@@ -6,7 +6,8 @@
 #include "aux/toggle.h"
 #include "aux/config.h"
 
-static int update_toggles_and_cwd(tec_arg_t *args, struct rm_options *opts)
+static int update_toggles_and_cwd(tec_arg_t *args,
+                                  struct tec_cli_rm_options *opts)
 {
     char *home;
     int status = LIBTEC_OK;
@@ -32,7 +33,7 @@ static int update_toggles_and_cwd(tec_arg_t *args, struct rm_options *opts)
     return status;
 }
 
-void rm_option_init(struct rm_options *opts)
+void tec_cli_rm_option_init(struct tec_cli_rm_options *opts)
 {
     opts->help = false;
     opts->quiet = false;
@@ -46,12 +47,12 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     int c;
     int status;
     int ntasks;
-    struct rm_options opts;
     int retcode = LIBTEC_OK;
     tec_arg_t args = ARGS_INIT();
+    struct tec_cli_rm_options opts;
     const char *errfmt = "cannot remove task '%s': %s";
 
-    rm_option_init(&opts);
+    tec_cli_rm_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:fihqvI")) != -1) {
         switch (c) {
         case 'd':

@@ -3,20 +3,20 @@
 
 #include <stdbool.h>
 
-enum rm_interactive {
+enum tec_cli_rm_interactive {
     RMI_ALWAYS,
     RMI_SOMETIMES,
     RMI_NEVER,
 };
 
-struct rm_options {
+struct tec_cli_rm_options {
     bool help;
     bool quiet;
     bool verbose;
     bool change_dir;
-    enum rm_interactive interactive;
+    enum tec_cli_rm_interactive interactive;
 };
 
-void rm_option_init(struct rm_options *opts);
+void tec_cli_rm_option_init(struct tec_cli_rm_options *opts);
 
 #endif

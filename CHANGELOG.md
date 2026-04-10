@@ -8,6 +8,7 @@
 - `cli`: Make invalid option return code clearer
 - `cli`: Move option error message to macro
 - `cli/add`: Unify option structure for command add
+- `cli/rm`: Add prefix to rm option structure
 
 ### Fixed
 
