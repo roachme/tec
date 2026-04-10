@@ -295,10 +295,9 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
             return elog(1, "option `-t' under development");
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
 

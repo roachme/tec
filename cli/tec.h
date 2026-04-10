@@ -31,6 +31,9 @@
 #define IDFMT               "%0" xstr(IDSIZ) "u"
 #define PADDING_UNIT        6
 
+#define FMT_OPT_ARG_INV "invalid option '-%c'"
+#define FMT_OPT_ARG_REQ "option '-%c' requires an argument"
+
 #define LIST_OBJ_UNITS(_obj, _pgnout, _desc, padsiz) do {\
     color_print_str("%-" xstr(padsiz) "s ", (_obj), BBLU); \
     color_print_str("%s ", (_pgnout), WHT); \

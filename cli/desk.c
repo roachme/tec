@@ -76,10 +76,9 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_cd_toggle = false;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
     i = optind;
@@ -181,10 +180,9 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_ask_once = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
     i = optind;
@@ -254,10 +252,9 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_help = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
 
@@ -329,10 +326,9 @@ static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
             ctx->units = tec_unit_add(ctx->units, "desc", optarg);
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
 
@@ -390,10 +386,9 @@ static int _desk_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_quiet = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
     i = optind;
@@ -459,10 +454,9 @@ static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_cd_toggle = false;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
 

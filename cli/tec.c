@@ -205,10 +205,9 @@ int main(int argc, const char **argv)
             opt_version = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, "option '-%c' requires an argument",
-                        optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
         default:
-            return elog(EXIT_FAILURE, "invalid option '-%c'", optopt);
+            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
         }
     }
 
