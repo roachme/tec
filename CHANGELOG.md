@@ -18,6 +18,7 @@
 - `tec/desk`: Add missing desk checks
 - `tec/add`: Fix task ID check order
 - `cli/help`: Fix documentation for rm command
+- `cli/env`: Fix pwd module function call
 
 ### Deleted
 

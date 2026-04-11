@@ -169,7 +169,7 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     }
 
     if (retcode == LIBTEC_OK && switch_dir)
-        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
 
     return retcode;
 }
