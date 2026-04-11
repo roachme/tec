@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "tec.h"
-#include "add.h"
+#include "cd.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
@@ -50,14 +50,6 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     return 0;
 }
 
-void tec_cli_add_option_init(struct tec_cli_add_options *opts)
-{
-    opts->help = false;
-    opts->quiet = false;
-    opts->chdir = true;
-    opts->chtog = true;
-}
-
 int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
 {
     int c;
@@ -65,10 +57,10 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     char *desc = NULL;
     int retcode = LIBTEC_OK;
     tec_arg_t args = ARGS_INIT();
-    struct tec_cli_add_options opts;
+    struct tec_cli_cd_options opts;
     const char *errfmt = "cannot create task '%s': %s";
 
-    tec_cli_add_option_init(&opts);
+    tec_cli_cd_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnD:N")) != -1) {
         switch (c) {
         case 'd':
