@@ -137,7 +137,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && opt_cd_dir)
-        retcode = tec_pwd_desk(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
 
     return retcode;
 }
@@ -228,7 +228,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++i < argvec->used);
 
     // TODO: update current directory if current env got deleted.
-    return retcode == LIBTEC_OK ? tec_pwd_desk(&args) : retcode;
+    return retcode == LIBTEC_OK ? tec_cli_pwd_set(&args) : retcode;
 }
 
 // TODO: show tasks in desk
@@ -499,7 +499,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && opt_cd_dir)
-        retcode = tec_pwd_desk(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
 
     return retcode;
 }

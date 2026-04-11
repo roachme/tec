@@ -212,7 +212,7 @@ int main(int argc, const char **argv)
     }
 
     i = optind;
-    tec_pwd_unset();
+    tec_cli_pwd_unset();
     tec_getopt_unset();
     argvec_offset(&argvec, i);  /* Skip program name and options if any.  */
 

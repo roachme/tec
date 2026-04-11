@@ -148,6 +148,6 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++argvec->i < argvec->used);
 
     if (retcode == LIBTEC_OK && opts.chdir)
-        retcode = tec_pwd_task(&args);
+        retcode = tec_cli_pwd_set(&args);
     return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

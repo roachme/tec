@@ -132,7 +132,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
         args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
         if (toggle_task_get_curr(teccfg.base.task, &args))
             args.taskid = "";
-        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
     }
 
     return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;

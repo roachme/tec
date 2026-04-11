@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "aux/pwd.h"
 #include "aux/aux.h"
 #include "aux/log.h"
 #include "aux/hook.h"
@@ -63,11 +64,6 @@ int help_usage(const char *cmd);
 int help_lookup(const char *cmd);
 
 bool yesno(void);
-
-int tec_pwd_unset(void);
-int tec_pwd_task(tec_arg_t * args);
-int tec_pwd_desk(tec_arg_t * args);
-int tec_pwd_env(tec_arg_t * args);
 
 // NOTE: maybe use 'prefix' like in git?
 // int cmd_add(int argc, const char **argv, const char *prefix, struct repository *repo);

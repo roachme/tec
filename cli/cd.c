@@ -90,7 +90,6 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++argvec->i < argvec->used);
 
     if (retcode == LIBTEC_OK && opts.chdir)
-        retcode = tec_pwd_task(&args) == LIBTEC_OK ? retcode : status;
-
-    return retcode;
+        retcode = tec_cli_pwd_set(&args);
+    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

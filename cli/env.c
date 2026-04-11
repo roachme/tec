@@ -2,8 +2,8 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "aux/argvec.h"
 #include "tec.h"
+#include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
 
@@ -169,9 +169,8 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     }
 
     if (retcode == LIBTEC_OK && switch_dir)
-        retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
-
-    return retcode;
+        retcode = tec_cli_pwd_set(&args);
+    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
@@ -259,7 +258,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     // TODO: update current directory if current env got deleted.
 
     if (retcode == LIBTEC_OK)
-        retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
 
     return retcode;
 }
@@ -366,7 +365,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
         return status;
     }
     // FIXME:TODO: free argvec
-    return tec_pwd_env(&dst);
+    return tec_cli_pwd_set(&dst);
 }
 
 static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
@@ -565,7 +564,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
     } while (++i < argvec->used);
 
     if (retcode == LIBTEC_OK && opt_cd_dir)
-        retcode = tec_pwd_env(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
 
     return retcode;
 }

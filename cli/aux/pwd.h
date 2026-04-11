@@ -3,9 +3,7 @@
 
 #include "../../lib/libtec.h"
 
-int tec_pwd_env(tec_arg_t * args);
-int tec_pwd_desk(tec_arg_t * args);
-int tec_pwd_task(tec_arg_t * args);
-int tec_pwd_unset(void);
+int tec_cli_pwd_set(tec_arg_t * args);
+int tec_cli_pwd_unset(void);
 
 #endif
