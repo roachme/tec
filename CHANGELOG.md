@@ -10,6 +10,7 @@
 - `cli/add`: Unify option structure for command add
 - `cli/rm`: Add prefix to rm option structure
 - `cli/cd`: Unify option structure for command cd
+- `cli/cat`: Unify option structure for command cat
 
 ### Fixed
 
