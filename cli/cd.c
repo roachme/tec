@@ -75,9 +75,13 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
     do {
         args.taskid = argvec->argv[argvec->i];
+
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            ;
-        } else if ((status = hook_action(&args, "cd"))) {
+            retcode = status == LIBTEC_OK ? retcode : status;
+            continue;
+        }
+
+        if ((status = hook_action(&args, "cd"))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         } else if (opts.chtog == true) {
