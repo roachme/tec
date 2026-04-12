@@ -135,9 +135,11 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
             show_headers = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("ls");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("ls");
         }
     }
 

@@ -295,9 +295,11 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
             return elog(1, "option `-t' under development");
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("mv");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("mv");
         }
     }
 

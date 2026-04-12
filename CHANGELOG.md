@@ -13,6 +13,7 @@
 - `cli/cat`: Unify option structure for command cat
 - `cli`: Refactor module pwd
 - `cli/cd`: Fix potential error in task check
+- `cli`: Add help message in case of invalid option
 
 ### Fixed
 

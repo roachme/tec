@@ -205,9 +205,11 @@ int main(int argc, const char **argv)
             opt_version = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("tec");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("tec");
         }
     }
 

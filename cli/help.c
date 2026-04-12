@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "aux/aux.h"
 #include "tec.h"
 #include "aux/log.h"
 
@@ -663,14 +665,8 @@ int help_list_pretty_commands(void)
 
 int help_usage(const char *cmd)
 {
-    for (int i = 0; i < ARRAY_SIZE(helptab); ++i) {
-        if (strcmp(helptab[i].name, cmd) == 0) {
-            printf("%s", helptab[i].synop);
-            printf("Try '" PROGRAM " help %s' for more info.\n", cmd);
-            return 0;
-        }
-    }
-    return elog(1, "%s: command not found", cmd);
+    fprintf(stderr, "Try '%s help %s' for more information.\n", PROGRAM, cmd);
+    return EXIT_FAILURE;
 }
 
 int help_lookup(const char *cmd)
@@ -723,9 +719,11 @@ int tec_cli_help(tec_argvec_t *argvec, tec_ctx_t *ctx)
             helpctx.desc_long = false;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("help");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("help");
         };
     }
 

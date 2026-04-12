@@ -82,8 +82,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         case 'T':
             if (valid_type(optarg) == false) {
                 elog(1, "invalid priority '%s'", optarg);
-                help_usage("set");
-                return 1;
+                return help_usage("set");
             }
             if (tec_unit_get(ctx->units, "type") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "type", optarg);
@@ -91,8 +90,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         case 'D':
             if (valid_desc(optarg) == false) {
                 elog(1, "invalid description '%s'", optarg);
-                help_usage("set");
-                return 1;
+                return help_usage("set");
             }
             if (tec_unit_get(ctx->units, "desc") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "desc", optarg);
@@ -100,16 +98,17 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         case 'P':
             if (valid_prio(optarg) == false) {
                 elog(1, "invalid priority '%s'", optarg);
-                help_usage("set");
-                return 1;
+                return help_usage("set");
             }
             if (tec_unit_get(ctx->units, "prio") == NULL)
                 ctx->units = tec_unit_add(ctx->units, "prio", optarg);
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("set");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("set");
         }
     }
     i = optind;

@@ -78,9 +78,11 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             switch_env = false;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-add");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-add");
         }
     }
 
@@ -213,9 +215,11 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_ask_once = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-rm");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-rm");
         }
     }
     i = optind;
@@ -283,9 +287,11 @@ static int _env_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_help = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-ls");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-ls");
         }
     }
 
@@ -334,7 +340,8 @@ static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_quiet = true;
             break;
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-rename");
         }
     }
 
@@ -395,16 +402,17 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         case 'D':
             if (valid_desc(optarg) == false) {
                 elog(1, "invalid description '%s'", optarg);
-                help_usage("env-set");
-                return 1;
+                return help_usage("env-set");
             }
             atleast_one_key_set = true;
             ctx->units = tec_unit_add(ctx->units, "desc", optarg);
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-set");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-set");
         }
     }
 
@@ -412,8 +420,7 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         return help_usage("env-set");
     else if (atleast_one_key_set == false) {
         elog(1, "gotta supply one of the options");
-        help_usage("env-set");
-        return 1;
+        return help_usage("env-set");
     }
 
     i = optind;
@@ -460,9 +467,11 @@ static int _env_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
             quiet = true;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-cat");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-cat");
         }
     }
 
@@ -523,9 +532,11 @@ static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
             opt_cd_toggle = false;
             break;
         case ':':
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            return help_usage("env-cd");
         default:
-            return elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            return help_usage("env-cd");
         }
     }
 
