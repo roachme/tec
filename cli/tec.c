@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -8,8 +10,6 @@
 #include "aux/log.h"
 #include "aux/pwd.h"
 #include "aux/argvec.h"
-#include "aux/config.h"
-#include "aux/toggle.h"
 
 #define tec_getopt_unset()  \
     do {                    \
@@ -25,14 +25,15 @@ typedef struct tec_cli_status {
 } tec_cli_status_t;
 */
 
-static tec_cfg_t *_teccfg = &teccfg;
-
 struct config teccfg;
-char *unitkeys[] = { "prio", "type", "date", "desc", };
 
-unsigned int nunitkey = sizeof(unitkeys) / sizeof(unitkeys[0]);
+static tec_cmd_t tec_cmd_types[] = {
+    {.name = "alias",.type = tec_cli_is_alias},
+    {.name = "plugin",.type = tec_cli_is_plugin},
+    {.name = "builtin",.type = tec_cli_is_builtin},
+};
 
-static tec_builtin_t builtins[] = {
+static tec_cmd_t tec_cmds[] = {
     {.name = "add",.func = &tec_cli_add,.option = TEC_SETUP_HARD},
     {.name = "cat",.func = &tec_cli_cat,.option = TEC_SETUP_HARD},
     {.name = "cd",.func = &tec_cli_cd,.option = TEC_SETUP_HARD},
@@ -46,131 +47,112 @@ static tec_builtin_t builtins[] = {
     {.name = "rm",.func = &tec_cli_rm,.option = TEC_SETUP_HARD},
     {.name = "set",.func = &tec_cli_set,.option = TEC_SETUP_HARD},
     {.name = "version",.func = &tec_cli_version,.option = TEC_SETUP_SOFT},
+    {.name = "_alias_",.func = &tec_cli_alias,.option = TEC_SETUP_SOFT},
+    {.name = "_pgn_",.func = &tec_cli_pgn,.option = TEC_SETUP_SOFT},
 };
 
-static int tec_setup(int setuplvl)
+static int is_valid_toggle(char *tog)
+{
+    if (strncmp(tog, "on", 2) == 0)
+        return true;
+    else if (strncmp(tog, "off", 3) == 0)
+        return false;
+    return -1;
+}
+
+static int tec_setup(int setuplvl, tec_cfg_t *cfg)
 {
     int status = LIBTEC_OK;
 
     if (setuplvl == TEC_SETUP_SOFT)     /* no filesystem check.  */
         ;
     else if (setuplvl == TEC_SETUP_HARD) {      /* check filesystem.  */
-        status = tec_check_db(teccfg.base.task);
+        status = tec_check_db(cfg->base.task);
     }
     return status;
 }
 
-// TODO: return tec_alias_t *. This way no need for static variables in the file
-static tec_alias_t *is_alias(char *pgndir, const char *cmd)
+static bool tec_cli_cmd_is_naughty(const char *cmdname)
 {
-    struct tec_alias *head;
+    if (!isalpha(cmdname[0]))
+        return true;
+    return false;
+}
 
-    for (head = teccfg.alias; head != NULL; head = head->next) {
-        if (strcmp(cmd, head->name) == 0) {
-            return head;
-        }
-    }
+static tec_cmd_t *tec_cli_cmd_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
+{
+    tec_cmd_t *cmd;
+
+    for (int i = 0; i < ARRAY_SIZE(tec_cmd_types); ++i)
+        if ((cmd = tec_cmd_types[i].type(argvec, cfg)))
+            return cmd;
     return NULL;
 }
 
-// Resolve nested alias
-/*
-static int alias_resolve()
+// TODO: what if alias returns pointer to builtin or plugin function?
+tec_cmd_t *tec_cli_is_alias(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    return 0;
-}
-*/
+    tec_alias_t *head;
+    char *cmdname = argvec->argv[0];
+    tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 2];
 
-static tec_builtin_t *is_builtin(const char *cmd)
-{
-    for (int idx = 0; idx < ARRAY_SIZE(builtins); ++idx)
-        if (strcmp(cmd, builtins[idx].name) == 0)
-            return &builtins[idx];
+    for (head = cfg->alias; head != NULL; head = head->next)
+        if (strcmp(cmdname, head->name) == 0)
+            return cmd;
     return NULL;
 }
 
-static int is_plugin(char *pgndir, const char *pgname)
+tec_cmd_t *tec_cli_is_plugin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     FILE *fp;
     char path[PATH_MAX + 1];
+    char *cmdname = argvec->argv[0];
+    tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 1];
 
-    sprintf(path, "%s/%s/%s", pgndir, pgname, pgname);
+    snprintf(path, sizeof(path), "%s/%s/%s", cfg->base.pgn, cmdname, cmdname);
 
     if ((fp = fopen(path, "r")) == NULL)
-        return false;
+        return NULL;
     fclose(fp);
-    return true;
+    return cmd;
 }
 
-static int run_builtin(tec_argvec_t *argvec, tec_builtin_t *cmd)
+tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    int status;
-    tec_cfg_t *cfg = _teccfg;
+    char *cmdname = argvec->argv[0];
 
-    if ((status = tec_setup(cmd->option)) != LIBTEC_OK)
+    for (int idx = 0; idx < ARRAY_SIZE(tec_cmds); ++idx)
+        if (strcmp(cmdname, tec_cmds[idx].name) == 0)
+            return &tec_cmds[idx];
+    return NULL;
+}
+
+int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
+{
+    int status = LIBTEC_OK;
+
+    if ((status = tec_setup(cmd->option, cfg)) != LIBTEC_OK) {
         return elog(status, "setup failed: %s", tec_strerror(status));
+    }
 
     return cmd->func(argvec, cfg);
 }
 
-static int run_plugin(tec_argvec_t *argvec)
-{
-    int status;
-    tec_cfg_t *cfg = _teccfg;
-
-    if ((status = tec_setup(TEC_SETUP_HARD)) != LIBTEC_OK)
-        return elog(status, "setup failed: %s", tec_strerror(status));
-
-    return tec_cli_pgn(argvec, cfg);
-}
-
-/* TODO: add support to include alias into alias (i.e. recursive aliases).  */
-static int run_alias(tec_argvec_t *argvec, tec_alias_t *alias)
-{
-    char *tok, *cmd;
-    int status = LIBTEC_OK;
-
-    tok = cmd = strtok(alias->cmd, " ");
-    argvec_replace(argvec, 0, tok, strlen(tok));
-
-    while ((tok = strtok(NULL, " ")) != NULL) {
-        argvec_add(argvec, tok);
-    }
-
-    if (is_plugin(teccfg.base.pgn, cmd) == true) {
-        dlog(1, "alias execute as plugin: '%s'", alias->name);
-        status = run_plugin(argvec);
-    } else {
-        dlog(1, "alias execute as builtin: '%s'", alias->name);
-        status = run_builtin(argvec, is_builtin(alias->cmd));
-    }
-    return status;
-}
-
-static int valid_toggle(char *tog)
-{
-    if (strcmp(tog, "on") == 0)
-        return true;
-    else if (strcmp(tog, "off") == 0)
-        return false;
-    return -1;
-}
-
 int main(int argc, const char **argv)
 {
+    int c;
+    int status;
+    tec_cmd_t *cmd;
     tec_opt_t opts;
     tec_base_t base;
-    int c, i, status;
-    tec_alias_t *alias;
+    const char *togfmt;
     tec_argvec_t argvec;
-    tec_builtin_t *builtin;
-    const char *cmd, *togfmt;
-    int opt_help, opt_version;
+    const char *cmdname;
+    tec_cfg_t *cfg = &teccfg;
 
-    cmd = NULL;
+    cmdname = NULL;
     status = LIBTEC_OK;
     base.pgn = base.task = NULL;
-    opt_help = opt_version = false;
     opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";
 
@@ -181,20 +163,20 @@ int main(int argc, const char **argv)
     while ((c = getopt(argvec.used, argvec.argv, "+:hC:D:F:H:P:T:V")) != -1) {
         switch (c) {
         case 'h':
-            opt_help = true;
+            argvec_add(&argvec, "help");
             break;
         case 'C':
-            if ((opts.color = valid_toggle(optarg)) == -1)
+            if ((opts.color = is_valid_toggle(optarg)) == -1)
                 return elog(1, togfmt, c);
             break;
         case 'D':
-            if ((opts.debug = valid_toggle(optarg)) == -1)
+            if ((opts.debug = is_valid_toggle(optarg)) == -1)
                 return elog(1, togfmt, c);
             break;
         case 'F':
             return elog(1, "option `-%c' under development", c);
         case 'H':
-            if ((opts.hook = valid_toggle(optarg)) == -1)
+            if ((opts.hook = is_valid_toggle(optarg)) == -1)
                 return elog(1, togfmt, c);
             break;
         case 'P':
@@ -204,55 +186,48 @@ int main(int argc, const char **argv)
             base.task = optarg;
             break;
         case 'V':
-            opt_version = true;
+            argvec_add(&argvec, "version");
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("tec");
+            return tec_cli_help_usage("tec");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("tec");
+            return tec_cli_help_usage("tec");
         }
     }
 
-    i = optind;
+    argvec.i = optind;
     tec_cli_pwd_unset();
     tec_getopt_unset();
-    argvec_offset(&argvec, i);  /* Skip program name and options if any.  */
+    argvec_offset(&argvec, argvec.i);   /* Skip program name and options if any.  */
 
-    if (opt_help == true) {
-        argvec_add(&argvec, "help");
-    } else if (opt_version == true) {
-        argvec_add(&argvec, "version");
-    }
-
-    if ((cmd = argvec.argv[0]) == NULL) {
-        status = 1;
-        help_list_pretty_commands();
-        goto err;
-    }
-
-    if (tec_config_init(&teccfg))
+    if (tec_config_init(cfg))
         return elog(1, "could init config file");
-    else if (tec_config_parse(&teccfg))
+    else if (tec_config_parse(cfg))
         return elog(1, "could parse config file");
     else if (tec_config_set_base(&base))
         return elog(1, "could set config base directories");
     else if (tec_config_set_options(&opts))
         return elog(1, "could set config options");
 
-    if ((alias = is_alias(teccfg.base.pgn, cmd)) != NULL) {
-        status = run_alias(&argvec, alias);
-    } else if (is_plugin(teccfg.base.pgn, cmd) == true) {
-        status = run_plugin(&argvec);
-    } else if ((builtin = is_builtin(cmd)) != NULL) {
-        status = run_builtin(&argvec, builtin);
-    } else {
-        status = elog(1, "'%s': no such command, alias or plugin", cmd);
+    if ((cmdname = argvec.argv[0]) == NULL) {
+        status = EXIT_FAILURE;
+        tec_cli_help_list();
+        goto err;
+    } else if (tec_cli_cmd_is_naughty(cmdname) == true) {
+        status = elog(1, "'%s': naughty command", cmdname);
+        goto err;
+    } else if ((cmd = tec_cli_cmd_get(&argvec, cfg)) == NULL) {
+        status = elog(1, "'%s': no such command, alias or plugin", cmdname);
+        goto err;
+    } else if ((status = tec_cli_cmd_run(cmd, &argvec, cfg))) {
+        status = elog(1, "'%s': failed to run command", cmdname);
+        goto err;
     }
 
  err:
-    tec_config_destroy(&teccfg);
+    tec_config_destroy(cfg);
     argvec_deinit(&argvec);
-    return status;
+    return status == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
 }

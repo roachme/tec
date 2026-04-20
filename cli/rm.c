@@ -82,17 +82,17 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("rm");
+            return tec_cli_help_usage("rm");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("rm");
+            return tec_cli_help_usage("rm");
         }
     }
     argvec->i = optind;
     ntasks = argvec->used - argvec->i;
 
     if (opts.help == true)
-        return help_usage("rm");
+        return tec_cli_help_usage("rm");
     else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
@@ -123,7 +123,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if ((status = update_toggles_and_cwd(&args, &opts))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "could not update toggles");
-        } else if ((status = tec_task_del(teccfg.base.task, &args, &ctx))) {
+        } else if ((status = tec_task_del(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if (opts.verbose == true)
@@ -133,7 +133,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (retcode == LIBTEC_OK && opts.change_dir) {
         args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
-        if (toggle_task_get_curr(teccfg.base.task, &args))
+        if (toggle_task_get_curr(cfg->base.task, &args))
             args.taskid = "";
         retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
     }

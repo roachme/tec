@@ -660,7 +660,7 @@ static int help_list_short_commands(void)
     return 0;
 }
 
-int help_list_pretty_commands(void)
+int tec_cli_help_list(void)
 {
     printf("Usage: " PROGRAM " [OPTION]... COMMAND|PLUGIN\n");
     printf(PADDING "Run '" PROGRAM " help " PROGRAM "' to get more info.\n");
@@ -671,13 +671,13 @@ int help_list_pretty_commands(void)
     return 0;
 }
 
-int help_usage(const char *cmd)
+int tec_cli_help_usage(const char *cmd)
 {
     fprintf(stderr, "Try '%s help %s' for more information.\n", PROGRAM, cmd);
     return EXIT_FAILURE;
 }
 
-int help_lookup(const char *cmd)
+int tec_cli_help_lookup(const char *cmd)
 {
     int i, found;
 
@@ -728,10 +728,10 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("help");
+            return tec_cli_help_usage("help");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("help");
+            return tec_cli_help_usage("help");
         };
     }
 
@@ -739,10 +739,10 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (opt_list_cmds)
         return help_list_short_commands();
     else if (optind == argvec->used)
-        return help_list_pretty_commands();
+        return tec_cli_help_list();
 
     for (i = optind; i < argvec->used; ++i)
-        if ((status = help_lookup(argvec->argv[i])))
+        if ((status = tec_cli_help_lookup(argvec->argv[i])))
             elog(1, "'%s': no such builtin command", argvec->argv[i]);
 
     return status;

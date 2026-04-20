@@ -7,12 +7,13 @@
 #include "aux/config.h"
 
 // TODO: remove parameter 'quiet', return status, and let the caller to
-static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
+static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet,
+                           tec_cfg_t *cfg)
 {
     int status;
     char *desc;
 
-    if ((status = tec_desk_get(teccfg.base.task, args, ctx))) {
+    if ((status = tec_desk_get(cfg->base.task, args, ctx))) {
         if (quiet == false)
             elog(status, "'%s': %s one", args->desk, tec_strerror(status));
     } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
@@ -78,16 +79,16 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-add");
+            return tec_cli_help_usage("desk-add");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-add");
+            return tec_cli_help_usage("desk-add");
         }
     }
     i = optind;
 
     if (opt_help)
-        return help_usage("desk-add");
+        return tec_cli_help_usage("desk-add");
 
     if (optind == argvec->used)
         return elog(1, "desk name required");
@@ -104,12 +105,12 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 elog(status, errfmt, args.desk, "desk name is too long");
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
-        } else if ((status = tec_desk_valid(teccfg.base.task, &args))) {
+        } else if ((status = tec_desk_valid(cfg->base.task, &args))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.desk, tec_strerror(status));
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
-        } else if (!(status = tec_desk_exist(teccfg.base.task, &args))) {
+        } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
             char *desk = args.desk;
             if (opt_quiet == false)
                 elog(status, errfmt, desk, tec_strerror(LIBTEC_ARG_EXISTS));
@@ -122,7 +123,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         }
 
-        if ((status = tec_desk_add(teccfg.base.task, &args, &ctx))) {
+        if ((status = tec_desk_add(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
             ctx.units = tec_unit_free(ctx.units);
@@ -130,7 +131,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             if (opt_quiet == false)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
-            if ((status = toggle_desk_set_curr(teccfg.base.task, &args))) {
+            if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)
                     elog(status, "could not update toggles");
             }
@@ -185,16 +186,16 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-rm");
+            return tec_cli_help_usage("desk-rm");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-rm");
+            return tec_cli_help_usage("desk-rm");
         }
     }
     i = optind;
 
     if (opt_help)
-        return help_usage("desk-rm");
+        return tec_cli_help_usage("desk-rm");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
@@ -222,7 +223,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status = hook_action(&args, "desk-rm"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.desk, "failed to execute hooks");
-        } else if ((status = tec_desk_del(teccfg.base.task, &args, &ctx))) {
+        } else if ((status = tec_desk_del(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }
@@ -260,15 +261,15 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-ls");
+            return tec_cli_help_usage("desk-ls");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-ls");
+            return tec_cli_help_usage("desk-ls");
         }
     }
 
     if (opt_help == true)
-        return help_usage("desk-ls");
+        return tec_cli_help_usage("desk-ls");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
@@ -279,7 +280,7 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if (tec_cli_check_env(&args, errfmt, opt_quiet))
             continue;
-        if ((status = tec_desk_list(teccfg.base.task, &args, &ctx))) {
+        if ((status = tec_desk_list(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.desk, tec_strerror(status));
             continue;
@@ -287,10 +288,10 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         for (tec_list_t * obj = ctx.list; obj != NULL; obj = obj->next) {
             args.desk = obj->name;
-            if ((desc = get_unit_desc(&ctx, &args, opt_quiet)) == NULL) {
+            if ((desc = get_unit_desc(&ctx, &args, opt_quiet, cfg)) == NULL) {
                 continue;
             }
-            LIST_OBJ_UNITS(obj->name, "", desc, DESKSIZ);
+            LIST_OBJ_UNITS(obj->name, "", desc, DESKSIZ, teccfg.opts.color);
             ctx.units = tec_unit_free(ctx.units);
         }
         ctx.list = tec_list_free(ctx.list);
@@ -329,25 +330,25 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         case 'D':
             if (valid_desc(optarg) == false) {
                 elog(1, "invalid description '%s'", optarg);
-                return help_usage("desk-set");
+                return tec_cli_help_usage("desk-set");
             }
             atleast_one_key_set = true;
             ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-set");
+            return tec_cli_help_usage("desk-set");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-set");
+            return tec_cli_help_usage("desk-set");
         }
     }
 
     if (opt_help)
-        return help_usage("desk-set");
+        return tec_cli_help_usage("desk-set");
     if (atleast_one_key_set == false) {
         elog(1, "gotta supply one of the options");
-        return help_usage("desk-set");
+        return tec_cli_help_usage("desk-set");
     }
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
@@ -359,7 +360,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_desk_set(teccfg.base.task, &args, &ctx))) {
+        } else if ((status = tec_desk_set(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "desk-set"))) {
@@ -398,16 +399,16 @@ static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-cat");
+            return tec_cli_help_usage("desk-cat");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-cat");
+            return tec_cli_help_usage("desk-cat");
         }
     }
     i = optind;
 
     if (opt_help)
-        return help_usage("desk-cat");
+        return tec_cli_help_usage("desk-cat");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
@@ -416,7 +417,7 @@ static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.desk = argvec->argv[i];
         if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_desk_get(teccfg.base.task, &args, &ctx))) {
+        } else if ((status = tec_desk_get(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
             ;
@@ -468,17 +469,17 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("desk-cd");
+            return tec_cli_help_usage("desk-cd");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("desk-cd");
+            return tec_cli_help_usage("desk-cd");
         }
     }
 
     i = optind;
 
     if (opt_help == true)
-        return help_usage("desk-cd");
+        return tec_cli_help_usage("desk-cd");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
@@ -491,7 +492,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     /* Resolve alias '-' to switch to previous environment.  */
     if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {
-        if ((status = toggle_desk_get_prev(teccfg.base.task, &args)))
+        if ((status = toggle_desk_get_prev(cfg->base.task, &args)))
             return elog(1, errfmt, "PREV", "no previous desk");
         argvec_replace(argvec, i, args.desk, DESKSIZ);
     }
@@ -505,7 +506,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
-            if ((status = toggle_desk_set_curr(teccfg.base.task, &args))) {
+            if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)
                     elog(1, "could not update toggles");
             }
@@ -519,7 +520,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     return retcode;
 }
 
-static const tec_builtin_t desk_commands[] = {
+static const tec_cmd_t desk_commands[] = {
     {.name = "add",.func = &_desk_add},
     {.name = "cat",.func = &_desk_cat},
     {.name = "cd",.func = &_desk_cd},

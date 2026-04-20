@@ -51,16 +51,16 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("cat");
+            return tec_cli_help_usage("cat");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("cat");
+            return tec_cli_help_usage("cat");
         }
     }
     argvec->i = optind;
 
     if (opts.help == true)
-        return help_usage("cat");
+        return tec_cli_help_usage("cat");
     else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
@@ -74,7 +74,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         }
 
-        if ((status = tec_task_get(teccfg.base.task, &args, &ctx))) {
+        if ((status = tec_task_get(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if ((status = valid_unitkeys(ctx.units))) {

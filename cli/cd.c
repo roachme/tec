@@ -47,16 +47,16 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("cd");
+            return tec_cli_help_usage("cd");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("cd");
+            return tec_cli_help_usage("cd");
         }
     }
     argvec->i = optind;
 
     if (opts.help == true)
-        return help_usage("cd");
+        return tec_cli_help_usage("cd");
     else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
@@ -70,7 +70,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     /* Resolve alias '-' to switch to previous task ID.  */
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
-        if ((status = toggle_task_get_prev(teccfg.base.task, &args)))
+        if ((status = toggle_task_get_prev(cfg->base.task, &args)))
             return elog(1, errfmt, "PREV", "no previous task ID");
         argvec_replace(argvec, argvec->i, args.taskid, IDSIZ);
     }
@@ -87,7 +87,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, "failed to execute hooks");
         } else if (opts.chtog == true) {
-            if ((status = toggle_task_set_curr(teccfg.base.task, &args))) {
+            if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
                     elog(1, "could not update toggles");
             }

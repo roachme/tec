@@ -83,7 +83,7 @@
 #define CRESET "\33[0m"
 #define COLOR_RESET "\33[0m"
 
-void color_print_str(const char *fmt, char *str, char *color);
+void color_print_str(const char *fmt, char *str, char *color, int enabled);
 void color_print_char(const char *fmt, char c, char *color);
 
 #endif

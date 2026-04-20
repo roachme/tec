@@ -83,7 +83,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         case 'T':
             if (valid_type(optarg) == false) {
                 elog(1, "invalid priority '%s'", optarg);
-                return help_usage("set");
+                return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "type") == NULL)
                 ctx.units = tec_unit_add(ctx.units, "type", optarg);
@@ -91,7 +91,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         case 'D':
             if (valid_desc(optarg) == false) {
                 elog(1, "invalid description '%s'", optarg);
-                return help_usage("set");
+                return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "desc") == NULL)
                 ctx.units = tec_unit_add(ctx.units, "desc", optarg);
@@ -99,23 +99,23 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         case 'P':
             if (valid_prio(optarg) == false) {
                 elog(1, "invalid priority '%s'", optarg);
-                return help_usage("set");
+                return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "prio") == NULL)
                 ctx.units = tec_unit_add(ctx.units, "prio", optarg);
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("set");
+            return tec_cli_help_usage("set");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("set");
+            return tec_cli_help_usage("set");
         }
     }
     i = optind;
 
     if (opt_help == true)
-        return help_usage("set");
+        return tec_cli_help_usage("set");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
@@ -127,7 +127,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_task_set(teccfg.base.task, &args, &ctx))) {
+        } else if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
             args.taskid = args.taskid ? args.taskid : "NOCURR";
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));

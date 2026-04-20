@@ -36,10 +36,10 @@
 #define FMT_OPT_ARG_INV "invalid option '-%c'"
 #define FMT_OPT_ARG_REQ "option '-%c' requires an argument"
 
-#define LIST_OBJ_UNITS(_obj, _pgnout, _desc, padsiz) do {\
-    color_print_str("%-" xstr(padsiz) "s ", (_obj), BBLU); \
-    color_print_str("%s ", (_pgnout), WHT); \
-    color_print_str("%s\n", (_desc), WHT); \
+#define LIST_OBJ_UNITS(_obj, _pgnout, _desc, padsiz, enabled) do {\
+    color_print_str("%-" xstr(padsiz) "s ", (_obj), BBLU, enabled); \
+    color_print_str("%s ", (_pgnout), WHT, enabled); \
+    color_print_str("%s\n", (_desc), WHT, enabled); \
 } while (0)
 
 #define CTX_INIT { .units = NULL, .list = NULL }
@@ -51,23 +51,19 @@ enum tec_setup_level {
     TEC_SETUP_HARD,
 };
 
-typedef struct builtin {
+typedef struct tec_cmd {
     const char *name;
-    int (*func)(tec_argvec_t * argvec, tec_cfg_t *cfg);
+    union {
+        struct tec_cmd *(*type) (tec_argvec_t * argvec, tec_cfg_t * cfg);
+        int (*func)(tec_argvec_t * argvec, tec_cfg_t * cfg);
+    };
     unsigned int option;
-} tec_builtin_t;
+} tec_cmd_t;
 
-extern char *unitkeys[];
-extern unsigned int nunitkey;
+tec_cmd_t *tec_cli_is_alias(tec_argvec_t * argvec, tec_cfg_t * cfg);
+tec_cmd_t *tec_cli_is_plugin(tec_argvec_t * argvec, tec_cfg_t * cfg);
+tec_cmd_t *tec_cli_is_builtin(tec_argvec_t * argvec, tec_cfg_t * cfg);
 
-int help_list_pretty_commands(void);
-int help_usage(const char *cmd);
-int help_lookup(const char *cmd);
-
-bool yesno(void);
-
-// NOTE: maybe use 'prefix' like in git?
-// int cmd_add(int argc, const char **argv, const char *prefix, struct repository *repo);
 int tec_cli_add(tec_argvec_t * argvec, tec_cfg_t * cfg);
 int tec_cli_alias(tec_argvec_t * argvec, tec_cfg_t * cfg);
 int tec_cli_cat(tec_argvec_t * argvec, tec_cfg_t * cfg);
@@ -83,5 +79,6 @@ int tec_cli_pgn(tec_argvec_t * argvec, tec_cfg_t * cfg);
 int tec_cli_rm(tec_argvec_t * argvec, tec_cfg_t * cfg);
 int tec_cli_set(tec_argvec_t * argvec, tec_cfg_t * cfg);
 int tec_cli_version(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_cmd_run(tec_cmd_t * cmd, tec_argvec_t * argvec, tec_cfg_t * cfg);
 
 #endif

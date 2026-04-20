@@ -51,23 +51,23 @@ static int _cfg_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
     /* Skip first argument because it's subcommand name, i.e. get.   */
     for (int i = 1; i < argvec->used; ++i) {
         if (strcmp("taskbase", argvec->argv[i]) == 0)
-            printf("%s\n", teccfg.base.task);
+            printf("%s\n", cfg->base.task);
         else if (strcmp("pgnbase", argvec->argv[i]) == 0)
-            printf("%s\n", teccfg.base.pgn);
+            printf("%s\n", cfg->base.pgn);
         else if (strcmp("opts.color", argvec->argv[i]) == 0)
-            printf("%s\n", teccfg.opts.color ? "true" : "false");
+            printf("%s\n", cfg->opts.color ? "true" : "false");
         else if (strcmp("opts.debug", argvec->argv[i]) == 0)
-            printf("%s\n", teccfg.opts.debug ? "true" : "false");
+            printf("%s\n", cfg->opts.debug ? "true" : "false");
         else if (strcmp("opts.hook", argvec->argv[i]) == 0)
-            printf("%s\n", teccfg.opts.hook ? "true" : "false");
+            printf("%s\n", cfg->opts.hook ? "true" : "false");
         else if (strcmp("hook.cat", argvec->argv[i]) == 0)
-            _cat_hooks(teccfg.hooks);
+            _cat_hooks(cfg->hooks);
         else if (strcmp("hook.ls", argvec->argv[i]) == 0)
-            _ls_hooks(teccfg.hooks);
+            _ls_hooks(cfg->hooks);
         else if (strcmp("hook.act", argvec->argv[i]) == 0)
-            _act_hooks(teccfg.hooks);
+            _act_hooks(cfg->hooks);
         else if (strcmp("alias", argvec->argv[i]) == 0)
-            _show_aliases(teccfg.alias);
+            _show_aliases(cfg->alias);
         else
             elog(1, "'%s': no such config value", argvec->argv[i]);
     }
@@ -82,17 +82,17 @@ static int _cfg_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
     struct tec_hook *hook;
 
     printf("Paths:\n");
-    printf("  taskbase\t: %s\n", teccfg.base.task);
-    printf("  pgnbase\t: %s\n", teccfg.base.pgn);
+    printf("  taskbase\t: %s\n", cfg->base.task);
+    printf("  pgnbase\t: %s\n", cfg->base.pgn);
     printf("\nOptions:\n");
-    printf("  debug\t\t: %s\n", teccfg.opts.debug ? "true" : "false");
-    printf("  color\t\t: %s\n", teccfg.opts.color ? "true" : "false");
-    printf("  hook\t\t: %s\n", teccfg.opts.hook ? "true" : "false");
+    printf("  debug\t\t: %s\n", cfg->opts.debug ? "true" : "false");
+    printf("  color\t\t: %s\n", cfg->opts.color ? "true" : "false");
+    printf("  hook\t\t: %s\n", cfg->opts.hook ? "true" : "false");
     printf("\nHooks:\n");
-    for (hook = teccfg.hooks; hook; hook = hook->next)
+    for (hook = cfg->hooks; hook; hook = hook->next)
         printf("  %s\t\t: %s\t%s\n", hook->cmd, hook->pgname, hook->pgncmd);
     printf("\nAliases:\n");
-    for (alias = teccfg.alias; alias; alias = alias->next)
+    for (alias = cfg->alias; alias; alias = alias->next)
         printf("  %s\t\t: %s\n", alias->name, alias->cmd);
     return 0;
 }
@@ -102,7 +102,7 @@ static int _cfg_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     return 0;
 }
 
-static const tec_builtin_t cfg_commands[] = {
+static const tec_cmd_t cfg_commands[] = {
     {.name = "get",.func = &_cfg_get},
     {.name = "ls",.func = &_cfg_ls},
     {.name = "set",.func = &_cfg_set},

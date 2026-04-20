@@ -50,7 +50,7 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     return 0;
 }
 
-int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t * cfg)
+int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     int status;
@@ -88,16 +88,16 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t * cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("add");
+            return tec_cli_help_usage("add");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("add");
+            return tec_cli_help_usage("add");
         }
     }
     argvec->i = optind;
 
     if (opts.help == true)
-        return help_usage("add");
+        return tec_cli_help_usage("add");
     else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
@@ -117,12 +117,12 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t * cfg)
                 elog(status, errfmt, args.taskid, "task ID is too long");
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
-        } else if ((status = tec_task_valid(teccfg.base.task, &args))) {
+        } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
-        } else if (!(status = tec_task_exist(teccfg.base.task, &args))) {
+        } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -134,14 +134,14 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t * cfg)
             continue;
         }
 
-        if ((status = tec_task_add(teccfg.base.task, &args, &ctx))) {
+        if ((status = tec_task_add(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
         } else if (opts.chtog == true) {
-            if ((status = toggle_task_set_curr(teccfg.base.task, &args))) {
+            if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
                     elog(status, "could not update toggles");
             }

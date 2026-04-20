@@ -7,7 +7,7 @@ SHELLNAME=bash
 CC=gcc
 SRCS=$(wildcard lib/*.c cli/*.c cli/aux/*.c)
 OBJS=$(patsubst %.c, %.o, $(SRCS))
-CFLAGS=-I cli -Wall -g3  -fbounds-check
+CFLAGS=-I cli -Wall -g3 -O0 -fbounds-check
 LFLAGS=-lconfig -g
 PWDFILE=/tmp/tecpwd
 

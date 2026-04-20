@@ -54,7 +54,7 @@ static void show_row(tec_ctx_t *ctx, tec_arg_t *args, tec_list_t *obj,
         if ((desc = get_unit_desc(ctx, args, quiet)) == NULL)
             return;
 
-        LIST_OBJ_UNITS(obj->name, "", desc, IDSIZ);
+        LIST_OBJ_UNITS(obj->name, "", desc, IDSIZ, teccfg.opts.color);
         ctx->units = tec_unit_free(ctx->units);
     }
 }
@@ -121,7 +121,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             args.desk = optarg;
             break;
         case 'h':
-            return help_usage("ls");
+            return tec_cli_help_usage("ls");
         case 'q':
             quiet = true;
             break;
@@ -135,10 +135,10 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
-            return help_usage("ls");
+            return tec_cli_help_usage("ls");
         default:
             elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
-            return help_usage("ls");
+            return tec_cli_help_usage("ls");
         }
     }
 
@@ -153,7 +153,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         else if ((status = tec_cli_check_desk(&args, errfmt, quiet)))
             continue;
-        else if ((status = tec_task_list(teccfg.base.task, &args, &ctx))) {
+        else if ((status = tec_task_list(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(status, errfmt, args.env, tec_strerror(status));
             continue;

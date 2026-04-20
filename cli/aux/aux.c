@@ -5,6 +5,10 @@
 #include "osdep.h"
 #include "config.h"
 
+char *unitkeys[] = { "prio", "type", "date", "desc", };
+
+unsigned int nunitkey = sizeof(unitkeys) / sizeof(unitkeys[0]);
+
 bool yesno(void)
 {
     char choice[10] = { 0 };

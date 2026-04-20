@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- `cli`: Unify all types of commands
+
 ### Deleted
 
 
