@@ -31,6 +31,7 @@ _subcommands() {
         'mv:Move (rename) tasks'
         'rm:Remove task from environment'
         'set:Set task unit values'
+        'version:Display version information'
     )
 }
 
@@ -463,6 +464,7 @@ _tec_comp() {
                 mv) _tec_mv ;;
                 rm) _tec_rm ;;
                 set) _tec_set ;;
+                version) ;;
                 *) _message "unknown subcommand: $line[1]" ;;
             esac
             ;;

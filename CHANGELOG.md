@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+- `cli/version`: Add help for command
+
+### Changed
+
+### Fixed
+
+### Deleted
+
+
 ## [0.7.0] - (2026-04-14)
 
 ### Added

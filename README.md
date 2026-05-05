@@ -107,6 +107,7 @@ Usage: tec [OPTION]... COMMAND|PLUGIN
     System:
       help       - Show help for commands.
       init       - Init directory structure.
+      version    - Display version information.
 
     Basic:
       add        - Add a new task to environment.

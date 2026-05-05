@@ -88,6 +88,14 @@ struct help helptab[] = {
     Exit status:\n\
     The return code is zero, unless one of the database directory could not\n\
     be created or hook failed to execute.\n"},
+    {
+     .tag = TAGSYSTEM,
+     .name = "version",
+     .synop = "Usage: " PROGRAM " version\n",
+     .desc_short = "Display version information.\n",
+     .desc_long = "\n\
+    Exit status:\n\
+    The return code is zero.\n"},
 
     {
      .tag = TAGBASIC,
