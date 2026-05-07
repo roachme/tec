@@ -6,6 +6,8 @@
 
 ### Changed
 
+- `cli`: Replace context with config in API
+
 ### Fixed
 
 ### Deleted

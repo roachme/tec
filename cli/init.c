@@ -1,7 +1,7 @@
 #include "tec.h"
 #include "aux/config.h"
 
-int tec_cli_init(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_init(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int status;
 

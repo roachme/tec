@@ -25,6 +25,8 @@ typedef struct tec_cli_status {
 } tec_cli_status_t;
 */
 
+static tec_cfg_t *_teccfg = &teccfg;
+
 struct config teccfg;
 char *unitkeys[] = { "prio", "type", "date", "desc", };
 
@@ -103,23 +105,23 @@ static int is_plugin(char *pgndir, const char *pgname)
 static int run_builtin(tec_argvec_t *argvec, tec_builtin_t *cmd)
 {
     int status;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_cfg_t *cfg = _teccfg;
 
     if ((status = tec_setup(cmd->option)) != LIBTEC_OK)
         return elog(status, "setup failed: %s", tec_strerror(status));
 
-    return cmd->func(argvec, &ctx);
+    return cmd->func(argvec, cfg);
 }
 
 static int run_plugin(tec_argvec_t *argvec)
 {
     int status;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_cfg_t *cfg = _teccfg;
 
     if ((status = tec_setup(TEC_SETUP_HARD)) != LIBTEC_OK)
         return elog(status, "setup failed: %s", tec_strerror(status));
 
-    return tec_cli_pgn(argvec, &ctx);
+    return tec_cli_pgn(argvec, cfg);
 }
 
 /* TODO: add support to include alias into alias (i.e. recursive aliases).  */

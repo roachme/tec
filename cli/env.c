@@ -45,9 +45,10 @@ static int valid_desc(const char *val)
 }
 
 // TODO: Find a good error message in case option fails.  */
-static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int switch_dir, switch_env;
     int i, quiet, showhelp, retcode, status;
@@ -137,25 +138,25 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
             continue;
         }
 
-        if (generate_units(ctx, args.env)) {
+        if (generate_units(&ctx, args.env)) {
             if (quiet == false)
                 elog(1, errfmt, args.env, "unit generation failed");
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         }
 
-        if ((status = tec_env_add(teccfg.base.task, &args, ctx))) {
+        if ((status = tec_env_add(teccfg.base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
-        } else if ((status = tec_desk_add(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_desk_add(teccfg.base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         }
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
     }
 
     if ((switch_env && status == LIBTEC_OK)
@@ -175,8 +176,9 @@ static int _env_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int i, c, retcode, status;
     const char *errfmt = "cannot delete env '%s': %s";
@@ -249,7 +251,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
         if ((status = hook_action(&args, "env-rm"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.env, "failed to execute hooks");
-        } else if ((status = tec_env_del(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_env_del(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }
@@ -267,9 +269,10 @@ static int _env_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return retcode;
 }
 
-static int _env_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char *desc;
+    tec_ctx_t ctx = CTX_INIT;
     int c, status;
     tec_arg_t args;
     int opt_help, opt_quiet;
@@ -298,7 +301,7 @@ static int _env_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
     if (opt_help == true)
         return help_usage("env-ls");
 
-    if ((status = tec_env_list(teccfg.base.task, &args, ctx))) {
+    if ((status = tec_env_list(teccfg.base.task, &args, &ctx))) {
         if (opt_quiet == false) {
             const char *errfmt = "cannot list env(s) '%s': %s";
             elog(status, errfmt, "ENV", tec_strerror(status));
@@ -306,20 +309,20 @@ static int _env_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
         }
     }
 
-    for (tec_list_t * obj = ctx->list; obj != NULL; obj = obj->next) {
+    for (tec_list_t * obj = ctx.list; obj != NULL; obj = obj->next) {
         args.env = obj->name;
-        if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
+        if ((desc = get_unit_desc(&ctx, &args, opt_quiet)) == NULL) {
             continue;
         }
         LIST_OBJ_UNITS(obj->name, "", desc, ENVSIZ);
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
     }
 
-    ctx->list = tec_list_free(ctx->list);
+    ctx.list = tec_list_free(ctx.list);
     return status;
 }
 
-static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int status;
     const char *errfmt;
@@ -375,8 +378,9 @@ static int _env_rename(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return tec_cli_pwd_set(&dst);
 }
 
-static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int atleast_one_key_set;
     int c, i, retcode, status;
@@ -405,7 +409,7 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 return help_usage("env-set");
             }
             atleast_one_key_set = true;
-            ctx->units = tec_unit_add(ctx->units, "desc", optarg);
+            ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
@@ -429,7 +433,7 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
         if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_env_set(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_env_set(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "env-set"))) {
@@ -439,12 +443,13 @@ static int _env_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
-    ctx->units = tec_unit_free(ctx->units);
+    ctx.units = tec_unit_free(ctx.units);
     return status;
 }
 
-static int _env_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, quiet, showhelp, status;
     struct tec_unit *unitbin, *unitpgn;
@@ -484,24 +489,24 @@ static int _env_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
         args.env = argvec->argv[i];
         if ((status = tec_cli_check_env(&args, errfmt, quiet))) {
             continue;
-        } else if ((status = tec_env_get(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_env_get(teccfg.base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
             continue;
         }
 
         printf("%-7s : %s\n", "env", args.env);
-        for (unitbin = ctx->units; unitbin; unitbin = unitbin->next)
+        for (unitbin = ctx.units; unitbin; unitbin = unitbin->next)
             printf("%-7s : %s\n", unitbin->key, unitbin->val);
 
         // TODO: add plugin output
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
     } while (++i < argvec->used);
 
     return status;
 }
 
-static int _env_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_arg_t args;
     int c, i, retcode, status;
@@ -590,14 +595,14 @@ static const tec_builtin_t env_commands[] = {
     {.name = "set",.func = &_env_set},
 };
 
-int tec_cli_env(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_env(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip env from argvec.  */
     for (int i = 0; i < ARRAY_SIZE(env_commands); ++i) {
         if (strcmp(cmd, env_commands[i].name) == 0) {
-            return env_commands[i].func(argvec, ctx);
+            return env_commands[i].func(argvec, cfg);
         }
     }
     return elog(1, "'%s': no such env command", cmd);

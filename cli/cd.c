@@ -14,7 +14,7 @@ void tec_cli_cd_option_init(struct tec_cli_cd_options *opts)
     opts->chtog = true;
 }
 
-int tec_cli_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     int status;

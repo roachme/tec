@@ -42,11 +42,12 @@ void tec_cli_rm_option_init(struct tec_cli_rm_options *opts)
     opts->interactive = RMI_ALWAYS;
 }
 
-int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     int status;
     int ntasks;
+    tec_ctx_t ctx = CTX_INIT;
     int retcode = LIBTEC_OK;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_rm_options opts;
@@ -122,7 +123,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
         } else if ((status = update_toggles_and_cwd(&args, &opts))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "could not update toggles");
-        } else if ((status = tec_task_del(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_task_del(teccfg.base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if (opts.verbose == true)

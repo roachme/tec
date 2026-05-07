@@ -12,7 +12,7 @@
     3. Separate plugin options from plugin command options.
     4. Or maybe it's better to let the plugin to handle plugin options and the rest.
 */
-int tec_cli_pgn(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_pgn(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int i;
     char *name;

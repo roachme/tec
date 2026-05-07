@@ -44,9 +44,10 @@ static int generate_units(tec_ctx_t *ctx, char *desk)
 }
 
 // TODO: add support to generate desk name
-static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int i, retcode, status;
     const char *errfmt = "cannot add desk '%s': %s";
@@ -114,17 +115,17 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(status, errfmt, desk, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? retcode : !status;
             continue;
-        } else if (generate_units(ctx, args.desk)) {
+        } else if (generate_units(&ctx, args.desk)) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.desk, "unit generation failed");
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         }
 
-        if ((status = tec_desk_add(teccfg.base.task, &args, ctx))) {
+        if ((status = tec_desk_add(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
-            ctx->units = tec_unit_free(ctx->units);
+            ctx.units = tec_unit_free(ctx.units);
         } else if ((status = hook_action(&args, "desk-add"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
@@ -134,7 +135,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
                     elog(status, "could not update toggles");
             }
         }
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
@@ -144,8 +145,9 @@ static int _desk_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return retcode;
 }
 
-static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, retcode, status;
     int opt_quiet, opt_help;
@@ -220,7 +222,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
         if ((status = hook_action(&args, "desk-rm"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.desk, "failed to execute hooks");
-        } else if ((status = tec_desk_del(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_desk_del(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }
@@ -236,9 +238,10 @@ static int _desk_rm(tec_argvec_t *argvec, tec_ctx_t *ctx)
 }
 
 // TODO: show tasks in desk
-static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char *desc;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, status;
     int opt_help, opt_quiet;
@@ -276,33 +279,34 @@ static int _desk_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
         if (tec_cli_check_env(&args, errfmt, opt_quiet))
             continue;
-        if ((status = tec_desk_list(teccfg.base.task, &args, ctx))) {
+        if ((status = tec_desk_list(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, args.desk, tec_strerror(status));
             continue;
         }
 
-        for (tec_list_t * obj = ctx->list; obj != NULL; obj = obj->next) {
+        for (tec_list_t * obj = ctx.list; obj != NULL; obj = obj->next) {
             args.desk = obj->name;
-            if ((desc = get_unit_desc(ctx, &args, opt_quiet)) == NULL) {
+            if ((desc = get_unit_desc(&ctx, &args, opt_quiet)) == NULL) {
                 continue;
             }
             LIST_OBJ_UNITS(obj->name, "", desc, DESKSIZ);
-            ctx->units = tec_unit_free(ctx->units);
+            ctx.units = tec_unit_free(ctx.units);
         }
-        ctx->list = tec_list_free(ctx->list);
+        ctx.list = tec_list_free(ctx.list);
     } while (++i < argvec->used);
 
     return status;
 }
 
-static int _desk_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     return elog(1, "%s: under development", __FUNCTION__);
 }
 
-static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int atleast_one_key_set;
     int opt_quiet, opt_help;
@@ -328,7 +332,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 return help_usage("desk-set");
             }
             atleast_one_key_set = true;
-            ctx->units = tec_unit_add(ctx->units, "desc", optarg);
+            ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
@@ -355,7 +359,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
         if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_desk_set(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_desk_set(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "desk-set"))) {
@@ -363,15 +367,16 @@ static int _desk_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
         }
 
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
     return retcode;
 }
 
-static int _desk_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int opt_quiet, opt_help;
     int c, i, retcode, status;
@@ -411,27 +416,27 @@ static int _desk_cat(tec_argvec_t *argvec, tec_ctx_t *ctx)
         args.desk = argvec->argv[i];
         if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_desk_get(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_desk_get(teccfg.base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
             ;
         } else {
             printf("%-7s : %s\n", "desk", args.desk);
-            for (units = ctx->units; units; units = units->next)
+            for (units = ctx.units; units; units = units->next)
                 printf("%-7s : %s\n", units->key, units->val);
 
             // TODO: add plugin output
         }
 
         unitpgn = tec_unit_free(unitpgn);
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
     return retcode;
 }
 
-static int _desk_cd(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_arg_t args;
     int c, i, retcode, status;
@@ -524,14 +529,14 @@ static const tec_builtin_t desk_commands[] = {
     {.name = "set",.func = &_desk_set},
 };
 
-int tec_cli_desk(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_desk(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip desk from argvec.  */
     for (int i = 0; i < ARRAY_SIZE(desk_commands); ++i) {
         if (strcmp(cmd, desk_commands[i].name) == 0) {
-            return desk_commands[i].func(argvec, ctx);
+            return desk_commands[i].func(argvec, cfg);
         }
     }
     return elog(1, "'%s': no such desk subcommand", cmd);

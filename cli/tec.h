@@ -13,6 +13,7 @@
 #include "aux/valid.h"
 #include "aux/color.h"
 #include "aux/argvec.h"
+#include "aux/config.h"
 #include "../lib/libtec.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -52,7 +53,7 @@ enum tec_setup_level {
 
 typedef struct builtin {
     const char *name;
-    int (*func)(tec_argvec_t * argvec, tec_ctx_t * ctx);
+    int (*func)(tec_argvec_t * argvec, tec_cfg_t *cfg);
     unsigned int option;
 } tec_builtin_t;
 
@@ -67,19 +68,20 @@ bool yesno(void);
 
 // NOTE: maybe use 'prefix' like in git?
 // int cmd_add(int argc, const char **argv, const char *prefix, struct repository *repo);
-int tec_cli_add(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_cat(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_cd(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_cfg(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_env(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_desk(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_help(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_init(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_ls(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_mv(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_pgn(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_rm(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_set(tec_argvec_t * argvec, tec_ctx_t * ctx);
-int tec_cli_version(tec_argvec_t * argvec, tec_ctx_t * ctx);
+int tec_cli_add(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_alias(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_cat(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_cd(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_cfg(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_env(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_desk(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_help(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_init(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_ls(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_mv(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_pgn(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_rm(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_set(tec_argvec_t * argvec, tec_cfg_t * cfg);
+int tec_cli_version(tec_argvec_t * argvec, tec_cfg_t * cfg);
 
 #endif

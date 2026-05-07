@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include "tec.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
@@ -104,9 +102,10 @@ static void show_rows(tec_ctx_t *ctx, tec_arg_t *args,
 }
 
 // TODO: Find a good error message in case option fails.  */
-int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int i, quiet, show_headers, status;
 
@@ -154,7 +153,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
             continue;
         else if ((status = tec_cli_check_desk(&args, errfmt, quiet)))
             continue;
-        else if ((status = tec_task_list(teccfg.base.task, &args, ctx))) {
+        else if ((status = tec_task_list(teccfg.base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(status, errfmt, args.env, tec_strerror(status));
             continue;
@@ -168,12 +167,12 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
         // TODO: optimize data structure load (it uses too much malloc)
 
         if (filter.toggle) {
-            show_toggles(ctx, &args);
+            show_toggles(&ctx, &args);
         } else {
-            show_rows(ctx, &args, ctx->list, quiet);
+            show_rows(&ctx, &args, ctx.list, quiet);
         }
 
-        ctx->list = tec_list_free(ctx->list);
+        ctx.list = tec_list_free(ctx.list);
     } while (++i < argvec->used);
 
     return status;

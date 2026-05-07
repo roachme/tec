@@ -50,12 +50,13 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     return 0;
 }
 
-int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t * cfg)
 {
     int c;
     int status;
     char *desc = NULL;
     int retcode = LIBTEC_OK;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
     const char *errfmt = "cannot create task '%s': %s";
@@ -126,14 +127,14 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
-        } else if ((status = generate_units(ctx, &args, desc))) {
+        } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.taskid, "unit generation failed");
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         }
 
-        if ((status = tec_task_add(teccfg.base.task, &args, ctx))) {
+        if ((status = tec_task_add(teccfg.base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
@@ -145,7 +146,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_ctx_t *ctx)
                     elog(status, "could not update toggles");
             }
         }
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
         retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
     } while (++argvec->i < argvec->used);
 

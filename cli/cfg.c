@@ -43,7 +43,7 @@ static int _ls_hooks(struct tec_hook *hooks)
 
 }
 
-static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _cfg_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     if (argvec->used == 0)
         return elog(1, "wrong number of arguments, should at least 1");
@@ -76,7 +76,7 @@ static int _cfg_get(tec_argvec_t *argvec, tec_ctx_t *ctx)
 }
 
 // TODO: show config values from config file. Not option set via CLI
-static int _cfg_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _cfg_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_alias_t *alias;
     struct tec_hook *hook;
@@ -97,7 +97,7 @@ static int _cfg_ls(tec_argvec_t *argvec, tec_ctx_t *ctx)
     return 0;
 }
 
-static int _cfg_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
+static int _cfg_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     return 0;
 }
@@ -108,14 +108,14 @@ static const tec_builtin_t cfg_commands[] = {
     {.name = "set",.func = &_cfg_set},
 };
 
-int tec_cli_cfg(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_cfg(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip cfg from argvec.  */
     for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i) {
         if (strcmp(cmd, cfg_commands[i].name) == 0) {
-            return cfg_commands[i].func(argvec, ctx);
+            return cfg_commands[i].func(argvec, cfg);
         }
     }
     return elog(1, "'%s': no such cfg command", cmd);

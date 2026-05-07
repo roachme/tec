@@ -270,9 +270,10 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
     return parse_path(path, args, errfmt);
 }
 
-int tec_cli_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
+    tec_ctx_t ctx = CTX_INIT;
     int i, showhelp, status, nargs, is_dir;
     tec_arg_t dst, src;
     char *errfmt;
@@ -333,7 +334,7 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
         if (dst.desk == NULL)
             dst.desk = src.desk;
 
-        if ((status = tec_task_move(teccfg.base.task, &src, &dst, ctx))) {
+        if ((status = tec_task_move(teccfg.base.task, &src, &dst, &ctx))) {
             return elog(status, "could not (re)move '%s': %s", src.taskid,
                         tec_strerror(status));
         }
@@ -369,7 +370,7 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_ctx_t *ctx)
             move_dst.taskid = src.taskid;       /* Keep same task ID */
 
             if ((status =
-                 tec_task_move(teccfg.base.task, &src, &move_dst, ctx))) {
+                 tec_task_move(teccfg.base.task, &src, &move_dst, &ctx))) {
                 elog(status, "could not move '%s': %s", src.taskid,
                      tec_strerror(status));
                 last_status = status;

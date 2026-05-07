@@ -50,8 +50,9 @@ static int valid_desc(const char *val)
 }
 
 // TODO: Find a good error message in case option fails.  */
-int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
+int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, retcode, status;
     int opt_help, opt_interactive, opt_quiet;
@@ -84,24 +85,24 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(1, "invalid priority '%s'", optarg);
                 return help_usage("set");
             }
-            if (tec_unit_get(ctx->units, "type") == NULL)
-                ctx->units = tec_unit_add(ctx->units, "type", optarg);
+            if (tec_unit_get(ctx.units, "type") == NULL)
+                ctx.units = tec_unit_add(ctx.units, "type", optarg);
             break;
         case 'D':
             if (valid_desc(optarg) == false) {
                 elog(1, "invalid description '%s'", optarg);
                 return help_usage("set");
             }
-            if (tec_unit_get(ctx->units, "desc") == NULL)
-                ctx->units = tec_unit_add(ctx->units, "desc", optarg);
+            if (tec_unit_get(ctx.units, "desc") == NULL)
+                ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case 'P':
             if (valid_prio(optarg) == false) {
                 elog(1, "invalid priority '%s'", optarg);
                 return help_usage("set");
             }
-            if (tec_unit_get(ctx->units, "prio") == NULL)
-                ctx->units = tec_unit_add(ctx->units, "prio", optarg);
+            if (tec_unit_get(ctx.units, "prio") == NULL)
+                ctx.units = tec_unit_add(ctx.units, "prio", optarg);
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
@@ -126,7 +127,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
 
         if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             ;
-        } else if ((status = tec_task_set(teccfg.base.task, &args, ctx))) {
+        } else if ((status = tec_task_set(teccfg.base.task, &args, &ctx))) {
             args.taskid = args.taskid ? args.taskid : "NOCURR";
             if (opt_quiet == false)
                 elog(status, errfmt, args.taskid, tec_strerror(status));
@@ -135,7 +136,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_ctx_t *ctx)
                 elog(1, errfmt, args.taskid, "failed to execute hooks");
         }
 
-        ctx->units = tec_unit_free(ctx->units);
+        ctx.units = tec_unit_free(ctx.units);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
