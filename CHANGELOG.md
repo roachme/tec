@@ -11,6 +11,7 @@
 ### Fixed
 
 - `cli`: Unify all types of commands
+- `cli/pgn`: Remove buffer overflow
 
 ### Deleted
 
