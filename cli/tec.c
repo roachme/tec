@@ -222,7 +222,6 @@ int main(int argc, const char **argv)
         status = elog(1, "'%s': no such command, alias or plugin", cmdname);
         goto err;
     } else if ((status = tec_cli_cmd_run(cmd, &argvec, cfg))) {
-        status = elog(1, "'%s': failed to run command", cmdname);
         goto err;
     }
 

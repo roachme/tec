@@ -12,6 +12,7 @@
 
 - `cli`: Unify all types of commands
 - `cli/pgn`: Remove buffer overflow
+- `cli/tec`: Remove descriptive message in case of command failure
 
 ### Deleted
 
