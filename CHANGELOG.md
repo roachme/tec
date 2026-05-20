@@ -7,6 +7,7 @@
 ### Changed
 
 - `cli`: Replace context with config in API
+- `cli`: Change option for version to `-v`
 
 ### Fixed
 

@@ -161,10 +161,13 @@ int main(int argc, const char **argv)
     argvec_parse(&argvec, argc, argv);
 
     /* Parse util itself options.  */
-    while ((c = getopt(argvec.used, argvec.argv, "+:hC:D:F:H:P:T:V")) != -1) {
+    while ((c = getopt(argvec.used, argvec.argv, "+:hvC:D:F:H:P:T:")) != -1) {
         switch (c) {
         case 'h':
             argvec_add(&argvec, "help");
+            break;
+        case 'v':
+            argvec_add(&argvec, "version");
             break;
         case 'C':
             if ((opts.color = is_valid_toggle(optarg)) == -1)
@@ -185,9 +188,6 @@ int main(int argc, const char **argv)
             break;
         case 'T':
             base.task = optarg;
-            break;
-        case 'V':
-            argvec_add(&argvec, "version");
             break;
         case ':':
             elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);

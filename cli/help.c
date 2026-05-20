@@ -42,13 +42,13 @@ struct help helptab[] = {
      .desc_long = "\n\
     Options:\n\
       -h      show this help and exit\n\
+      -v      show version and exit\n\
       -C TOG  enable colors (default: disabled)\n\
       -D TOG  enable debug mode (default: disabled)\n\
       -F DIR  path to the config file (under development)\n\
       -H TOG  enable hooks (default: disabled)\n\
       -P DIR  directory where plugins are stored\n\
       -T DIR  directory where tasks are stored\n\
-      -V      show version and exit\n\
     \n\
     Arguments:\n\
       DIR     path to directory\n\
