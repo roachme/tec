@@ -60,7 +60,7 @@ static int is_valid_toggle(char *tog)
     return -1;
 }
 
-static int tec_setup(int setuplvl, tec_cfg_t *cfg)
+static int cmd_setup(int setuplvl, tec_cfg_t *cfg)
 {
     int status = LIBTEC_OK;
 
@@ -72,14 +72,15 @@ static int tec_setup(int setuplvl, tec_cfg_t *cfg)
     return status;
 }
 
-static bool tec_cli_cmd_is_naughty(const char *cmdname)
+static bool cmd_is_naughty(const char *cmdname)
 {
     if (!isalpha(cmdname[0]))
         return true;
     return false;
 }
 
-static tec_cmd_t *tec_cli_cmd_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
+static tec_cmd_t *cmd_get(const char *cmdname, tec_argvec_t *argvec,
+                          tec_cfg_t *cfg)
 {
     tec_cmd_t *cmd;
 
@@ -131,7 +132,7 @@ int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int status = LIBTEC_OK;
 
-    if ((status = tec_setup(cmd->option, cfg)) != LIBTEC_OK) {
+    if ((status = cmd_setup(cmd->option, cfg)) != LIBTEC_OK) {
         return elog(status, "setup failed: %s", tec_strerror(status));
     }
 
@@ -215,10 +216,10 @@ int main(int argc, const char **argv)
         status = EXIT_FAILURE;
         tec_cli_help_list();
         goto err;
-    } else if (tec_cli_cmd_is_naughty(cmdname) == true) {
+    } else if (cmd_is_naughty(cmdname) == true) {
         status = elog(1, "'%s': naughty command", cmdname);
         goto err;
-    } else if ((cmd = tec_cli_cmd_get(&argvec, cfg)) == NULL) {
+    } else if ((cmd = cmd_get(cmdname, &argvec, cfg)) == NULL) {
         status = elog(1, "'%s': no such command, alias or plugin", cmdname);
         goto err;
     } else if ((status = tec_cli_cmd_run(cmd, &argvec, cfg))) {
