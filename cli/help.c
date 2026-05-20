@@ -735,12 +735,15 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
         };
     }
 
-    // FIXME: at exit argvec not freed
     if (opt_list_cmds)
         return help_list_short_commands();
     else if (optind == argvec->used)
         return tec_cli_help_list();
 
+    /* TODO: add support for regex like in bash help.
+     * command: bash -c "help 't*'"
+     * output: give help on all commands starting with letter 't'
+     * */
     for (i = optind; i < argvec->used; ++i)
         if ((status = tec_cli_help_lookup(argvec->argv[i])))
             elog(1, "'%s': no such builtin command", argvec->argv[i]);
