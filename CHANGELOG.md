@@ -18,6 +18,8 @@
 
 ### Deleted
 
+- `completion`: Delete completion for Bash
+
 
 ## [0.7.0] - (2026-04-14)
 
