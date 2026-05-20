@@ -3,36 +3,31 @@
 
 #define TEC_ERRMSGSIZ   100
 
-typedef struct tec_arg tec_arg_t;
-typedef struct tec_unit tec_unit_t;
-typedef struct tec_list tec_list_t;
-typedef struct tec_context tec_ctx_t;
-
-struct tec_arg {
+typedef struct tec_arg {
     char *env;
     char *desk;
     char *taskid;
-};
+} tec_arg_t;
 
-struct tec_unit {
+typedef struct tec_unit {
     char *key;
     char *val;
     struct tec_unit *next;
-};
+} tec_unit_t;
 
-struct tec_list {
+typedef struct tec_list {
     char *name;
     int status;                 /* Status code of the object */
     struct tec_list *next;
-};
+} tec_list_t;
 
-struct tec_context {
+typedef struct tec_context {
     struct tec_unit *units;
     struct tec_list *list;
-};
+} tec_ctx_t;
 
 enum tec_errno {
-    LIBTEC_OK,                  /* OK, interpret output as path or output */
+    LIBTEC_OK,
 
     LIBTEC_SYS_DB,
     LIBTEC_SYS_MALLOC,
