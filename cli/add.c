@@ -59,7 +59,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
-    const char *errfmt = "cannot create task '%s': %s";
+    const char *errfmt = "cannot add task '%s': %s";
 
     tec_cli_cd_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnD:N")) != -1) {

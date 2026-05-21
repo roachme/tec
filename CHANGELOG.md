@@ -9,6 +9,7 @@
 - `cli`: Replace context with config in API
 - `cli`: Change option for version to `-v`
 - `tec`: Rename member to `task` in struct `tec_arg_t`
+- `cli/add`: Change error message
 
 ### Fixed
 
