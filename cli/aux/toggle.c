@@ -139,36 +139,36 @@ int toggle_desk_get_prev(char *base, tec_arg_t *args)
 
 int toggle_task_get_curr(char *base, tec_arg_t *args)
 {
-    if (!args->taskid && !(args->taskid = task_get_curr(base, args)))
+    if (!args->task && !(args->task = task_get_curr(base, args)))
         return 1;
     return 0;
 }
 
 int toggle_task_get_prev(char *base, tec_arg_t *args)
 {
-    if (!args->taskid && !(args->taskid = task_get_prev(base, args)))
+    if (!args->task && !(args->task = task_get_prev(base, args)))
         return 1;
     return 0;
 }
 
 bool toggle_task_is_curr(char *base, tec_arg_t *args)
 {
-    char *taskid;
+    char *task;
 
     /* There is no current task ID - immediately return false.  */
-    if ((taskid = task_get_curr(base, args)) == NULL)
+    if ((task = task_get_curr(base, args)) == NULL)
         return false;
-    return !strcmp(taskid, args->taskid);
+    return !strcmp(task, args->task);
 }
 
 bool toggle_task_is_prev(char *base, tec_arg_t *args)
 {
-    char *taskid;
+    char *task;
 
     /* There is no previous task ID - immediately return false.  */
-    if ((taskid = task_get_prev(base, args)) == NULL)
+    if ((task = task_get_prev(base, args)) == NULL)
         return false;
-    return !strcmp(taskid, args->taskid);
+    return !strcmp(task, args->task);
 }
 
 int toggle_env_set_curr(char *base, tec_arg_t *args)
@@ -223,7 +223,7 @@ int toggle_task_set_curr(char *base, tec_arg_t *args)
     tec_unit_t *toggles;
 
     toggles = NULL;
-    curr = args->taskid;
+    curr = args->task;
     prev = task_get_curr(base, args);
 
     toggles = tec_unit_add(toggles, "curr", curr);
@@ -324,11 +324,11 @@ int toggle_task_update(char *base, tec_arg_t *args,
 
 /*
  * Clear a task from toggles when it's moved to a different desk/env.
- * If taskid matches curr, promote prev to curr and clear prev.
- * If taskid matches prev, just clear prev.
+ * If task matches curr, promote prev to curr and clear prev.
+ * If task matches prev, just clear prev.
  * args must have env and desk set for the source location.
  */
-int toggle_task_clear(char *base, tec_arg_t *args, const char *taskid)
+int toggle_task_clear(char *base, tec_arg_t *args, const char *task)
 {
     char *curr, *prev;
     tec_unit_t *toggles;
@@ -338,12 +338,12 @@ int toggle_task_clear(char *base, tec_arg_t *args, const char *taskid)
     curr = task_get_curr(base, args);
     prev = task_get_prev(base, args);
 
-    if (curr && strcmp(curr, taskid) == 0) {
+    if (curr && strcmp(curr, task) == 0) {
         /* Current task is being moved, promote prev to curr */
         curr = prev;
         prev = NULL;
         changed = 1;
-    } else if (prev && strcmp(prev, taskid) == 0) {
+    } else if (prev && strcmp(prev, task) == 0) {
         /* Previous task is being moved, just clear it */
         prev = NULL;
         changed = 1;

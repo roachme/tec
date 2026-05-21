@@ -71,16 +71,16 @@ int tec_cli_check_task(tec_arg_t *args, const char *errfmt, int quiet)
         return status;
     } else if ((status = tec_task_valid(teccfg.base.task, args))) {
         if (quiet == false)
-            elog(status, errfmt, args->taskid, tec_strerror(status));
+            elog(status, errfmt, args->task, tec_strerror(status));
         return status;
-    } else if (tec_cli_len_valid(args->taskid, IDSIZ) == false) {
+    } else if (tec_cli_len_valid(args->task, IDSIZ) == false) {
         status = 1;
         if (quiet == false)
-            elog(status, errfmt, args->taskid, "task ID is too long");
+            elog(status, errfmt, args->task, "task ID is too long");
         return status;
     } else if ((status = tec_task_exist(teccfg.base.task, args))) {
         if (quiet == false)
-            elog(status, errfmt, args->taskid, tec_strerror(status));
+            elog(status, errfmt, args->task, tec_strerror(status));
         return status;
     }
     return 0;

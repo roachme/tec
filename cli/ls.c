@@ -36,10 +36,10 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
 
     if ((status = tec_task_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
-            elog(status, "'%s': %s one", args->taskid, tec_strerror(status));
+            elog(status, "'%s': %s one", args->task, tec_strerror(status));
     } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
         if (quiet == false)
-            elog(1, "'%s': %s", args->taskid, "description not found");
+            elog(1, "'%s': %s", args->task, "description not found");
     }
     return desc;
 }
@@ -49,7 +49,7 @@ static void show_row(tec_ctx_t *ctx, tec_arg_t *args, tec_list_t *obj,
 {
     if (obj != NULL) {
         char *desc;
-        args->taskid = obj->name;
+        args->task = obj->name;
 
         if ((desc = get_unit_desc(ctx, args, quiet)) == NULL)
             return;
@@ -65,26 +65,26 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
     tec_list_t obj;
     int opt_quiet = 0;          /* TODO: sync it with option passed to CLI.  */
 
-    args->taskid = NULL;
+    args->task = NULL;
     if ((status = toggle_task_get_curr(teccfg.base.task, args)) == 0) {
         if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
             ;
         } else {
             obj.next = NULL;
             obj.status = LIBTEC_OK;
-            obj.name = args->taskid;
+            obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }
     }
 
-    args->taskid = NULL;
+    args->task = NULL;
     if ((status = toggle_task_get_prev(teccfg.base.task, args)) == 0) {
         if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
             ;
         } else {
             obj.next = NULL;
             obj.status = LIBTEC_OK;
-            obj.name = args->taskid;
+            obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }
     }
@@ -110,7 +110,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int i, quiet, show_headers, status;
 
     quiet = show_headers = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":ad:hqvtH")) != -1) {
         switch (c) {

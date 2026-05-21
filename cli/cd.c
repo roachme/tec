@@ -72,11 +72,11 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if ((status = toggle_task_get_prev(cfg->base.task, &args)))
             return elog(1, errfmt, "PREV", "no previous task ID");
-        argvec_replace(argvec, argvec->i, args.taskid, IDSIZ);
+        argvec_replace(argvec, argvec->i, args.task, IDSIZ);
     }
 
     do {
-        args.taskid = argvec->argv[argvec->i];
+        args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
@@ -85,7 +85,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = hook_action(&args, "cd"))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, "failed to execute hooks");
+                elog(status, errfmt, args.task, "failed to execute hooks");
         } else if (opts.chtog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)

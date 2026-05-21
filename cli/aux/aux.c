@@ -24,6 +24,6 @@ bool do_change_user_cwd(tec_arg_t *args)
     char *base = teccfg.base.task;
     char buf[FILENAME_MAX + 1] = { 0 };
 
-    sprintf(buf, "%s/%s/%s/%s", base, args->env, args->desk, args->taskid);
+    sprintf(buf, "%s/%s/%s/%s", base, args->env, args->desk, args->task);
     return strcmp(buf, tec_cli_osdep_getenv_cwd()) == 0;
 }

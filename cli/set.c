@@ -60,7 +60,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     retcode = LIBTEC_OK;
     opt_help = opt_interactive = opt_quiet = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hiqD:T:P:")) != -1) {
         switch (c) {
@@ -123,17 +123,17 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return status;
 
     do {
-        args.taskid = argvec->argv[i];
+        args.task = argvec->argv[i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
             ;
         } else if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
-            args.taskid = args.taskid ? args.taskid : "NOCURR";
+            args.task = args.task ? args.task : "NOCURR";
             if (opt_quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
+                elog(status, errfmt, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "set"))) {
             if (opt_quiet == false)
-                elog(1, errfmt, args.taskid, "failed to execute hooks");
+                elog(1, errfmt, args.task, "failed to execute hooks");
         }
 
         ctx.units = tec_unit_free(ctx.units);

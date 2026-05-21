@@ -86,7 +86,7 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
                             "could not get previous task");
             }
         } else {
-            args->taskid = strdup(parts[0]);
+            args->task = strdup(parts[0]);
         }
     } else if (nparts == 2) {
         /* desk/task: "desk/task1" or "./." */
@@ -122,7 +122,7 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
                             "could not get previous task");
             }
         } else {
-            args->taskid = strdup(parts[1]);
+            args->task = strdup(parts[1]);
         }
     } else if (nparts == 3) {
         /* env/desk/task: "env/desk/task1" or "././." */
@@ -167,7 +167,7 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
                             "could not get previous task");
             }
         } else {
-            args->taskid = strdup(parts[2]);
+            args->task = strdup(parts[2]);
         }
     }
 
@@ -177,7 +177,7 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
 
 /*
  * Parse destination path which may be a directory (ends with '/') or a task path.
- * If is_dir is set to true, the destination is a directory and taskid should not be set.
+ * If is_dir is set to true, the destination is a directory and task should not be set.
  */
 static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
                       const char *errfmt, tec_cfg_t *cfg)
@@ -282,8 +282,8 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
     showhelp = false;
     is_dir = false;
     errfmt = "cannot parse '%s': %s";
-    src.env = src.desk = src.taskid = NULL;
-    dst.env = dst.desk = dst.taskid = NULL;
+    src.env = src.desk = src.task = NULL;
+    dst.env = dst.desk = dst.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":ft:h")) != -1) {
         switch (c) {
@@ -337,19 +337,18 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
             dst.desk = src.desk;
 
         if ((status = tec_task_move(cfg->base.task, &src, &dst, &ctx))) {
-            return elog(status, "could not (re)move '%s': %s", src.taskid,
+            return elog(status, "could not (re)move '%s': %s", src.task,
                         tec_strerror(status));
         }
 
         /* Update toggles after successful move */
         if (strcmp(src.env, dst.env) == 0 && strcmp(src.desk, dst.desk) == 0) {
             /* Same desk: rename - update task ID in toggles */
-            if (strcmp(src.taskid, dst.taskid) != 0)
-                toggle_task_update(cfg->base.task, &src, src.taskid,
-                                   dst.taskid);
+            if (strcmp(src.task, dst.task) != 0)
+                toggle_task_update(cfg->base.task, &src, src.task, dst.task);
         } else {
             /* Different desk/env: clear from source toggles */
-            toggle_task_clear(cfg->base.task, &src, src.taskid);
+            toggle_task_clear(cfg->base.task, &src, src.task);
         }
     } else {
         /* Multiple moves: tec move src1 src2 ... dst/ */
@@ -358,7 +357,7 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
         /* Iterate over all source arguments (all except the last one) */
         for (; i < argvec->used - 1; i++) {
             /* Reset src for each iteration */
-            src.env = src.desk = src.taskid = NULL;
+            src.env = src.desk = src.task = NULL;
 
             if ((status = parse_path(argvec->argv[i], &src, errfmt, cfg))) {
                 last_status = status;
@@ -369,10 +368,10 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
             tec_arg_t move_dst;
             move_dst.env = dst.env ? dst.env : src.env;
             move_dst.desk = dst.desk ? dst.desk : src.desk;
-            move_dst.taskid = src.taskid;       /* Keep same task ID */
+            move_dst.task = src.task;   /* Keep same task ID */
 
             if ((status = tec_task_move(cfg->base.task, &src, &move_dst, &ctx))) {
-                elog(status, "could not move '%s': %s", src.taskid,
+                elog(status, "could not move '%s': %s", src.task,
                      tec_strerror(status));
                 last_status = status;
             } else {
@@ -380,12 +379,12 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 if (strcmp(src.env, move_dst.env) == 0 &&
                     strcmp(src.desk, move_dst.desk) == 0) {
                     /* Same desk: rename - update task ID in toggles */
-                    if (strcmp(src.taskid, move_dst.taskid) != 0)
+                    if (strcmp(src.task, move_dst.task) != 0)
                         toggle_task_update(cfg->base.task, &src,
-                                           src.taskid, move_dst.taskid);
+                                           src.task, move_dst.task);
                 } else {
                     /* Different desk/env: clear from source toggles */
-                    toggle_task_clear(cfg->base.task, &src, src.taskid);
+                    toggle_task_clear(cfg->base.task, &src, src.task);
                 }
             }
         }

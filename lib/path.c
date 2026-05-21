@@ -39,7 +39,7 @@ char *path_task_dir(const char *taskdir, const tec_arg_t *args)
     const char *fmt = "%s/%s/%s/%s";
     static char pathname[PATH_MAX + 1];
     return path_generic(pathname, fmt, taskdir, args->env, args->desk,
-                        args->taskid);
+                        args->task);
 }
 
 /* Generate path for unit files.  */
@@ -62,5 +62,5 @@ char *path_task_unit(const char *taskdir, const tec_arg_t *args)
     const char *fmt = "%s/%s/%s/%s/.tec/units";
     static char pathname[PATH_MAX + 1];
     return path_generic(pathname, fmt, taskdir, args->env, args->desk,
-                        args->taskid);
+                        args->task);
 }

@@ -210,7 +210,7 @@ struct help helptab[] = {
       SRC     source path\n\
     \n\
     Arguments structure:\n\
-      SRC -> env/desk/taskid\n\
+      SRC -> env/desk/task\n\
       .   -> current task ID, desk name or env name\n\
       ..  -> previous task ID, desk name or env name\n\
     \n\

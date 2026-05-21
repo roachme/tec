@@ -8,7 +8,7 @@ static int _task_dbmkdir(const char *taskdir, tec_arg_t *args)
 {
     char path[PATH_MAX + 1];
     const char *fmt = "%s/%s/%s/%s/.tec";
-    sprintf(path, fmt, taskdir, args->env, args->desk, args->taskid);
+    sprintf(path, fmt, taskdir, args->env, args->desk, args->task);
     return MKDIR(path);
 }
 
@@ -29,14 +29,14 @@ static int _env_dbmkdir(const char *taskdir, tec_arg_t *args)
 int dir_task_add(const char *taskdir, tec_arg_t *args)
 {
     char path[PATH_MAX + 1];
-    sprintf(path, "%s/%s/%s/%s", taskdir, args->env, args->desk, args->taskid);
+    sprintf(path, "%s/%s/%s/%s", taskdir, args->env, args->desk, args->task);
     return !(MKDIR(path) == 0 && _task_dbmkdir(taskdir, args) == 0);
 }
 
 int dir_task_del(const char *taskdir, tec_arg_t *args)
 {
     char path[BUFSIZ + 1];
-    sprintf(path, "%s/%s/%s/%s", taskdir, args->env, args->desk, args->taskid);
+    sprintf(path, "%s/%s/%s/%s", taskdir, args->env, args->desk, args->task);
     return RMDIR(path);
 }
 
@@ -44,8 +44,8 @@ int dir_task_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst)
 {
     char new_path[PATH_MAX + 1];
     char old_path[PATH_MAX + 1];
-    sprintf(old_path, "%s/%s/%s/%s", taskdir, src->env, src->desk, src->taskid);
-    sprintf(new_path, "%s/%s/%s/%s", taskdir, dst->env, dst->desk, dst->taskid);
+    sprintf(old_path, "%s/%s/%s/%s", taskdir, src->env, src->desk, src->task);
+    sprintf(new_path, "%s/%s/%s/%s", taskdir, dst->env, dst->desk, dst->task);
     return rename(old_path, new_path);
 }
 

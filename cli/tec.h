@@ -43,7 +43,7 @@
 } while (0)
 
 #define CTX_INIT { .units = NULL, .list = NULL }
-#define ARGS_INIT(args) { .env = NULL, .desk = NULL, .taskid = NULL }
+#define ARGS_INIT(args) { .env = NULL, .desk = NULL, .task = NULL }
 
 enum tec_setup_level {
     TEC_PAGER,

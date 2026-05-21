@@ -106,35 +106,35 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     }
 
     do {
-        args.taskid = argvec->argv[argvec->i];
+        args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
             continue;
         } else if (opts.interactive == RMI_ALWAYS) {
-            tec_cli_log_prompt(0, "remove task '%s'? [y/N] ", args.taskid);
+            tec_cli_log_prompt(0, "remove task '%s'? [y/N] ", args.task);
             if (!yesno())
                 continue;
         }
 
         if ((status = hook_action(&args, "rm"))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.taskid, "failed to execute hooks");
+                elog(1, errfmt, args.task, "failed to execute hooks");
         } else if ((status = update_toggles_and_cwd(&args, &opts))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.taskid, "could not update toggles");
+                elog(1, errfmt, args.task, "could not update toggles");
         } else if ((status = tec_task_del(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
+                elog(status, errfmt, args.task, tec_strerror(status));
         } else if (opts.verbose == true)
-            llog(0, "removed task '%s'", args.taskid);
+            llog(0, "removed task '%s'", args.task);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
     if (retcode == LIBTEC_OK && opts.change_dir) {
-        args.taskid = NULL;     // FIXME: ducking hotfix to get current task ID from file
+        args.task = NULL;       // FIXME: ducking hotfix to get current task ID from file
         if (toggle_task_get_curr(cfg->base.task, &args))
-            args.taskid = "";
+            args.task = "";
         retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
     }
 

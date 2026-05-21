@@ -47,14 +47,14 @@ static int aux_list_get(tec_ctx_t *ctx, const char *dirname)
 
     while ((ent = readdir(ids)) != NULL) {
         int status = LIBTEC_OK;
-        args.taskid = ent->d_name;
+        args.task = ent->d_name;
 
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
-        else if (valid_task_name(args.taskid) == false)
+        else if (valid_task_name(args.task) == false)
             status = LIBTEC_ARG_ILLEG;
 
-        ctx->list = list_add(ctx->list, args.taskid, status);
+        ctx->list = list_add(ctx->list, args.task, status);
     }
 
     closedir(ids);
@@ -102,7 +102,7 @@ int tec_desk_valid(const char *taskdir, tec_arg_t *args)
 
 int tec_task_valid(const char *taskdir, tec_arg_t *args)
 {
-    if (valid_task_name(args->taskid) == false)
+    if (valid_task_name(args->task) == false)
         return emod_set(LIBTEC_ARG_ILLEG);
     return LIBTEC_OK;
 }

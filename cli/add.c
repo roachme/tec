@@ -13,12 +13,12 @@ static int generate_task(tec_arg_t *args, tec_argvec_t *argvec)
 {
     char gentask[IDSIZ + 1] = { 0 };
 
-    args->taskid = gentask;
+    args->task = gentask;
     for (register unsigned int i = 1; i < IDLIMIT; ++i) {
         sprintf(gentask, IDFMT, i);
         if (tec_task_exist(teccfg.base.task, args) != LIBTEC_OK) {
             argvec_add(argvec, gentask);
-            args->taskid = argvec->argv[argvec->used];
+            args->task = argvec->argv[argvec->used];
             return 0;
         }
     }
@@ -39,7 +39,7 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     if (desc) {
         unitvals[ARRAY_SIZE(unitvals) - 1] = desc;
     } else {                    /* Generate description.  */
-        strcat(_desc, args->taskid);
+        strcat(_desc, args->task);
     }
 
     strftime(date, BUFSIZ, timefmt, timeinfo);
@@ -109,37 +109,37 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     }
 
     do {
-        args.taskid = argvec->argv[argvec->i];
+        args.task = argvec->argv[argvec->i];
 
-        if (tec_cli_len_valid(args.taskid, IDSIZ) == false) {
+        if (tec_cli_len_valid(args.task, IDSIZ) == false) {
             status = 1;
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, "task ID is too long");
+                elog(status, errfmt, args.task, "task ID is too long");
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
+                elog(status, errfmt, args.task, tec_strerror(status));
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.taskid, tec_strerror(LIBTEC_ARG_EXISTS));
+                elog(1, errfmt, args.task, tec_strerror(LIBTEC_ARG_EXISTS));
             retcode = !(status == LIBTEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.taskid, "unit generation failed");
+                elog(1, errfmt, args.task, "unit generation failed");
             retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_task_add(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
+                elog(status, errfmt, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.taskid, "failed to execute hooks");
+                elog(1, errfmt, args.task, "failed to execute hooks");
         } else if (opts.chtog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)

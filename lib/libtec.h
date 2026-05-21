@@ -6,7 +6,7 @@
 typedef struct tec_arg {
     char *env;
     char *desk;
-    char *taskid;
+    char *task;
 } tec_arg_t;
 
 typedef struct tec_unit {

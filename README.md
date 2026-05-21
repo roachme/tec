@@ -84,7 +84,7 @@ hooks = {
         { bincmd = "show"; pgname = "gmux"; pgncmd = "show" },
     );
     action = (
-        { bincmd = "add"; pgname = "gmux"; pgncmd = "sync" },
+        { bincmd = "add"; pgname = "gmux"; pgncmd = "cd" },
     );
     list = ();
 };

@@ -58,7 +58,7 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     showhelp = quiet = false;
     switch_dir = switch_env = true;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:hnqN")) != -1) {
         switch (c) {
@@ -188,7 +188,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     opt_ask_every = true;       /* prompt before every removal.  */
     opt_ask_once = false;       /* prompt before once for all environments.  */
     opt_quiet = opt_help = opt_verbose = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:fhiqvI")) != -1) {
         switch (c) {
@@ -279,7 +279,7 @@ static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     opt_quiet = false;
     opt_help = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
@@ -331,8 +331,8 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     opt_quiet = opt_help = false;
     errfmt = "could not rename env '%s': %s";
-    src.env = src.desk = src.taskid = NULL;
-    dst.env = dst.desk = dst.taskid = NULL;
+    src.env = src.desk = src.task = NULL;
+    dst.env = dst.desk = dst.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
@@ -390,7 +390,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_quiet = opt_help = false;
     atleast_one_key_set = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:hqD:")) != -1) {
         switch (c) {
@@ -438,7 +438,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "env-set"))) {
             if (opt_quiet == false)
-                elog(status, errfmt, args.taskid, "failed to execute hooks");
+                elog(status, errfmt, args.task, "failed to execute hooks");
         }
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
@@ -458,7 +458,7 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     status = LIBTEC_OK;
     unitbin = unitpgn = NULL;
     quiet = showhelp = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:hq")) != -1) {
         switch (c) {
@@ -516,7 +516,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_quiet = opt_help = false;
     opt_cd_toggle = opt_cd_dir = true;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:hnqN")) != -1) {
         switch (c) {
@@ -569,7 +569,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             ;
         } else if ((status = hook_action(&args, "env-cd"))) {
             if (opt_quiet == false)
-                elog(status, errfmt, args.taskid, "failed to execute hooks");
+                elog(status, errfmt, args.task, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
             if ((status = toggle_env_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)

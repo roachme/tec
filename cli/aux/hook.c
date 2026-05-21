@@ -14,7 +14,7 @@ static char *_hook_cmd(tec_arg_t *args, char *name, char *cmd)
 {
     const char *fmt = "%s/%s/%s -T %s %s -e %s -d %s %s";
     sprintf(pathname, fmt, teccfg.base.pgn, name, name, teccfg.base.task,
-            cmd, args->env, args->desk, args->taskid);
+            cmd, args->env, args->desk, args->task);
     return pathname;
 }
 

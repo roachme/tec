@@ -67,7 +67,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return EXIT_FAILURE;
 
     do {
-        args.taskid = argvec->argv[argvec->i];
+        args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
             retcode = status == LIBTEC_OK ? retcode : status;
@@ -76,17 +76,17 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = tec_task_get(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, tec_strerror(status));
+                elog(status, errfmt, args.task, tec_strerror(status));
         } else if ((status = valid_unitkeys(ctx.units))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, "invalid unit keys");
+                elog(status, errfmt, args.task, "invalid unit keys");
         } else if ((status = hook_cat(&unitpgn, &args, "cat"))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.taskid, "failed to execute hooks");
+                elog(status, errfmt, args.task, "failed to execute hooks");
         }
 
         if (status == LIBTEC_OK) {
-            units = tec_unit_add(units, "id", args.taskid);
+            units = tec_unit_add(units, "id", args.task);
             units = tec_unit_join(units, ctx.units);
             units = tec_unit_join(units, unitpgn);
 
@@ -101,7 +101,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
                         }
                     }
                     if (notfound && opts.quiet == false)
-                        elog(1, keyfmt, args.taskid, keyvec.argv[i]);
+                        elog(1, keyfmt, args.task, keyvec.argv[i]);
                     retcode = notfound == 0 ? retcode : 1;
                 }
             } else {            /* Show all keys.  */

@@ -57,7 +57,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_help = opt_quiet = false;
     opt_cd_dir = opt_cd_toggle = true;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":e:hnqN")) != -1) {
         switch (c) {
@@ -129,7 +129,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             ctx.units = tec_unit_free(ctx.units);
         } else if ((status = hook_action(&args, "desk-add"))) {
             if (opt_quiet == false)
-                elog(1, errfmt, args.taskid, "failed to execute hooks");
+                elog(1, errfmt, args.task, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)
@@ -158,7 +158,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_ask_every = true;       /* prompt before every removal.  */
     opt_ask_once = false;       /* prompt before once for all desks.  */
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
     opt_quiet = opt_help = opt_verbose = false;
 
     while ((c = getopt(argvec->used, argvec->argv, ":fhiqvI")) != -1) {
@@ -230,7 +230,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         /* TODO: handle current and previos task IDs.  */
 
         if (opt_verbose == true)
-            llog(0, "removed desk '%s'", args.taskid);
+            llog(0, "removed desk '%s'", args.task);
         retcode = status == LIBTEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
@@ -249,7 +249,7 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt = "cannot list desk(s) '%s': %s";
 
     opt_help = opt_quiet = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
@@ -317,7 +317,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_quiet = opt_help = false;
     atleast_one_key_set = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":hqD:")) != -1) {
         switch (c) {
@@ -365,7 +365,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "desk-set"))) {
             if (opt_quiet == false)
-                elog(1, errfmt, args.taskid, "failed to execute hooks");
+                elog(1, errfmt, args.task, "failed to execute hooks");
         }
 
         ctx.units = tec_unit_free(ctx.units);
@@ -387,7 +387,7 @@ static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     units = unitpgn = NULL;
     opt_quiet = opt_help = false;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
         switch (c) {
@@ -447,7 +447,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     retcode = LIBTEC_OK;
     opt_quiet = opt_help = false;
     opt_cd_toggle = opt_cd_dir = true;
-    args.env = args.desk = args.taskid = NULL;
+    args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":e:hnqN")) != -1) {
         switch (c) {
@@ -504,7 +504,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             ;
         } else if ((status = hook_action(&args, "desk-cd"))) {
             if (opt_quiet == false)
-                elog(status, errfmt, args.taskid, "failed to execute hooks");
+                elog(status, errfmt, args.task, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)
