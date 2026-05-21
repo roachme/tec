@@ -4,9 +4,12 @@
 
 ### Changed
 
+- `tec`: Refactor project structure
+
 ### Fixed
 
 - `lib/path`: Refactor string formats
+- `utils/install`: Add help message for user
 
 ### Deleted
 

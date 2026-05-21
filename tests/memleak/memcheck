@@ -3,7 +3,7 @@
 # TODO: there is no difference between memory leak and failure return code
 
 TASKBASE="/tmp/tec_memcheck"
-PROGRAM="./_tec -T $TASKBASE"
+PROGRAM="./build/_tec -T $TASKBASE"
 VALGRIND="valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all -q --error-exitcode=1"
 
 function memcheck()

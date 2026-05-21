@@ -1,5 +1,4 @@
-artifacts
-_tec
+build/
 gmon.out
 prof.txt
 tec_prof

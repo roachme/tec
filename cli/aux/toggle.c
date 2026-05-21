@@ -104,7 +104,6 @@ static char *task_get_prev(char *base, tec_arg_t *args)
     return _get_toggle(path, task_prev, IDSIZ, "prev");
 }
 
-/* Toggles: env scope: BEGIN.   */
 int toggle_env_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->env && !(args->env = env_get_curr(base, args)))
@@ -114,14 +113,10 @@ int toggle_env_get_curr(char *base, tec_arg_t *args)
 
 int toggle_env_get_prev(char *base, tec_arg_t *args)
 {
-    if (!args->env && !(args->env = env_get_prev(base, args))) {
-        TEC_LOG_E("sserror '%s'", args->env);
+    if (!args->env && !(args->env = env_get_prev(base, args)))
         return 1;
-    }
     return 0;
 }
-
-/* Toggles: env scope: END.   */
 
 int toggle_desk_get_curr(char *base, tec_arg_t *args)
 {
@@ -185,7 +180,7 @@ int toggle_env_set_curr(char *base, tec_arg_t *args)
         toggles = tec_unit_add(toggles, "prev", prev);
 
     /* Prevent duplicates in toggles.  */
-    if (prev && strcmp(curr, prev) == 0) {
+    if (prev && !strcmp(curr, prev)) {
         // do nothing
     } else {
         tec_unit_save(path_env_toggle(base, args), toggles);

@@ -1,8 +1,8 @@
 MAKE=make
-PROGRAM=_tec
+PROGRAM=build/_tec
 VERSION=$(shell cat VERSION)
 README=README.md
-SHELLSCRIPT=tec.sh
+SHELLSCRIPT=shell/tec.sh
 SHELLNAME=bash
 CC=gcc
 SRCS=$(wildcard lib/*.c cli/*.c cli/aux/*.c)
@@ -14,22 +14,22 @@ PWDFILE=/tmp/tecpwd
 # TODO: add debug mode
 # TODO: add user and developer builds
 
-all: $(PROGRAM)
+all: init $(PROGRAM)
 .PHONY: clean debug generate release
 
 init:
-	mkdir -p artifacts
-	mkdir -p artifacts/build/debug
-	mkdir -p artifacts/build/release
-	mkdir -p artifacts/docs
-	mkdir -p artifacts/reports
-	mkdir -p artifacts/cppcheck
-	mkdir -p artifacts/doxygen
-	mkdir -p artifacts/flawfinder
-	mkdir -p artifacts/ldoc
-	mkdir -p artifacts/luacheck
-	#ln -s ../build/artifacts/gcov artifacts/gcov ||:
-	#ln -s ../build/gtest artifacts/gtest ||:
+	mkdir -p build
+	mkdir -p build/debug
+	mkdir -p build/release
+	mkdir -p build/docs
+	mkdir -p build/reports
+	mkdir -p build/cppcheck
+	mkdir -p build/doxygen
+	mkdir -p build/flawfinder
+	mkdir -p build/ldoc
+	mkdir -p build/luacheck
+	#ln -s ../build/gcov gcov ||:
+	#ln -s ../build/gtest gtest ||:
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) -DVERSION=\"$(VERSION)\" -DPWDFILE=\"$(PWDFILE)\"
@@ -38,14 +38,14 @@ $(PROGRAM): $(OBJS)
 	$(CC) -o $@ $^ $(LFLAGS)
 
 generate: $(PROGRAM)
-	$(shell m4 -DSHELLNAME=$(SHELLNAME) -DPWDFILE=$(PWDFILE) ./scripts/genshell > $(SHELLSCRIPT))
-	$(shell m4 ./scripts/genreadme > $(README))
+	$(shell m4 -DSHELLNAME=$(SHELLNAME) -DPWDFILE=$(PWDFILE) ./utils/genshell > $(SHELLSCRIPT))
+	$(shell m4 ./utils/genreadme > $(README))
 
 clean:
-	rm -rf artifacts build
+	rm -rf build
 	rm -rf $(PROGRAM) $(OBJS)
 
-re: clean $(PROGRAM)
+re: clean init $(PROGRAM)
 
 check:
 	cppcheck --std=c89 --enable=all --language=c $(SRCS)
@@ -53,14 +53,11 @@ check:
 valgrind:
 	valgrind  --track-origins=yes --leak-check=full --show-leak-kinds=all ./$(PROGRAM)
 
-lnum:
-	find lib -name '*.c' | xargs wc -l
-
 install:
-	cp $(PROGRAM) $(HOME)/.local/bin
+	./utils/install full
 
 install-link:
-	ln -s $(PWD)/$(PROGRAM) $(HOME)/.local/bin/$(PROGRAM)
+	./utils/install soft
 
 style:
 	find . -name '*.[ch]' | xargs indent -nut -nbad -bap -nbc -bbo -hnl -br -brs -c33 -cd33 -ncdb -ce -ci4 -cli0 -d0 -di1 -nfc1 -i4 -ip0 -l80 -lp -npcs -nprs -npsl -sai -saf -saw -ncs -nsc -sob -nfca -cp33 -ss -ts8 -il1
@@ -69,13 +66,13 @@ style:
 test:
 	./tests/memleak/memcheck
 
-# Build project in debug configuration into ./artifacts/build/debug
+# Build project in debug configuration into ./build/debug
 .PHONY: build_debug
 build_debug:
 	make debug
 
 
-# Build project in release configuraiton into ./artifacts/build/release
+# Build project in release configuraiton into ./build/release
 .PHONY: build_release
 build_release:
 	make

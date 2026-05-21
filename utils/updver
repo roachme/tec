@@ -7,7 +7,7 @@ set -e
 
 CMD=
 VERSION_NEW=
-PROGRAM="./scripts/updver"
+PROGRAM="./utils/updver"
 
 FILEVERSION="VERSION"
 FILECHANGELOG="CHANGELOG.md"
