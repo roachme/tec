@@ -1,5 +1,5 @@
 define(MACRO_TECAME, tec)dnl
-define(MACRO_USAGE, `esyscmd(./_tec help)')dnl
+define(MACRO_USAGE, `esyscmd(./build/_tec help)')dnl
 define(MACRO_CODE, changequote([,])[changequote([,])```changequote(`,')]changequote(`,'))dnl
 define(MACRO_INLINE_CODE, changequote([,])[changequote([,])`changequote(`,')]changequote(`,'))dnl
 <div align="center">
@@ -53,13 +53,13 @@ MACRO_CODE
 2. Copy the content of tec.sh into your shell rc file. It's MACRO_INLINE_CODE ~/.bashrc MACRO_INLINE_CODE , MACRO_INLINE_CODE .zshrc MACRO_INLINE_CODE , etc.
 
 MACRO_CODE bash
-include(tec.sh)dnl
+include(shell/tec.sh)dnl
 MACRO_CODE
 
 3. Create basic Tec config file. Either in MACRO_INLINE_CODE ~/.tec/tec.cfg MACRO_INLINE_CODE or MACRO_INLINE_CODE ~/.config/tec/tec.cfg MACRO_INLINE_CODE and fill it with content below
 
 MACRO_CODE
-include(templates/tec.cfg)dnl
+include(shell/tec.cfg)dnl
 MACRO_CODE
 
 ## ⇁  Tec builtin commands

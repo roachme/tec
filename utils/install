@@ -1,0 +1,67 @@
+#!/bin/env bash
+
+CMD="$1"
+PROGRAM=_tec
+SRCPATH="build"
+DSTPATH="$HOME/.local/bin"
+SOURCESTR="source $(pwd)/shell/tec.sh"
+
+function install_help()
+{
+    echo "Usage: install.sh [soft|hard|shell|full]"
+}
+
+function install_hard()
+{
+    mkdir -p "$DSTPATH"
+
+    if [ -e "$DSTPATH/$PROGRAM" ]; then
+        rm -f "$DSTPATH/$PROGRAM"
+    fi
+    cp  "$SRCPATH/$PROGRAM" "$DSTPATH"
+}
+
+function install_soft()
+{
+    if [ -e "$DSTPATH/$PROGRAM" ]; then
+        rm -f "$DSTPATH/$PROGRAM"
+    fi
+    ln -fs "$PWD/$SRCPATH/$PROGRAM" "${DSTPATH}/$PROGRAM"
+}
+
+function install_shell()
+{
+    if [ "$(basename $SHELL)" = "zsh" ]; then
+        if ! grep -q "$SOURCESTR" $HOME/.zshrc; then
+            echo "$SOURCESTR" >> $HOME/.zshrc
+        fi
+        echo "Run: source ~/.zshrc"
+    elif [ "$(basename $SHELL)" = "bash" ]; then
+        if ! grep -q "$SOURCESTR" $HOME/.bashrc; then
+            echo "$SOURCESTR" >> $HOME/.bashrc
+        fi
+        echo "Run: source ~/.bashrc"
+    else
+        echo "uknown shell program"
+        exit 1
+    fi
+}
+
+function install_full()
+{
+    install_hard
+    install_shell
+}
+
+if [ "$CMD" = "full" ]; then
+    install_full
+elif [ "$CMD" = "hard" ]; then
+    install_hard
+elif [ "$CMD" = "soft" ]; then
+    install_soft
+elif [ "$CMD" = "shell" ]; then
+    install_shell
+else
+    install_help
+    exit 1
+fi
