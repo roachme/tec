@@ -76,45 +76,6 @@ static int fill_sysvars(const char *taskdir, struct tecstruct *tecfs)
     return TEC_OK;
 }
 
-int tec_env_exist(const char *taskdir, tec_arg_t *args)
-{
-    char *pathname = path_env_dir(taskdir, args);
-    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
-}
-
-int tec_desk_exist(const char *taskdir, tec_arg_t *args)
-{
-    char *pathname = path_desk_dir(taskdir, args);
-    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
-}
-
-int tec_task_exist(const char *taskdir, tec_arg_t *args)
-{
-    char *pathname = path_task_dir(taskdir, args);
-    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
-}
-
-int tec_env_valid(const char *taskdir, tec_arg_t *args)
-{
-    if (is_valid_object(args->env) == false)
-        return emod_set(TEC_ARG_ILLEG);
-    return TEC_OK;
-}
-
-int tec_desk_valid(const char *taskdir, tec_arg_t *args)
-{
-    if (is_valid_object(args->desk) == false)
-        return emod_set(TEC_ARG_ILLEG);
-    return TEC_OK;
-}
-
-int tec_task_valid(const char *taskdir, tec_arg_t *args)
-{
-    if (is_valid_object(args->task) == false)
-        return emod_set(TEC_ARG_ILLEG);
-    return TEC_OK;
-}
-
 int tec_make_db(const char *taskdir)
 {
     struct tecstruct tecfs;
@@ -151,6 +112,12 @@ int tec_task_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return TEC_OK;
 }
 
+int tec_task_exist(const char *taskdir, tec_arg_t *args)
+{
+    char *pathname = path_task_dir(taskdir, args);
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
+}
+
 int tec_task_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_task_rm(taskdir, args))
@@ -183,6 +150,13 @@ int tec_task_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return aux_unit_set(ctx->units, path_task_unit(taskdir, args));
 }
 
+int tec_task_valid(const char *taskdir, tec_arg_t *args)
+{
+    if (is_valid_object(args->task) == false)
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
+}
+
 int tec_desk_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_desk_add(taskdir, args))
@@ -190,6 +164,12 @@ int tec_desk_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     else if (unit_save(path_desk_unit(taskdir, args), ctx->units))
         return emod_set(TEC_UNIT_SAVE);
     return TEC_OK;
+}
+
+int tec_desk_exist(const char *taskdir, tec_arg_t *args)
+{
+    char *pathname = path_desk_dir(taskdir, args);
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
 }
 
 int tec_desk_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -224,6 +204,13 @@ int tec_desk_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return aux_unit_set(ctx->units, path_desk_unit(taskdir, args));
 }
 
+int tec_desk_valid(const char *taskdir, tec_arg_t *args)
+{
+    if (is_valid_object(args->desk) == false)
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
+}
+
 int tec_env_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_env_add(taskdir, args))
@@ -231,6 +218,12 @@ int tec_env_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     else if (unit_save(path_env_unit(taskdir, args), ctx->units))
         return emod_set(TEC_UNIT_SAVE);
     return TEC_OK;
+}
+
+int tec_env_exist(const char *taskdir, tec_arg_t *args)
+{
+    char *pathname = path_env_dir(taskdir, args);
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
 }
 
 int tec_env_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -263,6 +256,24 @@ int tec_env_rename(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
 int tec_env_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     return aux_unit_set(ctx->units, path_env_unit(taskdir, args));
+}
+
+int tec_env_valid(const char *taskdir, tec_arg_t *args)
+{
+    if (is_valid_object(args->env) == false)
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
+}
+
+void *tec_list_free(tec_list_t *list)
+{
+    list_free(list);
+    return NULL;
+}
+
+char *tec_strerror(int errnum)
+{
+    return emod_strerror(errnum);
 }
 
 tec_unit_t *tec_unit_add(struct tec_unit *head, char *key, char *val)
@@ -300,15 +311,4 @@ void *tec_unit_free(tec_unit_t *units)
 {
     unit_free(units);
     return NULL;
-}
-
-void *tec_list_free(tec_list_t *list)
-{
-    list_free(list);
-    return NULL;
-}
-
-char *tec_strerror(int errnum)
-{
-    return emod_strerror(errnum);
 }
