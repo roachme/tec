@@ -20,6 +20,7 @@
 - `cli/tec`: Remove descriptive message in case of command failure
 - `cli/tec`: Remove prefix from static functions
 - `lib`: Reorder API functions
+- `lib/unit`: Optimization stuff
 
 ### Deleted
 

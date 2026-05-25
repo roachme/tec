@@ -8,6 +8,18 @@
 #define UNIT_DELIM        ":\n"
 #define UNIT_FMT          "%s : %s\n"
 
+static tec_unit_t *make_node(void)
+{
+    tec_unit_t *node;
+
+    if ((node = malloc(sizeof(tec_unit_t))) == NULL)
+        return NULL;
+
+    node->key = node->val = NULL;
+    node->next = NULL;
+    return node;
+}
+
 static char *trim_whitespace_end(char *str)
 {
     size_t len;
@@ -48,13 +60,11 @@ int unit_save(const char *filename, tec_unit_t *units)
 tec_unit_t *unit_parse(tec_unit_t *units, const char *str)
 {
     char *token;
-    char key[BUFSIZ + 1];
-    char val[BUFSIZ + 1];
-    char buf[BUFSIZ + 1];
+    char key[BUFSIZ + 1] = { 0 };
+    char val[BUFSIZ + 1] = { 0 };
+    char buf[BUFSIZ + 1] = { 0 };
 
     strcpy(buf, str);
-    buf[BUFSIZ] = '\0';
-    key[0] = val[0] = '\0';
 
     if ((token = strtok(buf, UNIT_DELIM)) != NULL)
         strcpy(key, trim_whitespace(token));
@@ -72,12 +82,11 @@ tec_unit_t *unit_load(const char *filename)
 {
     FILE *fp;
     char buf[BUFSIZ + 1];
-    tec_unit_t *units;
+    tec_unit_t *units = NULL;
 
     if ((fp = fopen(filename, "r")) == NULL)
         return NULL;
 
-    units = NULL;
     while (fgets(buf, BUFSIZ, fp) != NULL)
         units = unit_parse(units, buf);
     fclose(fp);
@@ -91,10 +100,9 @@ tec_unit_t *unit_add(tec_unit_t *head, const char *key, const char *val)
 {
     tec_unit_t *unit, *tmp;
 
-    if ((unit = malloc(sizeof(tec_unit_t))) == NULL)
+    if ((unit = make_node()) == NULL)
         return head;
 
-    unit->next = NULL;
     if (!(unit->key = strdup(key)) || !(unit->val = strdup(val)))
         return head;
     else if ((tmp = head) == NULL)
@@ -109,21 +117,17 @@ tec_unit_t *unit_add(tec_unit_t *head, const char *key, const char *val)
 /**
  * Join two linked lists into one without copying data.
  */
-tec_unit_t *unit_join(tec_unit_t *head, tec_unit_t *body)
+tec_unit_t *unit_join(tec_unit_t *head, tec_unit_t *tail)
 {
     tec_unit_t *units, *tmp;
-
-    units = tmp = NULL;
 
     units = head;
     tmp = units;
 
-    while (units->next) {
+    while (units->next)
         units = units->next;
-    }
 
-    units->next = body;
-
+    units->next = tail;
     return tmp;
 }
 
