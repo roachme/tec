@@ -14,13 +14,13 @@ const char *errcodes[__LIBTEC_STATUS_LAST] = {
     [LIBTEC_ARG_NOSUCH] = "no such object",
     [LIBTEC_ARG_EXISTS] = "object already exists",
 
-    [LIBTEC_DIR_DEL] = "could not delete directory",
+    [LIBTEC_DIR_RM] = "could not delete directory",
     [LIBTEC_DIR_MAKE] = "could not create directory",
     [LIBTEC_DIR_MOVE] = "could not rename directory",
     [LIBTEC_DIR_OPEN] = "could not open directory",
 
     [LIBTEC_UNIT_ADD] = "could not add unit node",
-    [LIBTEC_UNIT_DEL] = "could not delete unit node",
+    [LIBTEC_UNIT_RM] = "could not delete unit node",
     [LIBTEC_UNIT_GET] = "could not get unit values",
     [LIBTEC_UNIT_ILLEG] = "illegal unit value",
     [LIBTEC_UNIT_KEY] = "unit key does not exist",

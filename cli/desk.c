@@ -223,7 +223,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status = hook_action(&args, "desk-rm"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.desk, "failed to execute hooks");
-        } else if ((status = tec_desk_del(cfg->base.task, &args, &ctx))) {
+        } else if ((status = tec_desk_rm(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }

@@ -123,7 +123,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if ((status = update_toggles_and_cwd(&args, &opts))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.task, "could not update toggles");
-        } else if ((status = tec_task_del(cfg->base.task, &args, &ctx))) {
+        } else if ((status = tec_task_rm(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.task, tec_strerror(status));
         } else if (opts.verbose == true)

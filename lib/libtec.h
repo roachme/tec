@@ -4,9 +4,9 @@
 #define TEC_ERRMSGSIZ   100
 
 typedef struct tec_arg {
-    char *env;
-    char *desk;
     char *task;
+    char *desk;
+    char *env;
 } tec_arg_t;
 
 typedef struct tec_unit {
@@ -36,14 +36,14 @@ enum tec_errno {
     LIBTEC_ARG_NOSUCH,
     LIBTEC_ARG_EXISTS,
 
-    LIBTEC_DIR_DEL,
+    LIBTEC_DIR_RM,
     LIBTEC_DIR_MAKE,
     LIBTEC_DIR_MOVE,
     LIBTEC_DIR_OPEN,
     LIBTEC_DIR_RENAME,
 
     LIBTEC_UNIT_ADD,
-    LIBTEC_UNIT_DEL,
+    LIBTEC_UNIT_RM,
     LIBTEC_UNIT_GET,
     LIBTEC_UNIT_ILLEG,
     LIBTEC_UNIT_KEY,
@@ -87,6 +87,7 @@ int tec_task_valid(const char *taskdir, tec_arg_t * args);
 int tec_task_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_task_move(const char *taskdir, tec_arg_t * src, tec_arg_t * dst,
                   tec_ctx_t * ctx);
+int tec_task_rm(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_task_set(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 
 /* Desk functions.  */
@@ -95,7 +96,9 @@ int tec_desk_exist(const char *taskdir, tec_arg_t * args);
 int tec_desk_get(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_desk_valid(const char *taskdir, tec_arg_t * args);
 int tec_desk_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
-int tec_desk_move(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_desk_move(const char *taskdir, tec_arg_t * src, tec_arg_t * dst,
+                  tec_ctx_t * ctx);
+int tec_desk_rm(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_desk_set(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 
 /* Environment functions.  */
@@ -106,6 +109,7 @@ int tec_env_get(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_env_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_env_rename(const char *taskdir, tec_arg_t * src, tec_arg_t * dst,
                    tec_ctx_t * ctx);
+int tec_env_rm(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_env_set(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 
 #endif

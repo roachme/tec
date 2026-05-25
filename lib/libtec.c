@@ -2,8 +2,6 @@
 #include <dirent.h>
 #include <ctype.h>
 
-// TODO: some stuff
-
 #include "dir.h"
 #include "unit.h"
 #include "list.h"
@@ -141,6 +139,9 @@ int tec_check_db(const char *taskdir)
     return LIBTEC_OK;
 }
 
+/* TODO: if units fail to create then directory will be leaving.
+ * To do it in atomic way: create everything in the tmp directory, and once it
+ * is done rename directory.  */
 int tec_task_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_task_add(taskdir, args) != 0)
@@ -150,10 +151,10 @@ int tec_task_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return LIBTEC_OK;
 }
 
-int tec_task_del(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
+int tec_task_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
-    if (dir_task_del(taskdir, args))
-        return emod_set(LIBTEC_DIR_DEL);
+    if (dir_task_rm(taskdir, args))
+        return emod_set(LIBTEC_DIR_RM);
     return LIBTEC_OK;
 }
 
@@ -191,10 +192,10 @@ int tec_desk_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return LIBTEC_OK;
 }
 
-int tec_desk_del(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
+int tec_desk_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
-    if (dir_desk_del(taskdir, args))
-        return emod_set(LIBTEC_DIR_DEL);
+    if (dir_desk_rm(taskdir, args))
+        return emod_set(LIBTEC_DIR_RM);
     return LIBTEC_OK;
 }
 
@@ -210,9 +211,12 @@ int tec_desk_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return aux_list_get(ctx, path_env_dir(taskdir, args));
 }
 
-int tec_desk_move(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
+int tec_desk_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
+                  tec_ctx_t *ctx)
 {
-    return 0;
+    if (dir_desk_move(taskdir, src, dst))
+        return emod_set(LIBTEC_DIR_MOVE);
+    return LIBTEC_OK;
 }
 
 int tec_desk_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -229,10 +233,10 @@ int tec_env_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
     return LIBTEC_OK;
 }
 
-int tec_env_del(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
+int tec_env_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
-    if (dir_env_del(taskdir, args))
-        return emod_set(LIBTEC_DIR_DEL);
+    if (dir_env_rm(taskdir, args))
+        return emod_set(LIBTEC_DIR_RM);
     return LIBTEC_OK;
 }
 

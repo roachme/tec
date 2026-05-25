@@ -251,7 +251,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status = hook_action(&args, "env-rm"))) {
             if (opt_quiet == false)
                 elog(1, errfmt, args.env, "failed to execute hooks");
-        } else if ((status = tec_env_del(cfg->base.task, &args, &ctx))) {
+        } else if ((status = tec_env_rm(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
                 elog(status, errfmt, argvec->argv[i], tec_strerror(status));
         }
