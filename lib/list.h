@@ -1,5 +1,5 @@
-#ifndef LIBTEC_LIST_H
-#define LIBTEC_LIST_H
+#ifndef TEC_LIST_H
+#define TEC_LIST_H
 
 #include "libtec.h"
 

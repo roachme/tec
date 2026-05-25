@@ -21,7 +21,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int status;
     tec_ctx_t ctx = CTX_INIT;
     tec_argvec_t keyvec;
-    int retcode = LIBTEC_OK;
+    int retcode = TEC_OK;
     tec_unit_t *units = NULL;
     tec_unit_t *unitpgn = NULL;
     tec_arg_t args = ARGS_INIT();
@@ -70,7 +70,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         }
 
@@ -85,7 +85,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 elog(status, errfmt, args.task, "failed to execute hooks");
         }
 
-        if (status == LIBTEC_OK) {
+        if (status == TEC_OK) {
             units = tec_unit_add(units, "id", args.task);
             units = tec_unit_join(units, ctx.units);
             units = tec_unit_join(units, unitpgn);
@@ -111,9 +111,9 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         }
 
         units = ctx.units = unitpgn = tec_unit_free(units);
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
     argvec_deinit(&keyvec);
-    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

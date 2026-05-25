@@ -18,7 +18,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     int status;
-    int retcode = LIBTEC_OK;
+    int retcode = TEC_OK;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
     const char *errfmt = "cannot switch to '%s': %s";
@@ -79,7 +79,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         }
 
@@ -92,10 +92,10 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
                     elog(1, "could not update toggles");
             }
         }
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
-    if (retcode == LIBTEC_OK && opts.chdir)
+    if (retcode == TEC_OK && opts.chdir)
         retcode = tec_cli_pwd_set(&args);
-    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

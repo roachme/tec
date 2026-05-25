@@ -1,5 +1,5 @@
-#ifndef LIBTEC_ERRMOD_H
-#define LIBTEC_ERRMOD_H
+#ifndef TEC_ERRMOD_H
+#define TEC_ERRMOD_H
 
 #define TEC_ERRMSGSIZ   100
 #define NERRCODE    50

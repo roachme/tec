@@ -31,17 +31,17 @@ static int aux_unit_set(tec_unit_t *newunits, const char *fname)
     struct tec_unit *units;
 
     if ((units = unit_load(fname)) == NULL)
-        return emod_set(LIBTEC_UNIT_LOAD);
+        return emod_set(TEC_UNIT_LOAD);
 
     // TODO: check values in atomic way
 
     for (item = newunits; item; item = item->next)
         unit_set(units, item->key, item->val);
     if (unit_save(fname, units))
-        return emod_set(LIBTEC_UNIT_SAVE);
+        return emod_set(TEC_UNIT_SAVE);
 
     unit_free(units);
-    return LIBTEC_OK;
+    return TEC_OK;
 }
 
 static int aux_list_get(tec_ctx_t *ctx, const char *dirname)
@@ -51,68 +51,68 @@ static int aux_list_get(tec_ctx_t *ctx, const char *dirname)
     struct dirent *ent;
 
     if ((ids = opendir(dirname)) == NULL)
-        return emod_set(LIBTEC_DIR_OPEN);
+        return emod_set(TEC_DIR_OPEN);
 
     while ((ent = readdir(ids)) != NULL) {
-        int status = LIBTEC_OK;
+        int status = TEC_OK;
         args.task = ent->d_name;
 
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
         else if (is_valid_object(args.task) == false)
-            status = LIBTEC_ARG_ILLEG;
+            status = TEC_ARG_ILLEG;
 
         ctx->list = list_add(ctx->list, args.task, status);
     }
 
     closedir(ids);
-    return LIBTEC_OK;
+    return TEC_OK;
 }
 
 static int fill_sysvars(const char *taskdir, struct tecstruct *tecfs)
 {
     sprintf(tecfs->base, "%s", taskdir);
     sprintf(tecfs->db, "%s/%s", taskdir, ".tec");
-    return LIBTEC_OK;
+    return TEC_OK;
 }
 
 int tec_env_exist(const char *taskdir, tec_arg_t *args)
 {
     char *pathname = path_env_dir(taskdir, args);
-    return ISDIR(pathname) == true ? LIBTEC_OK : LIBTEC_ARG_NOSUCH;
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
 }
 
 int tec_desk_exist(const char *taskdir, tec_arg_t *args)
 {
     char *pathname = path_desk_dir(taskdir, args);
-    return ISDIR(pathname) == true ? LIBTEC_OK : LIBTEC_ARG_NOSUCH;
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
 }
 
 int tec_task_exist(const char *taskdir, tec_arg_t *args)
 {
     char *pathname = path_task_dir(taskdir, args);
-    return ISDIR(pathname) == true ? LIBTEC_OK : LIBTEC_ARG_NOSUCH;
+    return ISDIR(pathname) == true ? TEC_OK : TEC_ARG_NOSUCH;
 }
 
 int tec_env_valid(const char *taskdir, tec_arg_t *args)
 {
     if (is_valid_object(args->env) == false)
-        return emod_set(LIBTEC_ARG_ILLEG);
-    return LIBTEC_OK;
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
 }
 
 int tec_desk_valid(const char *taskdir, tec_arg_t *args)
 {
     if (is_valid_object(args->desk) == false)
-        return emod_set(LIBTEC_ARG_ILLEG);
-    return LIBTEC_OK;
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
 }
 
 int tec_task_valid(const char *taskdir, tec_arg_t *args)
 {
     if (is_valid_object(args->task) == false)
-        return emod_set(LIBTEC_ARG_ILLEG);
-    return LIBTEC_OK;
+        return emod_set(TEC_ARG_ILLEG);
+    return TEC_OK;
 }
 
 int tec_make_db(const char *taskdir)
@@ -120,12 +120,12 @@ int tec_make_db(const char *taskdir)
     struct tecstruct tecfs;
 
     if (fill_sysvars(taskdir, &tecfs))
-        return emod_set(LIBTEC_SYS_MALLOC);
+        return emod_set(TEC_SYS_MALLOC);
     else if (MKDIR(tecfs.base))
-        return emod_set(LIBTEC_DIR_MAKE);
+        return emod_set(TEC_DIR_MAKE);
     else if (MKDIR(tecfs.db))
-        return emod_set(LIBTEC_DIR_MAKE);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_MAKE);
+    return TEC_OK;
 }
 
 int tec_check_db(const char *taskdir)
@@ -133,10 +133,10 @@ int tec_check_db(const char *taskdir)
     struct tecstruct tecfs;
 
     if (fill_sysvars(taskdir, &tecfs))
-        return emod_set(LIBTEC_SYS_MALLOC);
+        return emod_set(TEC_SYS_MALLOC);
     else if (!ISDIR(tecfs.db))
-        return emod_set(LIBTEC_SYS_DB);
-    return LIBTEC_OK;
+        return emod_set(TEC_SYS_DB);
+    return TEC_OK;
 }
 
 /* TODO: if units fail to create then directory will be leaving.
@@ -145,24 +145,24 @@ int tec_check_db(const char *taskdir)
 int tec_task_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_task_add(taskdir, args) != 0)
-        return emod_set(LIBTEC_DIR_MAKE);
+        return emod_set(TEC_DIR_MAKE);
     else if (unit_save(path_task_unit(taskdir, args), ctx->units))
-        return emod_set(LIBTEC_UNIT_SAVE);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_SAVE);
+    return TEC_OK;
 }
 
 int tec_task_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_task_rm(taskdir, args))
-        return emod_set(LIBTEC_DIR_RM);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_RM);
+    return TEC_OK;
 }
 
 int tec_task_get(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if ((ctx->units = unit_load(path_task_unit(taskdir, args))) == NULL)
-        return emod_set(LIBTEC_UNIT_GET);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_GET);
+    return TEC_OK;
 }
 
 int tec_task_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -174,8 +174,8 @@ int tec_task_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                   tec_ctx_t *ctx)
 {
     if (dir_task_move(taskdir, src, dst))
-        return emod_set(LIBTEC_DIR_MOVE);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_MOVE);
+    return TEC_OK;
 }
 
 int tec_task_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -186,24 +186,24 @@ int tec_task_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 int tec_desk_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_desk_add(taskdir, args))
-        return emod_set(LIBTEC_DIR_MAKE);
+        return emod_set(TEC_DIR_MAKE);
     else if (unit_save(path_desk_unit(taskdir, args), ctx->units))
-        return emod_set(LIBTEC_UNIT_SAVE);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_SAVE);
+    return TEC_OK;
 }
 
 int tec_desk_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_desk_rm(taskdir, args))
-        return emod_set(LIBTEC_DIR_RM);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_RM);
+    return TEC_OK;
 }
 
 int tec_desk_get(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if ((ctx->units = unit_load(path_desk_unit(taskdir, args))) == NULL)
-        return emod_set(LIBTEC_UNIT_GET);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_GET);
+    return TEC_OK;
 }
 
 int tec_desk_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -215,8 +215,8 @@ int tec_desk_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                   tec_ctx_t *ctx)
 {
     if (dir_desk_move(taskdir, src, dst))
-        return emod_set(LIBTEC_DIR_MOVE);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_MOVE);
+    return TEC_OK;
 }
 
 int tec_desk_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -227,24 +227,24 @@ int tec_desk_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 int tec_env_add(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_env_add(taskdir, args))
-        return emod_set(LIBTEC_DIR_MAKE);
+        return emod_set(TEC_DIR_MAKE);
     else if (unit_save(path_env_unit(taskdir, args), ctx->units))
-        return emod_set(LIBTEC_UNIT_SAVE);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_SAVE);
+    return TEC_OK;
 }
 
 int tec_env_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if (dir_env_rm(taskdir, args))
-        return emod_set(LIBTEC_DIR_RM);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_RM);
+    return TEC_OK;
 }
 
 int tec_env_get(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
     if ((ctx->units = unit_load(path_env_unit(taskdir, args))) == NULL)
-        return emod_set(LIBTEC_UNIT_LOAD);
-    return LIBTEC_OK;
+        return emod_set(TEC_UNIT_LOAD);
+    return TEC_OK;
 }
 
 int tec_env_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -256,8 +256,8 @@ int tec_env_rename(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                    tec_ctx_t *ctx)
 {
     if (dir_env_rename(taskdir, src, dst))
-        return emod_set(LIBTEC_DIR_RENAME);
-    return LIBTEC_OK;
+        return emod_set(TEC_DIR_RENAME);
+    return TEC_OK;
 }
 
 int tec_env_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
@@ -278,7 +278,7 @@ tec_unit_t *tec_unit_join(tec_unit_t *head, tec_unit_t *body)
 int tec_unit_set(struct tec_unit *head, char *key, char *val)
 {
     // TODO: this will never fail, cuz in case of error it returns head.
-    return !unit_set(head, key, val) ? LIBTEC_OK : LIBTEC_UNIT_SET;
+    return !unit_set(head, key, val) ? TEC_OK : TEC_UNIT_SET;
 }
 
 int tec_unit_save(const char *filename, tec_unit_t *units)

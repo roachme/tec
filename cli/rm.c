@@ -10,7 +10,7 @@ static int update_toggles_and_cwd(tec_arg_t *args,
                                   struct tec_cli_rm_options *opts)
 {
     char *home;
-    int status = LIBTEC_OK;
+    int status = TEC_OK;
 
     /* Not to break shell session in case user CWD gets deleted.  */
     if (do_change_user_cwd(args) == true) {
@@ -48,7 +48,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int status;
     int ntasks;
     tec_ctx_t ctx = CTX_INIT;
-    int retcode = LIBTEC_OK;
+    int retcode = TEC_OK;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_rm_options opts;
     const char *errfmt = "cannot remove task '%s': %s";
@@ -109,7 +109,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.task = argvec->argv[argvec->i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (opts.interactive == RMI_ALWAYS) {
             tec_cli_log_prompt(0, "remove task '%s'? [y/N] ", args.task);
@@ -128,15 +128,15 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 elog(status, errfmt, args.task, tec_strerror(status));
         } else if (opts.verbose == true)
             llog(0, "removed task '%s'", args.task);
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
-    if (retcode == LIBTEC_OK && opts.change_dir) {
+    if (retcode == TEC_OK && opts.change_dir) {
         args.task = NULL;       // FIXME: ducking hotfix to get current task ID from file
         if (toggle_task_get_curr(cfg->base.task, &args))
             args.task = "";
-        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
+        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
     }
 
-    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

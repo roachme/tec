@@ -1,5 +1,5 @@
-#ifndef LIBTEC_DIR_H
-#define LIBTEC_DIR_H
+#ifndef TEC_DIR_H
+#define TEC_DIR_H
 
 #include "libtec.h"
 

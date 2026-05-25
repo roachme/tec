@@ -11,6 +11,7 @@
 - `tec`: Rename member to `task` in struct `tec_arg_t`
 - `cli/add`: Change error message
 - `lib/valid`: Unify object validation
+- `lib`: Refactor error status code names
 
 ### Fixed
 

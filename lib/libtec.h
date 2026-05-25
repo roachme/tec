@@ -1,5 +1,5 @@
-#ifndef LIBTEC_H
-#define LIBTEC_H
+#ifndef TEC_H
+#define TEC_H
 
 #define TEC_ERRMSGSIZ   100
 
@@ -27,34 +27,34 @@ typedef struct tec_context {
 } tec_ctx_t;
 
 enum tec_errno {
-    LIBTEC_OK,
+    TEC_OK,
 
-    LIBTEC_SYS_DB,
-    LIBTEC_SYS_MALLOC,
+    TEC_SYS_DB,
+    TEC_SYS_MALLOC,
 
-    LIBTEC_ARG_ILLEG,
-    LIBTEC_ARG_NOSUCH,
-    LIBTEC_ARG_EXISTS,
+    TEC_ARG_ILLEG,
+    TEC_ARG_NOSUCH,
+    TEC_ARG_EXISTS,
 
-    LIBTEC_DIR_RM,
-    LIBTEC_DIR_MAKE,
-    LIBTEC_DIR_MOVE,
-    LIBTEC_DIR_OPEN,
-    LIBTEC_DIR_RENAME,
+    TEC_DIR_RM,
+    TEC_DIR_MAKE,
+    TEC_DIR_MOVE,
+    TEC_DIR_OPEN,
+    TEC_DIR_RENAME,
 
-    LIBTEC_UNIT_ADD,
-    LIBTEC_UNIT_RM,
-    LIBTEC_UNIT_GET,
-    LIBTEC_UNIT_ILLEG,
-    LIBTEC_UNIT_KEY,
-    LIBTEC_UNIT_LOAD,
-    LIBTEC_UNIT_SAVE,
-    LIBTEC_UNIT_SET,
+    TEC_UNIT_ADD,
+    TEC_UNIT_RM,
+    TEC_UNIT_GET,
+    TEC_UNIT_ILLEG,
+    TEC_UNIT_KEY,
+    TEC_UNIT_LOAD,
+    TEC_UNIT_SAVE,
+    TEC_UNIT_SET,
 
     /* HOTFIX: delete it once error code table is filled.  */
-    LIBTEC_NODEF_ERR,
+    TEC_NODEF_ERR,
 
-    __LIBTEC_STATUS_LAST
+    __TEC_STATUS_LAST
 };
 
 struct tec_err_codes {

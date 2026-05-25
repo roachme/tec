@@ -71,7 +71,7 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
             ;
         } else {
             obj.next = NULL;
-            obj.status = LIBTEC_OK;
+            obj.status = TEC_OK;
             obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }
@@ -83,7 +83,7 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
             ;
         } else {
             obj.next = NULL;
-            obj.status = LIBTEC_OK;
+            obj.status = TEC_OK;
             obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }

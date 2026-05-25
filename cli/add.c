@@ -16,7 +16,7 @@ static int generate_task(tec_arg_t *args, tec_argvec_t *argvec)
     args->task = gentask;
     for (register unsigned int i = 1; i < IDLIMIT; ++i) {
         sprintf(gentask, IDFMT, i);
-        if (tec_task_exist(teccfg.base.task, args) != LIBTEC_OK) {
+        if (tec_task_exist(teccfg.base.task, args) != TEC_OK) {
             argvec_add(argvec, gentask);
             args->task = argvec->argv[argvec->used];
             return 0;
@@ -55,7 +55,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int c;
     int status;
     char *desc = NULL;
-    int retcode = LIBTEC_OK;
+    int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
@@ -115,22 +115,22 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             status = 1;
             if (opts.quiet == false)
                 elog(status, errfmt, args.task, "task ID is too long");
-            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
                 elog(status, errfmt, args.task, tec_strerror(status));
-            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, tec_strerror(LIBTEC_ARG_EXISTS));
-            retcode = !(status == LIBTEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+                elog(1, errfmt, args.task, tec_strerror(TEC_ARG_EXISTS));
+            retcode = !(status == TEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
                 elog(1, errfmt, args.task, "unit generation failed");
-            retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         }
 
@@ -147,10 +147,10 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             }
         }
         ctx.units = tec_unit_free(ctx.units);
-        retcode = status == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+        retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
     } while (++argvec->i < argvec->used);
 
-    if (retcode == LIBTEC_OK && opts.chdir)
+    if (retcode == TEC_OK && opts.chdir)
         retcode = tec_cli_pwd_set(&args);
-    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

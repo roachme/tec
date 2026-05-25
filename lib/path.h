@@ -1,5 +1,5 @@
-#ifndef LIBTEC_PATH_H
-#define LIBTEC_PATH_H
+#ifndef TEC_PATH_H
+#define TEC_PATH_H
 
 #include "libtec.h"
 

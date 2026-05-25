@@ -62,7 +62,7 @@ static int is_valid_toggle(char *tog)
 
 static int cmd_setup(int setuplvl, tec_cfg_t *cfg)
 {
-    int status = LIBTEC_OK;
+    int status = TEC_OK;
 
     if (setuplvl == TEC_SETUP_SOFT)     /* no filesystem check.  */
         ;
@@ -130,9 +130,9 @@ tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    int status = LIBTEC_OK;
+    int status = TEC_OK;
 
-    if ((status = cmd_setup(cmd->option, cfg)) != LIBTEC_OK) {
+    if ((status = cmd_setup(cmd->option, cfg)) != TEC_OK) {
         return elog(status, "setup failed: %s", tec_strerror(status));
     }
 
@@ -152,7 +152,7 @@ int main(int argc, const char **argv)
     tec_cfg_t *cfg = &teccfg;
 
     cmdname = NULL;
-    status = LIBTEC_OK;
+    status = TEC_OK;
     base.pgn = base.task = NULL;
     opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";

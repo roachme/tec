@@ -58,7 +58,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int opt_help, opt_interactive, opt_quiet;
     const char *errfmt = "cannot set task units '%s': %s";
 
-    retcode = LIBTEC_OK;
+    retcode = TEC_OK;
     opt_help = opt_interactive = opt_quiet = false;
     args.env = args.desk = args.task = NULL;
 
@@ -137,7 +137,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         }
 
         ctx.units = tec_unit_free(ctx.units);
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
     return retcode;

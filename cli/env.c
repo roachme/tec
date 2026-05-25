@@ -55,7 +55,7 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt = "cannot add env '%s': %s";
     const char *errfmt_desk = "cannot add desk '%s': %s";
 
-    retcode = LIBTEC_OK;
+    retcode = TEC_OK;
     showhelp = quiet = false;
     switch_dir = switch_env = true;
     args.env = args.desk = args.task = NULL;
@@ -104,76 +104,76 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             status = 1;
             if (quiet == false)
                 elog(status, errfmt, args.env, "env name is too long");
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_env_valid(cfg->base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt, args.env, tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_env_exist(cfg->base.task, &args))) {
             char *env = args.env;
             if (quiet == false)
-                elog(status, errfmt, env, tec_strerror(LIBTEC_ARG_EXISTS));
-            retcode = !(status == LIBTEC_OK) ? retcode : !status;
+                elog(status, errfmt, env, tec_strerror(TEC_ARG_EXISTS));
+            retcode = !(status == TEC_OK) ? retcode : !status;
             continue;
         }
 
         if ((status = tec_desk_valid(cfg->base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
             status = 1;
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk, "desk name is too long");
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
             if (quiet == false)
                 elog(status, errfmt_desk, args.desk,
-                     tec_strerror(LIBTEC_ARG_EXISTS));
-            retcode = !(status == LIBTEC_OK) ? retcode : !status;
+                     tec_strerror(TEC_ARG_EXISTS));
+            retcode = !(status == TEC_OK) ? retcode : !status;
             continue;
         }
 
         if (generate_units(&ctx, args.env)) {
             if (quiet == false)
                 elog(1, errfmt, args.env, "unit generation failed");
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         }
 
         if ((status = tec_env_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_desk_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
                 elog(1, errfmt, argvec->argv[i], tec_strerror(status));
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         }
         ctx.units = tec_unit_free(ctx.units);
     }
 
-    if ((switch_env && status == LIBTEC_OK)
+    if ((switch_env && status == TEC_OK)
         && toggle_env_set_curr(cfg->base.task, &args)) {
         if (quiet == false)
             elog(status, "could not update env toggles");
         return 1;
-    } else if ((switch_env && status == LIBTEC_OK)
+    } else if ((switch_env && status == TEC_OK)
                && toggle_desk_set_curr(cfg->base.task, &args)) {
         if (quiet == false)
             elog(status, "could not update desk toggles");
         return 1;
     }
 
-    if (retcode == LIBTEC_OK && switch_dir)
+    if (retcode == TEC_OK && switch_dir)
         retcode = tec_cli_pwd_set(&args);
-    return retcode == LIBTEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
@@ -184,7 +184,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt = "cannot delete env '%s': %s";
     int opt_ask_once, opt_ask_every, opt_quiet, opt_help, opt_verbose;
 
-    retcode = LIBTEC_OK;
+    retcode = TEC_OK;
     opt_ask_every = true;       /* prompt before every removal.  */
     opt_ask_once = false;       /* prompt before once for all environments.  */
     opt_quiet = opt_help = opt_verbose = false;
@@ -232,14 +232,14 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (opt_ask_once == true) {
         printf("Are you sure to remove environment(s)? [y/N] ");
         if (yesno() == false) {
-            return LIBTEC_OK;
+            return TEC_OK;
         }
     }
 
     do {
         args.env = argvec->argv[i];
         if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove environment '%s'? [y/N] ", args.env);
@@ -258,13 +258,13 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if (opt_verbose == true)
             llog(0, "removed environment '%s'", args.env);
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
     // TODO: update current directory if current env got deleted.
 
-    if (retcode == LIBTEC_OK)
-        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
+    if (retcode == TEC_OK)
+        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
 
     return retcode;
 }
@@ -387,7 +387,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int opt_quiet, opt_help;
     const char *errfmt = "could not set env unit value '%s': %s";
 
-    retcode = LIBTEC_OK;
+    retcode = TEC_OK;
     opt_quiet = opt_help = false;
     atleast_one_key_set = false;
     args.env = args.desk = args.task = NULL;
@@ -440,7 +440,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             if (opt_quiet == false)
                 elog(status, errfmt, args.task, "failed to execute hooks");
         }
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
     ctx.units = tec_unit_free(ctx.units);
@@ -455,7 +455,7 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     struct tec_unit *unitbin, *unitpgn;
     const char *errfmt = "cannot show env units '%s': %s";
 
-    status = LIBTEC_OK;
+    status = TEC_OK;
     unitbin = unitpgn = NULL;
     quiet = showhelp = false;
     args.env = args.desk = args.task = NULL;
@@ -513,7 +513,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt = "cannot switch to '%s': %s";
     int opt_quiet, opt_help, opt_cd_toggle, opt_cd_dir;
 
-    retcode = LIBTEC_OK;
+    retcode = TEC_OK;
     opt_quiet = opt_help = false;
     opt_cd_toggle = opt_cd_dir = true;
     args.env = args.desk = args.task = NULL;
@@ -576,11 +576,11 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
                     elog(1, "could not update toggles");
             }
         }
-        retcode = status == LIBTEC_OK ? retcode : status;
+        retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
-    if (retcode == LIBTEC_OK && opt_cd_dir)
-        retcode = tec_cli_pwd_set(&args) == LIBTEC_OK ? retcode : status;
+    if (retcode == TEC_OK && opt_cd_dir)
+        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
 
     return retcode;
 }

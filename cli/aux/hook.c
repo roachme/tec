@@ -23,7 +23,7 @@ int hook_action(tec_arg_t *args, char *cmd)
     int retcode, status;
     struct tec_hook *hooks = teccfg.hooks;
 
-    retcode = status = LIBTEC_OK;
+    retcode = status = TEC_OK;
 
     /* Execute hooks only if they are enabled.  */
     if (teccfg.opts.hook == false)
@@ -34,7 +34,7 @@ int hook_action(tec_arg_t *args, char *cmd)
             char *cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
             dlog(1, cmd);
             status = system(cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
-            retcode = status == LIBTEC_OK ? retcode : status;
+            retcode = status == TEC_OK ? retcode : status;
         }
     }
 
@@ -48,7 +48,7 @@ int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
     char line[BUFSIZ + 1] = { 0 };
     struct tec_hook *hooks = teccfg.hooks;
 
-    retcode = status = LIBTEC_OK;
+    retcode = status = TEC_OK;
 
     /* Execute hooks only if they are enabled.  */
     if (teccfg.opts.hook == false)
@@ -105,7 +105,7 @@ char *hook_list(struct tec_hook *hooks, char *pgnout, char *env, char *task)
         pgnout[1] = '[';
         strcat(pgnout, "]");
     }
-    //return LIBTEC_OK;
+    //return TEC_OK;
     return pgnout;
 }
 */

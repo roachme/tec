@@ -708,7 +708,7 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int c, i, status;
     int opt_list_cmds;
 
-    status = LIBTEC_OK;
+    status = TEC_OK;
     opt_list_cmds = false;
 
     while ((c = getopt(argvec->used, argvec->argv, ":dls")) != -1) {

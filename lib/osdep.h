@@ -1,5 +1,5 @@
-#ifndef LIBTEC_OSDEP_H
-#define LIBTEC_OSDEP_H
+#ifndef TEC_OSDEP_H
+#define TEC_OSDEP_H
 
 #include <stdbool.h>
 

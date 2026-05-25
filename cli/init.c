@@ -5,9 +5,9 @@ int tec_cli_init(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int status;
 
-    if ((status = tec_make_db(teccfg.base.task)) != LIBTEC_OK) {
+    if ((status = tec_make_db(teccfg.base.task)) != TEC_OK) {
         const char *errfmt = "could not make core filesystem: %s";
         return elog(status, errfmt, tec_strerror(status));
     }
-    return LIBTEC_OK;
+    return TEC_OK;
 }
