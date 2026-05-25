@@ -10,6 +10,7 @@
 - `cli`: Change option for version to `-v`
 - `tec`: Rename member to `task` in struct `tec_arg_t`
 - `cli/add`: Change error message
+- `lib/valid`: Unify object validation
 
 ### Fixed
 

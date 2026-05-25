@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <dirent.h>
+#include <ctype.h>
 
 // TODO: some stuff
 
@@ -7,7 +8,6 @@
 #include "unit.h"
 #include "list.h"
 #include "path.h"
-#include "valid.h"
 #include "osdep.h"
 #include "errmod.h"
 #include "libtec.h"
@@ -16,6 +16,16 @@ struct tecstruct {
     char db[PATH_MAX + 1];      /* directory for tec metadata */
     char base[PATH_MAX + 1];    /* directory for all stuff above */
 };
+
+static bool is_valid_object(const char *name)
+{
+    if (!isalnum(*name++))
+        return false;
+    for (; *name; ++name)
+        if (!(isalnum(*name) || *name == '_' || *name == '-'))
+            return false;
+    return isalnum(*--name) != false;
+}
 
 static int aux_unit_set(tec_unit_t *newunits, const char *fname)
 {
@@ -51,7 +61,7 @@ static int aux_list_get(tec_ctx_t *ctx, const char *dirname)
 
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
-        else if (valid_task_name(args.task) == false)
+        else if (is_valid_object(args.task) == false)
             status = LIBTEC_ARG_ILLEG;
 
         ctx->list = list_add(ctx->list, args.task, status);
@@ -88,21 +98,21 @@ int tec_task_exist(const char *taskdir, tec_arg_t *args)
 
 int tec_env_valid(const char *taskdir, tec_arg_t *args)
 {
-    if (valid_env_name(args->env) == false)
+    if (is_valid_object(args->env) == false)
         return emod_set(LIBTEC_ARG_ILLEG);
     return LIBTEC_OK;
 }
 
 int tec_desk_valid(const char *taskdir, tec_arg_t *args)
 {
-    if (valid_desk_name(args->desk) == false)
+    if (is_valid_object(args->desk) == false)
         return emod_set(LIBTEC_ARG_ILLEG);
     return LIBTEC_OK;
 }
 
 int tec_task_valid(const char *taskdir, tec_arg_t *args)
 {
-    if (valid_task_name(args->task) == false)
+    if (is_valid_object(args->task) == false)
         return emod_set(LIBTEC_ARG_ILLEG);
     return LIBTEC_OK;
 }

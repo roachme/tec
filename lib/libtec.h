@@ -79,18 +79,11 @@ int tec_unit_save(const char *filename, tec_unit_t * units);
 /* Data structure for list of objects.  */
 void *tec_list_free(tec_list_t * list);
 
-/* Input argument functions.  */
-int tec_env_exist(const char *taskdir, tec_arg_t * args);
-int tec_env_valid(const char *taskdir, tec_arg_t * args);
-int tec_desk_exist(const char *taskdir, tec_arg_t * args);
-int tec_desk_valid(const char *taskdir, tec_arg_t * args);
-int tec_task_exist(const char *taskdir, tec_arg_t * args);
-int tec_task_valid(const char *taskdir, tec_arg_t * args);
-
 /* Task functions.  */
 int tec_task_add(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
-int tec_task_del(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_task_exist(const char *taskdir, tec_arg_t * args);
 int tec_task_get(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_task_valid(const char *taskdir, tec_arg_t * args);
 int tec_task_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_task_move(const char *taskdir, tec_arg_t * src, tec_arg_t * dst,
                   tec_ctx_t * ctx);
@@ -98,15 +91,17 @@ int tec_task_set(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 
 /* Desk functions.  */
 int tec_desk_add(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
-int tec_desk_del(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_desk_exist(const char *taskdir, tec_arg_t * args);
 int tec_desk_get(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_desk_valid(const char *taskdir, tec_arg_t * args);
 int tec_desk_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_desk_move(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_desk_set(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 
 /* Environment functions.  */
 int tec_env_add(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
-int tec_env_del(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
+int tec_env_exist(const char *taskdir, tec_arg_t * args);
+int tec_env_valid(const char *taskdir, tec_arg_t * args);
 int tec_env_get(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_env_list(const char *taskdir, tec_arg_t * args, tec_ctx_t * ctx);
 int tec_env_rename(const char *taskdir, tec_arg_t * src, tec_arg_t * dst,
