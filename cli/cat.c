@@ -63,12 +63,17 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     }
     argvec->i = optind;
 
-    if (opts.help == true)
-        return tec_cli_help_usage("cat");
-    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
-        return EXIT_FAILURE;
-    else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
-        return EXIT_FAILURE;
+    if (opts.help == true) {
+        retcode = TEC_OK;
+        tec_cli_help_usage("cat");
+        goto err;
+    } else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet))) {
+        retcode = EXIT_FAILURE;
+        goto err;
+    } else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet))) {
+        retcode = EXIT_FAILURE;
+        goto err;
+    }
 
     do {
         args.task = argvec->argv[argvec->i];
@@ -118,6 +123,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
+ err:
     argvec_deinit(&keys);
     return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

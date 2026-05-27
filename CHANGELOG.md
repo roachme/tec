@@ -23,6 +23,7 @@
 - `lib/unit`: Optimization stuff
 - `cli/cat`: Fix compiler warning
 - `cli/help`: Update help message for command `cat`
+- `cli/cat`: Fix memleak at exit
 
 ### Deleted
 
