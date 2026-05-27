@@ -22,6 +22,7 @@
 - `lib`: Reorder API functions
 - `lib/unit`: Optimization stuff
 - `cli/cat`: Fix compiler warning
+- `cli/help`: Update help message for command `cat`
 
 ### Deleted
 

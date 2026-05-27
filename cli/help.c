@@ -140,7 +140,7 @@ struct help helptab[] = {
       ENV     environment name (default is current)\n\
     \n\
     Option `-k' can be passed many times in case multiple keys\n\
-    need to be shown.\n\
+    need to be shown. The same key can be passsed multiple times as well.\n\
     \n\
     Exit status:\n\
     The return code is zero, unless invalid option, argument or key is given,\n\
