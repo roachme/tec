@@ -1,3 +1,9 @@
+/*
+ * TODO:
+ * 1. Add support to line-up key names in output. Make sure builtin and plugin
+ *    keys line-up well.
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include "cd.h"
