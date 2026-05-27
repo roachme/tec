@@ -93,7 +93,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             /* Show specific keys only.  */
             if (argvec_is_empty(&keyvec) == false) {
                 for (int i = 0; i < keyvec.used; i++) {
-                    int notfound;
+                    int notfound = false;
                     for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
                         if ((notfound = strcmp(keyvec.argv[i], tmp->key)) == 0) {
                             printf("%s\n", tmp->val);

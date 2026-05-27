@@ -21,6 +21,7 @@
 - `cli/tec`: Remove prefix from static functions
 - `lib`: Reorder API functions
 - `lib/unit`: Optimization stuff
+- `cli/cat`: Fix compiler warning
 
 ### Deleted
 
