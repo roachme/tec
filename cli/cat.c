@@ -19,10 +19,10 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     int status;
-    tec_ctx_t ctx = CTX_INIT;
-    tec_argvec_t keyvec;
+    tec_argvec_t keys;
     int retcode = TEC_OK;
     tec_unit_t *units = NULL;
+    tec_ctx_t ctx = CTX_INIT;
     tec_unit_t *unitpgn = NULL;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
@@ -30,7 +30,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
     const char *keyfmt = "cannot show units '%s': '%s' no such key";
 
-    argvec_init(&keyvec);
+    argvec_init(&keys);
     tec_cli_cd_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hk:q")) != -1) {
         switch (c) {
@@ -44,7 +44,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.help = true;
             break;
         case 'k':
-            argvec_add(&keyvec, optarg);
+            argvec_add(&keys, optarg);
             break;
         case 'q':
             opts.quiet = true;
@@ -91,17 +91,17 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             units = tec_unit_join(units, unitpgn);
 
             /* Show specific keys only.  */
-            if (argvec_is_empty(&keyvec) == false) {
-                for (int i = 0; i < keyvec.used; i++) {
+            if (argvec_is_empty(&keys) == false) {
+                for (int i = 0; i < keys.used; i++) {
                     int notfound = false;
                     for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
-                        if ((notfound = strcmp(keyvec.argv[i], tmp->key)) == 0) {
+                        if ((notfound = strcmp(keys.argv[i], tmp->key)) == 0) {
                             printf("%s\n", tmp->val);
                             break;
                         }
                     }
                     if (notfound && opts.quiet == false)
-                        elog(1, keyfmt, args.task, keyvec.argv[i]);
+                        elog(1, keyfmt, args.task, keys.argv[i]);
                     retcode = notfound == 0 ? retcode : 1;
                 }
             } else {            /* Show all keys.  */
@@ -114,6 +114,6 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
         retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
-    argvec_deinit(&keyvec);
+    argvec_deinit(&keys);
     return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
