@@ -7,11 +7,9 @@
 
 static int valid_unitkeys(tec_unit_t *units)
 {
-    for (int i = 0; units && i < nunitkey; units = units->next) {
+    for (int i = 0; units && i < nunitkey; units = units->next, ++i)
         if (strcmp(units->key, unitkeys[i]) != 0)
             return 1;
-        ++i;
-    }
     return 0;
 }
 
