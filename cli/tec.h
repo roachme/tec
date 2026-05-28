@@ -1,5 +1,5 @@
-#ifndef TEC_TEC_H
-#define TEC_TEC_H
+#ifndef TEC_CLI_TEC_H
+#define TEC_CLI_TEC_H
 
 #include <stdio.h>
 #include <getopt.h>

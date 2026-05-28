@@ -1,5 +1,5 @@
-#ifndef TEC_TOGGLE_H
-#define TEC_TOGGLE_H
+#ifndef TEC_CLI_TOGGLE_H
+#define TEC_CLI_TOGGLE_H
 
 #include "../tec.h"
 

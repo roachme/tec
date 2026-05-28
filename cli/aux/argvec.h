@@ -1,5 +1,5 @@
-#ifndef TEC_ARGVEC_H
-#define TEC_ARGVEC_H
+#ifndef TEC_CLI_ARGVEC_H
+#define TEC_CLI_ARGVEC_H
 
 #include <stdbool.h>
 

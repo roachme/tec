@@ -1,5 +1,5 @@
-#ifndef TEC_HOOK_H
-#define TEC_HOOK_H
+#ifndef TEC_CLI_HOOK_H
+#define TEC_CLI_HOOK_H
 
 #include "../../lib/libtec.h"
 

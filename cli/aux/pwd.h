@@ -1,5 +1,5 @@
-#ifndef TEC_PWD_H
-#define TEC_PWD_H
+#ifndef TEC_CLI_PWD_H
+#define TEC_CLI_PWD_H
 
 #include "../../lib/libtec.h"
 

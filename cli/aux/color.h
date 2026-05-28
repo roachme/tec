@@ -1,5 +1,5 @@
-#ifndef TEC_COLOR_H
-#define TEC_COLOR_H
+#ifndef TEC_CLI_COLOR_H
+#define TEC_CLI_COLOR_H
 
 /*
  * This is free and unencumbered software released into the public domain.

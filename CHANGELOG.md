@@ -27,6 +27,7 @@
 - `cli/cat`: Fix memleak at exit
 - `cli/tec`: Fix task directory in case invalid option
 - `cli/aux/log`: Fix debug message format
+- `cli`: Fix header guard name
 
 ### Deleted
 

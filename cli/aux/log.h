@@ -1,5 +1,5 @@
-#ifndef TEC_LOG_H
-#define TEC_LOG_H
+#ifndef TEC_CLI_LOG_H
+#define TEC_CLI_LOG_H
 
 #include <stdio.h>
 #include "aux.h"

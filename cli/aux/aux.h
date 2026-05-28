@@ -1,5 +1,5 @@
-#ifndef TEC_AUX_H
-#define TEC_AUX_H
+#ifndef TEC_CLI_AUX_H
+#define TEC_CLI_AUX_H
 
 #include <stdbool.h>
 #include "../../lib/libtec.h"
