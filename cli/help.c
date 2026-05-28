@@ -727,10 +727,10 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
             helpctx.desc_long = false;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("help");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("help");
         };
     }
@@ -746,7 +746,7 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
      * */
     for (i = optind; i < argvec->used; ++i)
         if ((status = tec_cli_help_lookup(argvec->argv[i])))
-            elog(1, "'%s': no such builtin command", argvec->argv[i]);
+            TEC_LOG_E("'%s': no such builtin command", argvec->argv[i]);
 
     return status;
 }

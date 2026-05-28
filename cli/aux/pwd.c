@@ -15,7 +15,7 @@ int tec_cli_pwd_set(tec_arg_t *args)
     args->task = args->task == NULL ? "" : args->task;
 
     if ((fp = fopen(PWDFILE, "w"))) {
-        dlog(1, fmtdebug, args->env, args->desk, args->task);
+        TEC_LOG_D(fmtdebug, args->env, args->desk, args->task);
         fprintf(fp, fmt, taskdir, args->env, args->desk, args->task);
         return fclose(fp);
     }

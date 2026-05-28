@@ -15,10 +15,10 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
 
     if ((status = tec_env_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
-            elog(status, "'%s': %s", args->env, tec_strerror(status));
+            TEC_LOG_E("'%s': %s", args->env, tec_strerror(status));
     } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
         if (quiet == false)
-            elog(1, "'%s': %s", args->env, "description not found");
+            TEC_LOG_E("'%s': %s", args->env, "description not found");
     }
     return desc;
 }
@@ -79,10 +79,10 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             switch_env = false;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-add");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-add");
         }
     }
@@ -90,7 +90,7 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (showhelp)
         return tec_cli_help_usage("env-add");
     if (optind == argvec->used) {
-        return elog(1, "env name required");
+        return TEC_LOG_E("env name required");
     }
 
     /* Set default desk name to create.  */
@@ -103,56 +103,55 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if (tec_cli_len_valid(args.env, ENVSIZ) == false) {
             status = 1;
             if (quiet == false)
-                elog(status, errfmt, args.env, "env name is too long");
+                TEC_LOG_E(errfmt, args.env, "env name is too long");
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_env_valid(cfg->base.task, &args))) {
             if (quiet == false)
-                elog(status, errfmt, args.env, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.env, tec_strerror(status));
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_env_exist(cfg->base.task, &args))) {
             char *env = args.env;
             if (quiet == false)
-                elog(status, errfmt, env, tec_strerror(TEC_ARG_EXISTS));
+                TEC_LOG_E(errfmt, env, tec_strerror(TEC_ARG_EXISTS));
             retcode = !(status == TEC_OK) ? retcode : !status;
             continue;
         }
 
         if ((status = tec_desk_valid(cfg->base.task, &args))) {
             if (quiet == false)
-                elog(status, errfmt_desk, args.desk, tec_strerror(status));
+                TEC_LOG_E(errfmt_desk, args.desk, tec_strerror(status));
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
             status = 1;
             if (quiet == false)
-                elog(status, errfmt_desk, args.desk, "desk name is too long");
+                TEC_LOG_E(errfmt_desk, args.desk, "desk name is too long");
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
             if (quiet == false)
-                elog(status, errfmt_desk, args.desk,
-                     tec_strerror(TEC_ARG_EXISTS));
+                TEC_LOG_E(errfmt_desk, args.desk, tec_strerror(TEC_ARG_EXISTS));
             retcode = !(status == TEC_OK) ? retcode : !status;
             continue;
         }
 
         if (generate_units(&ctx, args.env)) {
             if (quiet == false)
-                elog(1, errfmt, args.env, "unit generation failed");
+                TEC_LOG_E(errfmt, args.env, "unit generation failed");
             retcode = status == TEC_OK ? retcode : status;
             continue;
         }
 
         if ((status = tec_env_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
-                elog(1, errfmt, argvec->argv[i], tec_strerror(status));
+                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if ((status = tec_desk_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
-                elog(1, errfmt, argvec->argv[i], tec_strerror(status));
+                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
             retcode = status == TEC_OK ? retcode : status;
             continue;
         }
@@ -162,12 +161,12 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if ((switch_env && status == TEC_OK)
         && toggle_env_set_curr(cfg->base.task, &args)) {
         if (quiet == false)
-            elog(status, "could not update env toggles");
+            TEC_LOG_E("could not update env toggles");
         return 1;
     } else if ((switch_env && status == TEC_OK)
                && toggle_desk_set_curr(cfg->base.task, &args)) {
         if (quiet == false)
-            elog(status, "could not update desk toggles");
+            TEC_LOG_E("could not update desk toggles");
         return 1;
     }
 
@@ -217,10 +216,10 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opt_ask_once = true;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-rm");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-rm");
         }
     }
@@ -250,14 +249,14 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = hook_action(&args, "env-rm"))) {
             if (opt_quiet == false)
-                elog(1, errfmt, args.env, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.env, "failed to execute hooks");
         } else if ((status = tec_env_rm(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
-                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
+                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
         }
 
         if (opt_verbose == true)
-            llog(0, "removed environment '%s'", args.env);
+            TEC_LOG_V("removed environment '%s'", args.env);
         retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
@@ -290,10 +289,10 @@ static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opt_help = true;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-ls");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-ls");
         }
     }
@@ -304,7 +303,7 @@ static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if ((status = tec_env_list(cfg->base.task, &args, &ctx))) {
         if (opt_quiet == false) {
             const char *errfmt = "cannot list env(s) '%s': %s";
-            elog(status, errfmt, "ENV", tec_strerror(status));
+            TEC_LOG_E(errfmt, "ENV", tec_strerror(status));
             return status;
         }
     }
@@ -343,7 +342,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opt_quiet = true;
             break;
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-rename");
         }
     }
@@ -352,7 +351,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return tec_cli_help_usage("env-rename");
 
     if (argvec->used - optind != 2)
-        return elog(1, "source or destination env name missing");
+        return TEC_LOG_E("source or destination env name missing");
 
     src.env = argvec->argv[optind];
     dst.env = argvec->argv[optind + 1];
@@ -365,13 +364,13 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return status;
     else if (!tec_env_exist(cfg->base.task, &dst)) {
         if (opt_quiet == false)
-            elog(1, errfmt, src.env, "such destination env exists");
+            TEC_LOG_E(errfmt, src.env, "such destination env exists");
         return status;
     }
 
     if ((status = tec_env_rename(cfg->base.task, &src, &dst, NULL))) {
         if (opt_quiet == false)
-            elog(status, errfmt, "ENV", tec_strerror(status));
+            TEC_LOG_E(errfmt, "ENV", tec_strerror(status));
         return status;
     }
     // FIXME:TODO: free argvec
@@ -405,17 +404,17 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'D':
             if (valid_desc(optarg) == false) {
-                elog(1, "invalid description '%s'", optarg);
+                TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("env-set");
             }
             atleast_one_key_set = true;
             ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-set");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-set");
         }
     }
@@ -423,7 +422,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (opt_help)
         return tec_cli_help_usage("env-set");
     else if (atleast_one_key_set == false) {
-        elog(1, "gotta supply one of the options");
+        TEC_LOG_E("gotta supply one of the options");
         return tec_cli_help_usage("env-set");
     }
 
@@ -435,10 +434,10 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             ;
         } else if ((status = tec_env_set(cfg->base.task, &args, &ctx))) {
             if (opt_quiet == false)
-                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
+                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
         } else if ((status = hook_action(&args, "env-set"))) {
             if (opt_quiet == false)
-                elog(status, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
         retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
@@ -472,10 +471,10 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             quiet = true;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-cat");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-cat");
         }
     }
@@ -491,7 +490,7 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         } else if ((status = tec_env_get(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
-                elog(status, errfmt, argvec->argv[i], tec_strerror(status));
+                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
             continue;
         }
 
@@ -537,10 +536,10 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opt_cd_toggle = false;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-cd");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("env-cd");
         }
     }
@@ -553,13 +552,13 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     /* Check that alias '-' is not passed with other envs nor duplicated.  */
     for (int idx = i; idx < argvec->used; ++idx) {
         if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - i > 1)
-            return elog(1, "alias '-' is used alone");
+            return TEC_LOG_E("alias '-' is used alone");
     }
 
     /* Resolve alias '-' to switch to previous environment.  */
     if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {
         if ((status = toggle_env_get_prev(cfg->base.task, &args)))
-            return elog(1, errfmt, "PREV", "no previous environment");
+            return TEC_LOG_E(errfmt, "PREV", "no previous environment");
         argvec_replace(argvec, i, args.env, ENVSIZ);
     }
 
@@ -569,11 +568,11 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             ;
         } else if ((status = hook_action(&args, "env-cd"))) {
             if (opt_quiet == false)
-                elog(status, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         } else if (opt_cd_toggle == true) {
             if ((status = toggle_env_set_curr(cfg->base.task, &args))) {
                 if (opt_quiet == false)
-                    elog(1, "could not update toggles");
+                    TEC_LOG_E("could not update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;
@@ -605,5 +604,5 @@ int tec_cli_env(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return env_commands[i].func(argvec, cfg);
         }
     }
-    return elog(1, "'%s': no such env command", cmd);
+    return TEC_LOG_E("'%s': no such env command", cmd);
 }

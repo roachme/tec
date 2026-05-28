@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "rm.h"
+#include "aux/log.h"
 #include "tec.h"
 #include "aux/aux.h"
 #include "aux/osdep.h"
@@ -15,10 +16,10 @@ static int update_toggles_and_cwd(tec_arg_t *args,
     /* Not to break shell session in case user CWD gets deleted.  */
     if (do_change_user_cwd(args) == true) {
         if ((home = tec_cli_osdep_getenv_home()) == NULL) {
-            elog(EXIT_FAILURE, "could not get env 'HOME' variable");
+            TEC_LOG_E("could not get env 'HOME' variable");
             exit(EXIT_FAILURE);
         } else if (tec_cli_osdep_chdir(home)) {
-            elog(EXIT_FAILURE, "could not change user CWD");
+            TEC_LOG_E("could not change user CWD");
             exit(EXIT_FAILURE);
         }
         opts->change_dir = true;
@@ -81,10 +82,10 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.interactive = RMI_SOMETIMES;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("rm");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("rm");
         }
     }
@@ -99,7 +100,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return EXIT_FAILURE;
 
     if (ntasks >= 3 && opts.interactive == RMI_SOMETIMES) {
-        tec_cli_log_prompt(0, "remove %d tasks? [y/N] ", ntasks);
+        TEC_LOG_P("remove %d tasks? [y/N] ", ntasks);
         if (yesno() == false) {
             return EXIT_SUCCESS;
         }
@@ -112,22 +113,22 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             retcode = status == TEC_OK ? retcode : status;
             continue;
         } else if (opts.interactive == RMI_ALWAYS) {
-            tec_cli_log_prompt(0, "remove task '%s'? [y/N] ", args.task);
+            TEC_LOG_P("remove task '%s'? [y/N] ", args.task);
             if (!yesno())
                 continue;
         }
 
         if ((status = hook_action(&args, "rm"))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         } else if ((status = update_toggles_and_cwd(&args, &opts))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, "could not update toggles");
+                TEC_LOG_E(errfmt, args.task, "could not update toggles");
         } else if ((status = tec_task_rm(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
         } else if (opts.verbose == true)
-            llog(0, "removed task '%s'", args.task);
+            TEC_LOG_V("removed task '%s'", args.task);
         retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 

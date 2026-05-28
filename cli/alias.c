@@ -41,16 +41,16 @@ int tec_cli_alias(tec_argvec_t *argvec, tec_cfg_t *cfg)
     char *cmdname = argvec->argv[0];
 
     if ((alias = get_alias(cmdname, cfg)) == NULL) {
-        return elog(1, "'%s': could not get alias", cmdname);
+        return TEC_LOG_E("'%s': could not get alias", cmdname);
     } else if ((cmdname = resolve_alias(argvec, alias)) == NULL) {
-        return elog(1, "'%s': could not resolve alias", cmdname);
+        return TEC_LOG_E("'%s': could not resolve alias", cmdname);
     }
 
     if ((cmd = tec_cli_is_plugin(argvec, cfg))) {
-        dlog(1, "alias execute as plugin: '%s'", alias->name);
+        TEC_LOG_D("alias execute as plugin: '%s'", alias->name);
         status = tec_cli_cmd_run(cmd, argvec, cfg);
     } else if ((cmd = tec_cli_is_builtin(argvec, NULL))) {
-        dlog(1, "alias execute as builtin: '%s'", alias->name);
+        TEC_LOG_D("alias execute as builtin: '%s'", alias->name);
         status = tec_cli_cmd_run(cmd, argvec, cfg);
     }
     return status;

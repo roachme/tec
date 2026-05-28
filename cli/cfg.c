@@ -46,7 +46,7 @@ static int _ls_hooks(struct tec_hook *hooks)
 static int _cfg_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     if (argvec->used == 0)
-        return elog(1, "wrong number of arguments, should at least 1");
+        return TEC_LOG_E("wrong number of arguments, should at least 1");
 
     /* Skip first argument because it's subcommand name, i.e. get.   */
     for (int i = 1; i < argvec->used; ++i) {
@@ -69,7 +69,7 @@ static int _cfg_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
         else if (strcmp("alias", argvec->argv[i]) == 0)
             _show_aliases(cfg->alias);
         else
-            elog(1, "'%s': no such config value", argvec->argv[i]);
+            TEC_LOG_E("'%s': no such config value", argvec->argv[i]);
     }
 
     return 0;
@@ -118,5 +118,5 @@ int tec_cli_cfg(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return cfg_commands[i].func(argvec, cfg);
         }
     }
-    return elog(1, "'%s': no such cfg command", cmd);
+    return TEC_LOG_E("'%s': no such cfg command", cmd);
 }

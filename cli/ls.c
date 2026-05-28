@@ -24,7 +24,8 @@ static struct list_filter filter = {
 static int check_filters(void)
 {
     if (filter.toggle && filter.all)
-        return elog(1, "options `-%s' and `-%s' are not compatible", "t", "a");
+        return TEC_LOG_E("options `-%s' and `-%s' are not compatible", "t",
+                         "a");
     return 0;
 }
 
@@ -36,10 +37,10 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
 
     if ((status = tec_task_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
-            elog(status, "'%s': %s one", args->task, tec_strerror(status));
+            TEC_LOG_E("'%s': %s one", args->task, tec_strerror(status));
     } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
         if (quiet == false)
-            elog(1, "'%s': %s", args->task, "description not found");
+            TEC_LOG_E("'%s': %s", args->task, "description not found");
     }
     return desc;
 }
@@ -126,7 +127,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             quiet = true;
             break;
         case 'v':
-            return elog(1, "option `-%c' under development", c);
+            return TEC_LOG_E("option `-%c' under development", c);
         case 't':
             filter.toggle = true;
             break;
@@ -134,10 +135,10 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             show_headers = true;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("ls");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("ls");
         }
     }
@@ -155,7 +156,7 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         else if ((status = tec_task_list(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
-                elog(status, errfmt, args.env, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.env, tec_strerror(status));
             continue;
         }
 

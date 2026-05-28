@@ -133,7 +133,7 @@ int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
     int status = TEC_OK;
 
     if ((status = cmd_setup(cmd->option, cfg)) != TEC_OK) {
-        return elog(status, "setup failed: %s", tec_strerror(status));
+        return TEC_LOG_E("setup failed: %s", tec_strerror(status));
     }
 
     return cmd->func(argvec, cfg);
@@ -171,17 +171,17 @@ int main(int argc, const char **argv)
             break;
         case 'C':
             if ((opts.color = is_valid_toggle(optarg)) == -1)
-                return elog(1, togfmt, c);
+                return TEC_LOG_E(togfmt, c);
             break;
         case 'D':
             if ((opts.debug = is_valid_toggle(optarg)) == -1)
-                return elog(1, togfmt, c);
+                return TEC_LOG_E(togfmt, c);
             break;
         case 'F':
-            return elog(1, "option `-%c' under development", c);
+            return TEC_LOG_E("option `-%c' under development", c);
         case 'H':
             if ((opts.hook = is_valid_toggle(optarg)) == -1)
-                return elog(1, togfmt, c);
+                return TEC_LOG_E(togfmt, c);
             break;
         case 'P':
             base.pgn = optarg;
@@ -190,10 +190,10 @@ int main(int argc, const char **argv)
             base.task = optarg;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("tec");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("tec");
         }
     }
@@ -204,23 +204,23 @@ int main(int argc, const char **argv)
     argvec_offset(&argvec, argvec.i);   /* Skip program name and options if any.  */
 
     if (tec_config_init(cfg))
-        return elog(1, "could init config file");
+        return TEC_LOG_E("could init config file");
     else if (tec_config_parse(cfg))
-        return elog(1, "could parse config file");
+        return TEC_LOG_E("could parse config file");
     else if (tec_config_set_base(&base))
-        return elog(1, "could set config base directories");
+        return TEC_LOG_E("could set config base directories");
     else if (tec_config_set_options(&opts))
-        return elog(1, "could set config options");
+        return TEC_LOG_E("could set config options");
 
     if ((cmdname = argvec.argv[0]) == NULL) {
         status = EXIT_FAILURE;
         tec_cli_help_list();
         goto err;
     } else if (cmd_is_naughty(cmdname) == true) {
-        status = elog(1, "'%s': naughty command", cmdname);
+        status = TEC_LOG_E("'%s': naughty command", cmdname);
         goto err;
     } else if ((cmd = cmd_get(cmdname, &argvec, cfg)) == NULL) {
-        status = elog(1, "'%s': no such command, alias or plugin", cmdname);
+        status = TEC_LOG_E("'%s': no such command, alias or plugin", cmdname);
         goto err;
     } else if ((status = tec_cli_cmd_run(cmd, &argvec, cfg))) {
         goto err;

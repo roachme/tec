@@ -32,7 +32,7 @@ int hook_action(tec_arg_t *args, char *cmd)
     for (; hooks; hooks = hooks->next) {
         if (strcmp(cmd, hooks->cmd) == 0) {
             char *cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
-            dlog(1, cmd);
+            TEC_LOG_D(cmd);
             status = system(cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
             retcode = status == TEC_OK ? retcode : status;
         }

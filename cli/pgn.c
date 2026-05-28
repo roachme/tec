@@ -69,11 +69,11 @@ static int pgn_cmd_genpath(tec_pgn_cmd_t *cmd, tec_argvec_t *argvec,
                            tec_cfg_t *cfg)
 {
     if (pgn_cmd_add_path(cmd, cfg))
-        return elog(1, "pgn: base generation buffer overflow");
+        return TEC_LOG_E("pgn: base generation buffer overflow");
     else if (pgn_cmd_add_opts(cmd, cfg))
-        return elog(1, "pgn: option generation buffer overflow");
+        return TEC_LOG_E("pgn: option generation buffer overflow");
     else if (pgn_cmd_add_args(cmd, argvec))
-        return elog(1, "pgn: argument generation buffer overflow");
+        return TEC_LOG_E("pgn: argument generation buffer overflow");
     return 0;
 }
 
@@ -86,8 +86,8 @@ int tec_cli_pgn(tec_argvec_t *argvec, tec_cfg_t *cfg)
     argvec_offset(argvec, 1);
 
     if (pgn_cmd_genpath(&cmd, argvec, cfg))
-        return elog(1, "pgn: command generation failed '%s'", cmd.cmd);
+        return TEC_LOG_E("pgn: command generation failed '%s'", cmd.cmd);
 
-    dlog(1, "pgn: %s", cmd.cmd);
+    TEC_LOG_D("pgn: %s", cmd.cmd);
     return system(cmd.cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
 }

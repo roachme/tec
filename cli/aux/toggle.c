@@ -18,7 +18,7 @@ static char *path_env_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base);
-    dlog(1, "%s:pathname: '%s'", __func__, pathname);
+    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -27,7 +27,7 @@ static char *path_desk_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env);
-    dlog(1, "%s:pathname: '%s'", __func__, pathname);
+    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -36,7 +36,7 @@ static char *path_task_toggle(char *base, const tec_arg_t *args)
     const char *fmt = "%s/%s/%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base, args->env, args->desk);
-    dlog(1, "%s:pathname: '%s'", __func__, pathname);
+    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
     return pathname;
 }
 
@@ -115,7 +115,7 @@ int toggle_env_get_curr(char *base, tec_arg_t *args)
 int toggle_env_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->env && !(args->env = env_get_prev(base, args))) {
-        elog(1, "sserror '%s'", args->env);
+        TEC_LOG_E("sserror '%s'", args->env);
         return 1;
     }
     return 0;
@@ -350,7 +350,7 @@ int toggle_task_clear(char *base, tec_arg_t *args, const char *task)
     }
 
     if (!changed) {
-        dlog(1, "%s: NOT HAPPENED\n", __func__);
+        TEC_LOG_D("%s: NOT HAPPENED\n", __func__);
         return 0;
     }
 

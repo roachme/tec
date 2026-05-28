@@ -12,6 +12,7 @@
 - `cli/add`: Change error message
 - `lib/valid`: Unify object validation
 - `lib`: Refactor error status code names
+- `cli`: Refactor logging module
 
 ### Fixed
 

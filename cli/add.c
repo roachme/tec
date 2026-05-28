@@ -87,10 +87,10 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.chtog = false;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("add");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("add");
         }
     }
@@ -104,7 +104,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return EXIT_FAILURE;
     else if (optind == argvec->used && generate_task(&args, argvec)) {
         if (opts.quiet == false)
-            elog(1, "could not generate task ID: limit is %d", IDLIMIT);
+            TEC_LOG_E("could not generate task ID: limit is %d", IDLIMIT);
         return EXIT_FAILURE;
     }
 
@@ -114,36 +114,36 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if (tec_cli_len_valid(args.task, IDSIZ) == false) {
             status = 1;
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, "task ID is too long");
+                TEC_LOG_E(errfmt, args.task, "task ID is too long");
             retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
             retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, tec_strerror(TEC_ARG_EXISTS));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(TEC_ARG_EXISTS));
             retcode = !(status == TEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, "unit generation failed");
+                TEC_LOG_E(errfmt, args.task, "unit generation failed");
             retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_task_add(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
             if (opts.quiet == false)
-                elog(1, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         } else if (opts.chtog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    elog(status, "could not update toggles");
+                    TEC_LOG_E("could not update toggles");
             }
         }
         ctx.units = tec_unit_free(ctx.units);

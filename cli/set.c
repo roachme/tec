@@ -78,11 +78,11 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'i':
             opt_interactive = true;
-            return elog(1, "this option is under development");
+            return TEC_LOG_E("this option is under development");
             break;
         case 'T':
             if (valid_type(optarg) == false) {
-                elog(1, "invalid priority '%s'", optarg);
+                TEC_LOG_E("invalid priority '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "type") == NULL)
@@ -90,7 +90,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'D':
             if (valid_desc(optarg) == false) {
-                elog(1, "invalid description '%s'", optarg);
+                TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "desc") == NULL)
@@ -98,17 +98,17 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'P':
             if (valid_prio(optarg) == false) {
-                elog(1, "invalid priority '%s'", optarg);
+                TEC_LOG_E("invalid priority '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "prio") == NULL)
                 ctx.units = tec_unit_add(ctx.units, "prio", optarg);
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("set");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("set");
         }
     }
@@ -130,10 +130,10 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
             args.task = args.task ? args.task : "NOCURR";
             if (opt_quiet == false)
-                elog(status, errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "set"))) {
             if (opt_quiet == false)
-                elog(1, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
 
         ctx.units = tec_unit_free(ctx.units);

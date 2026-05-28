@@ -54,10 +54,10 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.quiet = true;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("cat");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("cat");
         }
     }
@@ -85,13 +85,13 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = tec_task_get(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
         } else if ((status = valid_unitkeys(ctx.units))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, "invalid unit keys");
+                TEC_LOG_E(errfmt, args.task, "invalid unit keys");
         } else if ((status = hook_cat(&unitpgn, &args, "cat"))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
 
         if (status == TEC_OK) {
@@ -110,7 +110,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
                         }
                     }
                     if (notfound && opts.quiet == false)
-                        elog(1, keyfmt, args.task, keys.argv[i]);
+                        TEC_LOG_E(keyfmt, args.task, keys.argv[i]);
                     retcode = notfound == 0 ? retcode : 1;
                 }
             } else {            /* Show all keys.  */

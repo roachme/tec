@@ -82,7 +82,7 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    elog(1, "FAILED: to parse hook.shows");
+                    TEC_LOG_E("FAILED: to parse hook.shows");
                     continue;
                 }
                 strcpy(hook->pgntag, "HOOKSHOW");
@@ -108,7 +108,7 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    elog(1, "FAILED: to parse hook.shows");
+                    TEC_LOG_E("FAILED: to parse hook.shows");
                     continue;
                 }
                 strcpy(hook->pgntag, "HOOKCMD");
@@ -192,18 +192,18 @@ static int parseconf(tec_cfg_t *tec_config, const char *fname)
 
     config_init(&cfg);
     if (!config_read_file(&cfg, fname)) {
-        return elog(1, "%s:%d - %s", config_error_file(&cfg),
-                    config_error_line(&cfg), config_error_text(&cfg));
+        return TEC_LOG_E("%s:%d - %s", config_error_file(&cfg),
+                         config_error_line(&cfg), config_error_text(&cfg));
     }
 
     if (tec_config_get_base(&cfg, tec_config))
-        elog(1, "tec_config_get_base: FAILED\n");
+        TEC_LOG_E("tec_config_get_base: FAILED\n");
     else if (tec_config_get_options(&cfg, tec_config))
-        elog(1, "tec_config_get_options: FAILED\n");
+        TEC_LOG_E("tec_config_get_options: FAILED\n");
     else if (tec_config_get_hooks(&cfg, tec_config))
-        elog(1, "tec_config_get_hooks: FAILED\n");
+        TEC_LOG_E("tec_config_get_hooks: FAILED\n");
     else if (tec_config_get_aliases(&cfg, tec_config))
-        elog(1, "tec_config_get_aliases: FAILED\n");
+        TEC_LOG_E("tec_config_get_aliases: FAILED\n");
 
     config_destroy(&cfg);
     return 0;

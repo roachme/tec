@@ -46,10 +46,10 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.chtog = false;
             break;
         case ':':
-            elog(EXIT_FAILURE, FMT_OPT_ARG_REQ, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("cd");
         default:
-            elog(EXIT_FAILURE, FMT_OPT_ARG_INV, optopt);
+            TEC_LOG_E(FMT_OPT_ARG_INV, optopt);
             return tec_cli_help_usage("cd");
         }
     }
@@ -65,13 +65,13 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     /* Check that alias '-' is not passed with other task IDs nor duplicated.  */
     for (int idx = argvec->i; idx < argvec->used; ++idx) {
         if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - argvec->i > 1)
-            return elog(1, "alias '-' is used alone");
+            return TEC_LOG_E("alias '-' is used alone");
     }
 
     /* Resolve alias '-' to switch to previous task ID.  */
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if ((status = toggle_task_get_prev(cfg->base.task, &args)))
-            return elog(1, errfmt, "PREV", "no previous task ID");
+            return TEC_LOG_E(errfmt, "PREV", "no previous task ID");
         argvec_replace(argvec, argvec->i, args.task, IDSIZ);
     }
 
@@ -85,11 +85,11 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = hook_action(&args, "cd"))) {
             if (opts.quiet == false)
-                elog(status, errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         } else if (opts.chtog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    elog(1, "could not update toggles");
+                    TEC_LOG_E("could not update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;
