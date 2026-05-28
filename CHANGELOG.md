@@ -25,6 +25,7 @@
 - `cli/cat`: Fix compiler warning
 - `cli/help`: Update help message for command `cat`
 - `cli/cat`: Fix memleak at exit
+- `cli/tec`: Fix task directory in case invalid option
 
 ### Deleted
 

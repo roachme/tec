@@ -157,6 +157,7 @@ int main(int argc, const char **argv)
     opts.color = opts.debug = opts.hook = NONEBOOL;
     togfmt = "option `-%c' accepts either 'on' or 'off'";
 
+    tec_cli_pwd_unset();
     argvec_init(&argvec);
     argvec_parse(&argvec, argc, argv);
 
@@ -199,7 +200,6 @@ int main(int argc, const char **argv)
     }
 
     argvec.i = optind;
-    tec_cli_pwd_unset();
     tec_getopt_unset();
     argvec_offset(&argvec, argvec.i);   /* Skip program name and options if any.  */
 
