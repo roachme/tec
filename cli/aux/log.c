@@ -27,7 +27,8 @@ int tec_cli_log_verbose(int status, const char *fmt, ...)
     return EXIT_SUCCESS;
 }
 
-int tec_cli_log_debug(int level, const char *fmt, ...)
+int tec_cli_log_debug(int level, const char *fname, int line, const char *fmt,
+                      ...)
 {
     va_list arg;
 
@@ -35,7 +36,7 @@ int tec_cli_log_debug(int level, const char *fmt, ...)
         return EXIT_SUCCESS;
 
     va_start(arg, fmt);
-    fprintf(stderr, "%s[DBG]:%s: ", PROGRAM, __FILE__);
+    fprintf(stderr, "%s[%s:%d]: ", PROGRAM, fname, line);
     vfprintf(stderr, fmt, arg);
     fprintf(stderr, "\n");
     va_end(arg);

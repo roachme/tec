@@ -26,6 +26,7 @@
 - `cli/help`: Update help message for command `cat`
 - `cli/cat`: Fix memleak at exit
 - `cli/tec`: Fix task directory in case invalid option
+- `cli/aux/log`: Fix debug message format
 
 ### Deleted
 
