@@ -113,7 +113,7 @@ int tec_cli_cfg(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip cfg from argvec.  */
-    for (int i = 0; i < ARRAY_SIZE(cfg_commands); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(cfg_commands); ++i) {
         if (strcmp(cmd, cfg_commands[i].name) == 0) {
             return cfg_commands[i].func(argvec, cfg);
         }

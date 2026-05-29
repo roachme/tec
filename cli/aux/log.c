@@ -5,7 +5,7 @@
 #include "log.h"
 #include "config.h"
 
-int tec_cli_log_error(int level, const char *fmt, ...)
+int tec_cli_log_error(const char *fmt, ...)
 {
     va_list arg;
     va_start(arg, fmt);
@@ -16,7 +16,7 @@ int tec_cli_log_error(int level, const char *fmt, ...)
     return EXIT_FAILURE;
 }
 
-int tec_cli_log_verbose(int status, const char *fmt, ...)
+int tec_cli_log_verbose(const char *fmt, ...)
 {
     va_list arg;
     va_start(arg, fmt);
@@ -27,8 +27,7 @@ int tec_cli_log_verbose(int status, const char *fmt, ...)
     return EXIT_SUCCESS;
 }
 
-int tec_cli_log_debug(int level, const char *fname, int line, const char *fmt,
-                      ...)
+int tec_cli_log_debug(const char *fname, int line, const char *fmt, ...)
 {
     va_list arg;
 
@@ -43,7 +42,7 @@ int tec_cli_log_debug(int level, const char *fname, int line, const char *fmt,
     return EXIT_SUCCESS;
 }
 
-int tec_cli_log_prompt(int level, const char *fmt, ...)
+int tec_cli_log_prompt(const char *fmt, ...)
 {
     va_list arg;
 

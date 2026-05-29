@@ -10,7 +10,7 @@ void argvec_init(tec_argvec_t *vec)
     int size = 2;
 
     if ((vec->argv = malloc(size * sizeof(vec->argv))) == NULL) {
-        TEC_LOG_E("'%s': memory allocation failed", __FUNCTION__);
+        TEC_LOG_E("'%s': memory allocation failed", __func__);
         exit(1);
     }
 
@@ -45,7 +45,7 @@ void argvec_add(tec_argvec_t *vec, const char *arg)
         vec->size *= 2;
         if ((vec->argv =
              realloc(vec->argv, vec->size * sizeof(char *))) == NULL) {
-            TEC_LOG_E("'%s': memory allocation failed", __FUNCTION__);
+            TEC_LOG_E("'%s': memory allocation failed", __func__);
             exit(1);
         }
 
@@ -68,7 +68,7 @@ void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg, int argsiz)
     assert(vec_idx >= 0 && vec_idx < vec->used);
     free(vec->argv[vec_idx]);   /* free previous key value.  */
     if ((vec->argv[vec_idx] = strndup(arg, argsiz)) == NULL) {
-        TEC_LOG_E("'%s': memory allocation failed", __FUNCTION__);
+        TEC_LOG_E("'%s': memory allocation failed", __func__);
         exit(1);
     }
 }

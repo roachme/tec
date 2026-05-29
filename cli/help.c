@@ -639,7 +639,7 @@ static void show_cmd_section(const char *title, const char *tag)
     const char *name, *desc;
 
     printf("\n" PADDING "%s:\n", title);
-    for (int i = 0; i < ARRAY_SIZE(helptab); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(helptab); ++i) {
         if (strcmp(helptab[i].tag, tag) == 0) {
             name = helptab[i].name;
             desc = helptab[i].desc_short;
@@ -652,7 +652,7 @@ static int help_list_short_commands(void)
 {
     const char *name, *desc;
 
-    for (int i = 0; i < ARRAY_SIZE(helptab); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(helptab); ++i) {
         name = helptab[i].name;
         desc = helptab[i].desc_short;
         printf("%-" xstr(CMDSIZ) "s - %s", name, desc);
@@ -679,10 +679,9 @@ int tec_cli_help_usage(const char *cmd)
 
 int tec_cli_help_lookup(const char *cmd)
 {
-    int i, found;
+    int found = false;
 
-    found = false;
-    for (i = 0; i < ARRAY_SIZE(helptab); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(helptab); ++i) {
         if (strcmp(helptab[i].name, cmd) == 0) {
             found = true;
             if (helpctx.synop) {

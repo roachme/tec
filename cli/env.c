@@ -11,7 +11,7 @@
 static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
 {
     int status;
-    char *desc;
+    char *desc = NULL;
 
     if ((status = tec_env_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
@@ -56,6 +56,7 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt_desk = "cannot add desk '%s': %s";
 
     retcode = TEC_OK;
+    status = TEC_OK;
     showhelp = quiet = false;
     switch_dir = switch_env = true;
     args.env = args.desk = args.task = NULL;
@@ -270,10 +271,11 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    char *desc;
+    int c;
+    char *desc = NULL;
     tec_ctx_t ctx = CTX_INIT;
-    int c, status;
     tec_arg_t args;
+    int status = TEC_OK;
     int opt_help, opt_quiet;
 
     opt_quiet = false;
@@ -599,7 +601,7 @@ int tec_cli_env(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip env from argvec.  */
-    for (int i = 0; i < ARRAY_SIZE(env_commands); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(env_commands); ++i) {
         if (strcmp(cmd, env_commands[i].name) == 0) {
             return env_commands[i].func(argvec, cfg);
         }

@@ -4,7 +4,7 @@
 #include "toggle.h"
 #include "config.h"
 
-int tec_cli_len_valid(char *obj, int len)
+int tec_cli_len_valid(char *obj, size_t len)
 {
     if (strlen(obj) <= len)
         return true;

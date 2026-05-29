@@ -84,7 +84,7 @@ static tec_cmd_t *cmd_get(const char *cmdname, tec_argvec_t *argvec,
 {
     tec_cmd_t *cmd;
 
-    for (int i = 0; i < ARRAY_SIZE(tec_cmd_types); ++i)
+    for (size_t i = 0; i < ARRAY_SIZE(tec_cmd_types); ++i)
         if ((cmd = tec_cmd_types[i].type(argvec, cfg)))
             return cmd;
     return NULL;
@@ -122,7 +122,7 @@ tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char *cmdname = argvec->argv[0];
 
-    for (int idx = 0; idx < ARRAY_SIZE(tec_cmds); ++idx)
+    for (size_t idx = 0; idx < ARRAY_SIZE(tec_cmds); ++idx)
         if (strcmp(cmdname, tec_cmds[idx].name) == 0)
             return &tec_cmds[idx];
     return NULL;

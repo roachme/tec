@@ -22,7 +22,7 @@ static void pgn_cmd_init(tec_pgn_cmd_t *cmd, char *name)
 
 static int pgn_cmd_add_path(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
 {
-    int len;
+    size_t len;
     char *name = cmd->name;
     const char *fmt = "%s/%s/%s";
     char *cmdptr = cmd->cmd + cmd->offset;
@@ -37,7 +37,7 @@ static int pgn_cmd_add_path(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
 
 static int pgn_cmd_add_opts(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
 {
-    int len;
+    size_t len;
     const char *fmt = " -T %s -P %s";
     char *cmdptr = cmd->cmd + cmd->offset;
 
@@ -51,7 +51,7 @@ static int pgn_cmd_add_opts(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
 
 static int pgn_cmd_add_args(tec_pgn_cmd_t *cmd, tec_argvec_t *argvec)
 {
-    int len;
+    size_t len;
 
     for (int i = 0; i < argvec->used; ++i) {
         char *cmdptr = cmd->cmd + cmd->offset;

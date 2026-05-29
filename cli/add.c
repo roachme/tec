@@ -44,7 +44,7 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
 
     strftime(date, BUFSIZ, timefmt, timeinfo);
 
-    for (int i = 0; i < nunitkey; ++i)
+    for (size_t i = 0; i < nunitkey; ++i)
         units = tec_unit_add(units, unitkeys[i], unitvals[i]);
     ctx->units = units;
     return 0;

@@ -11,7 +11,7 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet,
                            tec_cfg_t *cfg)
 {
     int status;
-    char *desc;
+    char *desc = NULL;
 
     if ((status = tec_desk_get(cfg->base.task, args, ctx))) {
         if (quiet == false)
@@ -241,7 +241,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 // TODO: show tasks in desk
 static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    char *desc;
+    char *desc = NULL;
     tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, status;
@@ -302,7 +302,7 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    return TEC_LOG_E("%s: under development", __FUNCTION__);
+    return TEC_LOG_E("%s: under development", __func__);
 }
 
 static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
@@ -535,7 +535,7 @@ int tec_cli_desk(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *cmd = argvec->argv[1] != NULL ? argvec->argv[1] : "ls";
 
     argvec_offset(argvec, 1);   /* Skip desk from argvec.  */
-    for (int i = 0; i < ARRAY_SIZE(desk_commands); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(desk_commands); ++i) {
         if (strcmp(cmd, desk_commands[i].name) == 0) {
             return desk_commands[i].func(argvec, cfg);
         }

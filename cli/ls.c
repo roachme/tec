@@ -33,7 +33,7 @@ static int check_filters(void)
 static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
 {
     int status;
-    char *desc;
+    char *desc = NULL;
 
     if ((status = tec_task_get(teccfg.base.task, args, ctx))) {
         if (quiet == false)
@@ -49,7 +49,7 @@ static void show_row(tec_ctx_t *ctx, tec_arg_t *args, tec_list_t *obj,
                      int quiet)
 {
     if (obj != NULL) {
-        char *desc;
+        char *desc = NULL;
         args->task = obj->name;
 
         if ((desc = get_unit_desc(ctx, args, quiet)) == NULL)
