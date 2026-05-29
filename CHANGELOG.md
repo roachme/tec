@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `lib/path`: Refactor string formats
+
+### Deleted
+
+
 ## [0.8.0] - (2026-05-28)
 
 ### Added
