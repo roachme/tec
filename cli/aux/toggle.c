@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <stdarg.h>
 
 #include "../tec.h"
+
+#define TOGENV          "%s/.tec/toggles"
+#define TOGDESK         "%s/%s/.tec/toggles"
+#define TOGTASK         "%s/%s/%s/.tec/toggles"
 
 static char env_curr[ENVSIZ + 1];
 static char env_prev[ENVSIZ + 1];
@@ -13,59 +18,58 @@ static char desk_prev[DESKSIZ + 1];
 static char task_curr[IDSIZ + 1];
 static char task_prev[IDSIZ + 1];
 
+static char *path_generic(char *buf, const char *fmt, ...)
+{
+    va_list arg;
+    va_start(arg, fmt);
+    vsprintf(buf, fmt, arg);
+    va_end(arg);
+    return buf;
+}
+
 static char *path_env_toggle(char *base, const tec_arg_t *args)
 {
     (void)args;
-    const char *fmt = "%s/.tec/toggles";
+    const char *fmt = TOGENV;
     static char pathname[PATH_MAX + 1];
-    sprintf(pathname, fmt, base);
-    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
-    return pathname;
+    return path_generic(pathname, fmt, base);
 }
 
 static char *path_desk_toggle(char *base, const tec_arg_t *args)
 {
-    const char *fmt = "%s/%s/.tec/toggles";
+    const char *fmt = TOGDESK;
     static char pathname[PATH_MAX + 1];
-    sprintf(pathname, fmt, base, args->env);
-    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
-    return pathname;
+    return path_generic(pathname, fmt, base, args->env);
 }
 
 static char *path_task_toggle(char *base, const tec_arg_t *args)
 {
-    const char *fmt = "%s/%s/%s/.tec/toggles";
+    const char *fmt = TOGTASK;
     static char pathname[PATH_MAX + 1];
-    sprintf(pathname, fmt, base, args->env, args->desk);
-    TEC_LOG_D("%s:pathname: '%s'", __func__, pathname);
-    return pathname;
+    return path_generic(pathname, fmt, base, args->env, args->desk);
 }
 
-static char *_get_toggle(const char *fname, char *buf, int bufsiz,
-                         char *togname)
+static char *_get_toggle(const char *fname, char *buf, int bufsiz, char *tog)
 {
     FILE *fp;
-    char *toggle;
-    tec_unit_t *units;
+    char *toggle = NULL;
+    tec_unit_t *units = NULL;
     char buffer[BUFSIZ + 1] = { 0 };
 
-    toggle = NULL;
-    units = NULL;
+    /* Remove previous value if any.  */
+    buf[0] = '\0';
+
     if ((fp = fopen(fname, "r")) == NULL)
         return NULL;
 
     while (fgets(buffer, BUFSIZ, fp) != NULL)
         units = tec_unit_parse(units, buffer);
 
-    if ((toggle = tec_unit_get(units, togname))) {
+    if ((toggle = tec_unit_get(units, tog)))
         strncpy(buf, toggle, bufsiz);
-        buf[bufsiz] = '\0';
-    } else {
-        buf[0] = '\0';          /* toggle current or previous not found. */
-    }
 
-    tec_unit_free(units);
     fclose(fp);
+    tec_unit_free(units);
     return buf[0] == '\0' ? NULL : buf;
 }
 
@@ -181,11 +185,8 @@ int toggle_env_set_curr(char *base, tec_arg_t *args)
         toggles = tec_unit_add(toggles, "prev", prev);
 
     /* Prevent duplicates in toggles.  */
-    if (prev && !strcmp(curr, prev)) {
-        // do nothing
-    } else {
+    if (!(prev && strcmp(curr, prev) == 0))
         tec_unit_save(path_env_toggle(base, args), toggles);
-    }
     tec_unit_free(toggles);
     return 0;
 }
@@ -204,11 +205,8 @@ int toggle_desk_set_curr(char *base, tec_arg_t *args)
         toggles = tec_unit_add(toggles, "prev", prev);
 
     /* Prevent duplicates in toggles.  */
-    if (prev && strcmp(curr, prev) == 0) {
-        // do nothing
-    } else {
+    if (!(prev && strcmp(curr, prev) == 0))
         tec_unit_save(path_desk_toggle(base, args), toggles);
-    }
     tec_unit_free(toggles);
     return 0;
 }
@@ -227,11 +225,8 @@ int toggle_task_set_curr(char *base, tec_arg_t *args)
         toggles = tec_unit_add(toggles, "prev", prev);
 
     /* Prevent duplicates in toggles.  */
-    if (prev && strcmp(curr, prev) == 0) {
-        // do nothing
-    } else {
+    if (!(prev && strcmp(curr, prev) == 0))
         tec_unit_save(path_task_toggle(base, args), toggles);
-    }
     tec_unit_free(toggles);
     return 0;
 }

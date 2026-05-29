@@ -123,7 +123,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     } while (++argvec->i < argvec->used);
 
     if (retcode == TEC_OK && opts.change_dir) {
-        args.task = NULL;       // FIXME: ducking hotfix to get current task ID from file
+        args.task = NULL;       /* Force to get current task ID.  */
         if (toggle_task_get_curr(cfg->base.task, &args))
             args.task = "";
         retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
