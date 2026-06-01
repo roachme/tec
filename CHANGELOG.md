@@ -2,6 +2,8 @@
 
 ### Added
 
+- `tec`: Add docker image for testing
+
 ### Changed
 
 - `tec`: Refactor project structure
