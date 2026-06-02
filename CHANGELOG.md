@@ -12,6 +12,7 @@
 
 - `lib/path`: Refactor string formats
 - `utils/install`: Add help message for user
+- `cli/help`: Update help message
 
 ### Deleted
 

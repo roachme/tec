@@ -122,6 +122,10 @@ Usage: tec [OPTION]... COMMAND|PLUGIN
       cfg        - Manage and show configs (under development).
       desk       - Manage and show desks.
       env        - Manage and show environments.
+    
+    To get help on commands use help command. Examples are show below.
+      $ tec help add
+      $ tec help cat
 
 ```
 
