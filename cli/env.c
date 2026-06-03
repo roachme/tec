@@ -257,7 +257,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         }
 
         if (opt_verbose == true)
-            TEC_LOG_V("removed environment '%s'", args.env);
+            TEC_LOG_I("removed environment '%s'", args.env);
         retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 

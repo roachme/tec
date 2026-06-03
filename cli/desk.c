@@ -230,7 +230,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         /* TODO: handle current and previos task IDs.  */
 
         if (opt_verbose == true)
-            TEC_LOG_V("removed desk '%s'", args.task);
+            TEC_LOG_I("removed desk '%s'", args.task);
         retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 

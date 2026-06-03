@@ -16,7 +16,7 @@ int tec_cli_log_error(const char *fmt, ...)
     return EXIT_FAILURE;
 }
 
-int tec_cli_log_verbose(const char *fmt, ...)
+int tec_cli_log_info(const char *fmt, ...)
 {
     va_list arg;
     va_start(arg, fmt);
