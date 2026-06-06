@@ -3,6 +3,7 @@
 ### Added
 
 - `tec`: Add docker image for testing
+- `tests`: Add script for testing environment
 
 ### Changed
 
