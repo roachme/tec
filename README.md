@@ -103,6 +103,7 @@ alias = {
 ```
 Usage: tec [OPTION]... COMMAND|PLUGIN
     Run 'tec help tec' to get more info.
+    Run 'tec help help' to get more info on command.
 
     System:
       help       - Show help for commands.
@@ -122,10 +123,6 @@ Usage: tec [OPTION]... COMMAND|PLUGIN
       cfg        - Manage and show configs (under development).
       desk       - Manage and show desks.
       env        - Manage and show environments.
-    
-    To get help on commands use help command. Examples are show below.
-      $ tec help add
-      $ tec help cat
 
 ```
 

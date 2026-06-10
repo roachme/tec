@@ -668,16 +668,12 @@ int tec_cli_help_list(void)
 {
     printf("Usage: " PROGRAM " [OPTION]... COMMAND|PLUGIN\n");
     printf(PADDING "Run '" PROGRAM " help " PROGRAM "' to get more info.\n");
+    printf(PADDING "Run '" PROGRAM
+           " help help' to get more info on command.\n");
 
     show_cmd_section("System", TAGSYSTEM);
     show_cmd_section("Basic", TAGBASIC);
     show_cmd_section("Object", TAGOBJ);
-
-    printf("\
-    \n\
-    To get help on commands use help command. Examples are show below.\n\
-      $ tec help add\n\
-      $ tec help cat\n");
     return 0;
 }
 
