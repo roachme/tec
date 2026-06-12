@@ -10,6 +10,7 @@
 - `tec`: Refactor project structure
 - `cli/aux/log`: Rename `TEC_LOG_V` into `TEC_LOG_I`
 - `cli/help`: Update help message for user
+- `dosc`: Update REAMDE video
 
 ### Fixed
 

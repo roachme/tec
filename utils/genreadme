@@ -70,10 +70,10 @@ MACRO_CODE
 
 ## ⇁  Plugins
 
-There is a MACRO_INLINE_CODE pgm MACRO_INLINE_CODE plugin manager to install plugins.
+There is a MACRO_INLINE_CODE nine MACRO_INLINE_CODE plugin manager to install plugins.
 
 Here's some plugin to check out \
-MACRO_INLINE_CODE pgm MACRO_INLINE_CODE - [Tec plugin manager](https://github.com/roachme/tec-pgm.git) \
+MACRO_INLINE_CODE nine MACRO_INLINE_CODE - [Tec plugin manager](https://github.com/roachme/tec-nine.git) \
 MACRO_INLINE_CODE gmux MACRO_INLINE_CODE - [Manage bunch of git repos](https://github.com/roachme/tec-gmux.git) \
 MACRO_INLINE_CODE find MACRO_INLINE_CODE - [Find stuff in tasks](https://github.com/roachme/tec-find.git)
 
@@ -82,8 +82,8 @@ MACRO_INLINE_CODE find MACRO_INLINE_CODE - [Find stuff in tasks](https://github.
 
 To install plugin manager run the code below
 MACRO_CODE
-export PGNDIR="$HOME/.local/lib/tec/pgn"
-git clone https://github.com/roachme/tec-pgm.git "$PGNDIR/pgm"
+PGNDIR="$HOME/.local/lib/tec/pgn"
+git clone https://github.com/roachme/tec-nine.git "$PGNDIR/nine"
 MACRO_CODE
 Note: \
 1. Make sure repo dirname has NO prefix MACRO_INLINE_CODE tec- MACRO_INLINE_CODE. The same goes about any plugin to install \
@@ -93,12 +93,13 @@ Note: \
 
 ## ⇁  Basic workflow
 1. To initalize util type in MACRO_INLINE_CODE tec init MACRO_INLINE_CODE
-2. Now you're ready to create a environment: MACRO_INLINE_CODE tec environment add test MACRO_INLINE_CODE
+2. Now you're ready to create a environment: MACRO_INLINE_CODE tec env add test MACRO_INLINE_CODE
 3. Once task environment is created you can fill it with tasks: MACRO_INLINE_CODE tec add test1 MACRO_INLINE_CODE
-4. List all your task in current environment: MACRO_INLINE_CODE tec list MACRO_INLINE_CODE
-5. Show the content of task: MACRO_INLINE_CODE tec show test1 MACRO_INLINE_CODE
-6. Sync with current task: MACRO_INLINE_CODE tec sync MACRO_INLINE_CODE
-7. Or quickly switch to previous task: MACRO_INLINE_CODE tec prev MACRO_INLINE_CODE
+3. Add one more task: MACRO_INLINE_CODE tec add test2 MACRO_INLINE_CODE
+4. List all your task in current environment: MACRO_INLINE_CODE tec ls MACRO_INLINE_CODE
+5. Show the content of task: MACRO_INLINE_CODE tec cat test1 MACRO_INLINE_CODE
+6. Sync with current task: MACRO_INLINE_CODE tec cd MACRO_INLINE_CODE
+7. Or quickly switch to previous task: MACRO_INLINE_CODE tec cd - MACRO_INLINE_CODE
 
 
 ## ⇁  Tips

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# NOTE:
+# 1. use rust asciinema
+# 2. docker run --rm -v $(pwd):/data ghcr.io/asciinema/agg tec.cast tec.gif
+
 FILESCRIPT="docs/cmdscript.txt"
 TMUX_SESSION="tec-video"       # To get it use <PREFIX>s
 TMUX_WINDOW_ID="1"              # To get it use <PREFIX>w
@@ -41,7 +45,7 @@ function execmd()
 function video_start()
 {
     local cast="asciinema rec $FILECAST"
-    local _cls="clear"
+    local _cls=" clear"
 
     execmd "$cast"
     execmd "$_cls"

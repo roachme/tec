@@ -1,4 +1,4 @@
-# Let's initialize tec
+# Initialize tec
 tec init
 
 # We create a testing environment, name it 'test' and add some tasks
@@ -6,7 +6,26 @@ tec env add test
 tec add test1
 tec add test2
 tec add test3
-tec add test4
 
 # Let's see those tasks
-tec list
+tec ls
+
+# Switch to user home directory
+cd
+
+# Switch back to current task directory
+tec cd
+
+# Switch to previous task
+tec cd -
+
+# Delete current task
+tec rm -f
+
+# User current directory is automatically switch to previous
+pwd
+
+# Current task directory is removed
+tec ls
+
+# Use 'tec help tec' to get more info

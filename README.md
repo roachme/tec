@@ -129,10 +129,10 @@ Usage: tec [OPTION]... COMMAND|PLUGIN
 
 ## ⇁  Plugins
 
-There is a ` pgm ` plugin manager to install plugins.
+There is a ` nine ` plugin manager to install plugins.
 
 Here's some plugin to check out \
-` pgm ` - [Tec plugin manager](https://github.com/roachme/tec-pgm.git) \
+` nine ` - [Tec plugin manager](https://github.com/roachme/tec-nine.git) \
 ` gmux ` - [Manage bunch of git repos](https://github.com/roachme/tec-gmux.git) \
 ` find ` - [Find stuff in tasks](https://github.com/roachme/tec-find.git)
 
@@ -141,8 +141,8 @@ Here's some plugin to check out \
 
 To install plugin manager run the code below
 ```
-export PGNDIR="$HOME/.local/lib/tec/pgn"
-git clone https://github.com/roachme/tec-pgm.git "$PGNDIR/pgm"
+PGNDIR="$HOME/.local/lib/tec/pgn"
+git clone https://github.com/roachme/tec-nine.git "$PGNDIR/nine"
 ```
 Note: \
 1. Make sure repo dirname has NO prefix ` tec- `. The same goes about any plugin to install \
@@ -152,12 +152,13 @@ Note: \
 
 ## ⇁  Basic workflow
 1. To initalize util type in ` tec init `
-2. Now you're ready to create a environment: ` tec environment add test `
+2. Now you're ready to create a environment: ` tec env add test `
 3. Once task environment is created you can fill it with tasks: ` tec add test1 `
-4. List all your task in current environment: ` tec list `
-5. Show the content of task: ` tec show test1 `
-6. Sync with current task: ` tec sync `
-7. Or quickly switch to previous task: ` tec prev `
+3. Add one more task: ` tec add test2 `
+4. List all your task in current environment: ` tec ls `
+5. Show the content of task: ` tec cat test1 `
+6. Sync with current task: ` tec cd `
+7. Or quickly switch to previous task: ` tec cd - `
 
 
 ## ⇁  Tips
