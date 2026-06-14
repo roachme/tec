@@ -11,6 +11,11 @@ function install_help()
     echo "Usage: install.sh [soft|hard|shell|full]"
 }
 
+function install_prep()
+{
+    mkdir -p $HOME/.local/bin
+}
+
 function install_hard()
 {
     mkdir -p "$DSTPATH"
@@ -45,6 +50,7 @@ function install_shell()
         echo "uknown shell program"
         exit 1
     fi
+    echo 'Run if needed: export PATH=$HOME/.local/bin:$PATH'
 }
 
 function install_full()
@@ -53,6 +59,7 @@ function install_full()
     install_shell
 }
 
+install_prep
 if [ "$CMD" = "full" ]; then
     install_full
 elif [ "$CMD" = "hard" ]; then
