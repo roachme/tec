@@ -18,6 +18,7 @@
 - `utils/install`: Add help message for user
 - `cli/help`: Update help message
 - `utils/install`: Add user help messages
+- `utils/docker`: Add help message
 
 ### Deleted
 
