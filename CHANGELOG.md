@@ -19,6 +19,7 @@
 - `cli/help`: Update help message
 - `utils/install`: Add user help messages
 - `utils/docker`: Add help message
+- `cli/aux/config`: Fix default option values
 
 ### Deleted
 

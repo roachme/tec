@@ -11,6 +11,14 @@
 
 // TODO: gotta add config checker so a program doesn't fail.
 
+static int config_set_default_options(struct config *cfg)
+{
+    cfg->opts.hook = false;
+    cfg->opts.debug = false;
+    cfg->opts.color = false;
+    return 0;
+}
+
 static void resolve_env_var_home(char *dst, const char *src)
 {
     char *home = getenv("HOME");
@@ -42,6 +50,7 @@ static int tec_config_set_default_base(tec_cfg_t *tec_config)
 static int tec_config_set_default_config(tec_cfg_t *tec_config)
 {
     tec_config_set_default_base(tec_config);
+    config_set_default_options(tec_config);
     return 0;
 }
 
@@ -173,9 +182,6 @@ static int tec_config_get_base(config_t *cfg, tec_cfg_t *tec_config)
 static int tec_config_get_options(config_t *cfg, tec_cfg_t *tec_config)
 {
     config_setting_t *setting;
-    tec_config->opts.color = false;
-    tec_config->opts.debug = false;
-    tec_config->opts.hook = false;
 
     if ((setting = config_lookup(cfg, "options")) == NULL)
         return 0;
@@ -211,9 +217,6 @@ static int parseconf(tec_cfg_t *tec_config, const char *fname)
 
 int tec_config_init(tec_cfg_t *tec_config)
 {
-    tec_config->opts.color = NONEBOOL;
-    tec_config->opts.debug = NONEBOOL;
-    tec_config->opts.hook = NONEBOOL;
     return 0;
 }
 
@@ -226,12 +229,15 @@ int tec_config_parse(tec_cfg_t *tec_config)
         "%s/.config/%s/%s.cfg",
     };
 
+    /* Set default values first in case there is no config file.  */
+    tec_config_set_default_config(tec_config);
+
     for (int i = 0; i < NUMCONFIG; ++i) {
         sprintf(cfgfile, cfgfmts[i], homedir, PROGRAM, PROGRAM);
         if (ISFILE(cfgfile))
             return parseconf(tec_config, cfgfile);
     }
-    return tec_config_set_default_config(tec_config);
+    return 0;
 }
 
 int tec_config_set_base(tec_base_t *base)
