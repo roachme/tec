@@ -14,7 +14,7 @@ global_opts=(
     '(-H)'{-H,--hooks}'[enable hooks]:toggle:(on off)'
     '(-P)'{-P,--plugins}'[plugins directory]:directory:_files'
     '(-T)'{-T,--tasks}'[tasks directory]:directory:_files'
-    '(-V)'{-V,--version}'[show version and exit]'
+    '(-v)'{-v,--version}'[show version and exit]'
 )
 
 _subcommands() {

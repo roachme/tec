@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `shell/_tec.zsh`: Fix version option
+
+### Deleted
+
+
 ## [0.9.0] - (2026-06-17)
 
 ### Added
