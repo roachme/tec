@@ -278,7 +278,7 @@ struct help helptab[] = {
      .tag = TAGOBJ,
      .name = "cfg",
      .synop = "Usage: " PROGRAM " cfg SUBCMD [OPTION]... ARGS\n",
-     .desc_short = "Manage and show configs (under development).\n",
+     .desc_short = "Manage and show configs.\n",
      .desc_long = "\n\
     Arguments:\n\
       SUBCMD  cfg subcommand\n\
