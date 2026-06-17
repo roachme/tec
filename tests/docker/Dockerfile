@@ -11,7 +11,10 @@ RUN apt-get update && \
     libconfig-dev \
     && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    && \
+    python3 \
+    python3-pygit2
 
 # Set working directory
 WORKDIR /root
