@@ -5,8 +5,8 @@
 
 typedef struct argvec {
     int i;                      /* index of current argument */
-    int used;                   /* argument copied */
-    int size;                   /* argument size */
+    int used;                   /* number of used slots in dynamic array */
+    int size;                   /* capacity of dynamic array */
     int offset;                 /* offset in dynamic array of arguments */
     char **argv;                /* argument vector */
 } tec_argvec_t;
