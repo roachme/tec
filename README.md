@@ -132,9 +132,9 @@ Usage: tec [OPTION]... COMMAND|PLUGIN
 There is a ` nine ` plugin manager to install plugins.
 
 Here's some plugin to check out \
-` nine ` - [Tec plugin manager](https://github.com/roachme/tec-nine.git) \
-` gmux ` - [Manage bunch of git repos](https://github.com/roachme/tec-gmux.git) \
-` find ` - [Find stuff in tasks](https://github.com/roachme/tec-find.git)
+[nine](https://github.com/roachme/tec-nine.git) - Tec plugin manager \
+[gmux](https://github.com/roachme/tec-gmux.git) - Manage bunch of git repos \
+[find](https://github.com/roachme/tec-find.git) - Find stuff in tasks
 
 
 ## ⇁  Install plugin manager
