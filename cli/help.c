@@ -77,6 +77,13 @@ struct help helptab[] = {
     Arguments:\n\
       CMD     builtin command\n\
     \n\
+    This command can be used to get help on specific command.\n\
+    Examples:\n\
+      $ tec help add\n\
+      $ tec help cat\n\
+      $ tec help env\n\
+      $ tec help env-cat\n\
+    \n\
     Exit status:\n\
     Returns success unless CMD is not found or an invalid option is given.\n"},
     {
