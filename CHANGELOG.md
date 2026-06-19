@@ -9,6 +9,7 @@
 ### Fixed
 
 - `shell/_tec.zsh`: Fix version option
+- `cli/aux/log`: Remove program name from user prompt
 
 ### Deleted
 
