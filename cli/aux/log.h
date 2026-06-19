@@ -4,10 +4,15 @@
 #include <stdio.h>
 #include "aux.h"
 
+/*
+ * There is no need to complicate things. There is no need for full 8 level of
+ * logging because it is not a daemon, just a CLI util.
+ */
+
 typedef enum tec_cli_log_lvl {
     TEC_LOG_PROMPT,             /* Prompt user for input */
     TEC_LOG_ERROR,              /* Error, no recovery, terminate immediately */
-    TEC_LOG_INFO,               /* Info for user */
+    TEC_LOG_INFO,               /* Info for user, what has been done */
     TEC_LOG_DEBUG,              /* Debug info */
 } tec_cli_log_lvl_t;
 
