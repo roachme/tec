@@ -166,6 +166,7 @@ struct help helptab[] = {
       -n      do not update toggles\n\
       -h      show this help and exit\n\
       -q      do not write anything to standard error output\n\
+      -p      directory path inside task directory (under development)\n\
       -N      neither update toggles nor switch to task directory\n\
     \n\
     Arguments:\n\

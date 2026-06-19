@@ -2,6 +2,8 @@
 
 ### Added
 
+- `cli/help`: Add TODO for new option for command `cd`
+
 ### Changed
 
 ### Fixed
