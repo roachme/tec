@@ -53,9 +53,11 @@ static tec_cmd_t tec_cmds[] = {
 
 static int is_valid_toggle(char *tog)
 {
-    if (strncmp(tog, "on", 2) == 0)
+    size_t len = strlen(tog);
+
+    if (len <= 2 && strcmp(tog, "on") == 0)
         return true;
-    else if (strncmp(tog, "off", 3) == 0)
+    else if (len <= 3 && strcmp(tog, "off") == 0)
         return false;
     return -1;
 }

@@ -12,6 +12,7 @@
 - `cli/aux/log`: Remove program name from user prompt
 - `cli/aux/config`: Fix memory leak for default paths
 - `cli`: Fix compiler warnings for unused parameters
+- `cli/tec`: Fix toggle parser
 
 ### Deleted
 
