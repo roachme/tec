@@ -10,6 +10,7 @@
 
 - `shell/_tec.zsh`: Fix version option
 - `cli/aux/log`: Remove program name from user prompt
+- `cli/aux/config`: Fix memory leak for default paths
 
 ### Deleted
 

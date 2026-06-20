@@ -168,15 +168,23 @@ static int tec_config_get_base(config_t *cfg, tec_cfg_t *tec_config)
         if (config_setting_lookup_string(setting, "task", &task)) {
             pathname[0] = '\0'; /* unset pathname value */
             resolve_env_var_home(pathname, task);
+
+            /* Free default value.  */
+            if (tec_config->base.task)
+                free(tec_config->base.task);
             tec_config->base.task = strdup(pathname);
         }
         if (config_setting_lookup_string(setting, "pgn", &pgn)) {
             pathname[0] = '\0'; /* unset pathname value */
             resolve_env_var_home(pathname, pgn);
+
+            /* Free default value.  */
+            if (tec_config->base.pgn)
+                free(tec_config->base.pgn);
             tec_config->base.pgn = strdup(pathname);
         }
     }
-    return tec_config_set_default_base(tec_config);
+    return 0;
 }
 
 static int tec_config_get_options(config_t *cfg, tec_cfg_t *tec_config)
