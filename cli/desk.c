@@ -302,6 +302,8 @@ static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    (void)argvec;
+    (void)cfg;
     return TEC_LOG_E("%s: under development", __func__);
 }
 

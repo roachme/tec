@@ -120,6 +120,9 @@ int tec_task_exist(const char *taskdir, tec_arg_t *args)
 
 int tec_task_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
+    (void)args;
+    (void)ctx;
+
     if (dir_task_rm(taskdir, args))
         return emod_set(TEC_DIR_RM);
     return TEC_OK;
@@ -140,6 +143,8 @@ int tec_task_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 int tec_task_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                   tec_ctx_t *ctx)
 {
+    (void)ctx;
+
     if (dir_task_move(taskdir, src, dst))
         return emod_set(TEC_DIR_MOVE);
     return TEC_OK;
@@ -152,6 +157,8 @@ int tec_task_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 
 int tec_task_valid(const char *taskdir, tec_arg_t *args)
 {
+    (void)taskdir;
+
     if (is_valid_object(args->task) == false)
         return emod_set(TEC_ARG_ILLEG);
     return TEC_OK;
@@ -174,6 +181,8 @@ int tec_desk_exist(const char *taskdir, tec_arg_t *args)
 
 int tec_desk_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
+    (void)ctx;
+
     if (dir_desk_rm(taskdir, args))
         return emod_set(TEC_DIR_RM);
     return TEC_OK;
@@ -194,6 +203,8 @@ int tec_desk_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 int tec_desk_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                   tec_ctx_t *ctx)
 {
+    (void)ctx;
+
     if (dir_desk_move(taskdir, src, dst))
         return emod_set(TEC_DIR_MOVE);
     return TEC_OK;
@@ -201,11 +212,14 @@ int tec_desk_move(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
 
 int tec_desk_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
+    (void)ctx;
     return aux_unit_set(ctx->units, path_desk_unit(taskdir, args));
 }
 
 int tec_desk_valid(const char *taskdir, tec_arg_t *args)
 {
+    (void)taskdir;
+
     if (is_valid_object(args->desk) == false)
         return emod_set(TEC_ARG_ILLEG);
     return TEC_OK;
@@ -228,6 +242,8 @@ int tec_env_exist(const char *taskdir, tec_arg_t *args)
 
 int tec_env_rm(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
+    (void)ctx;
+
     if (dir_env_rm(taskdir, args))
         return emod_set(TEC_DIR_RM);
     return TEC_OK;
@@ -242,12 +258,15 @@ int tec_env_get(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 
 int tec_env_list(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 {
+    (void)args;
     return aux_list_get(ctx, taskdir);
 }
 
 int tec_env_rename(const char *taskdir, tec_arg_t *src, tec_arg_t *dst,
                    tec_ctx_t *ctx)
 {
+    (void)ctx;
+
     if (dir_env_rename(taskdir, src, dst))
         return emod_set(TEC_DIR_RENAME);
     return TEC_OK;
@@ -260,6 +279,8 @@ int tec_env_set(const char *taskdir, tec_arg_t *args, tec_ctx_t *ctx)
 
 int tec_env_valid(const char *taskdir, tec_arg_t *args)
 {
+    (void)taskdir;
+
     if (is_valid_object(args->env) == false)
         return emod_set(TEC_ARG_ILLEG);
     return TEC_OK;

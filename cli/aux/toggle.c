@@ -15,6 +15,7 @@ static char task_prev[IDSIZ + 1];
 
 static char *path_env_toggle(char *base, const tec_arg_t *args)
 {
+    (void)args;
     const char *fmt = "%s/.tec/toggles";
     static char pathname[PATH_MAX + 1];
     sprintf(pathname, fmt, base);

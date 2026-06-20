@@ -78,6 +78,7 @@ static int _cfg_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
 // TODO: show config values from config file. Not option set via CLI
 static int _cfg_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    (void)argvec;
     tec_alias_t *alias;
     struct tec_hook *hook;
 
@@ -99,6 +100,8 @@ static int _cfg_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _cfg_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    (void)argvec;
+    (void)cfg;
     return 0;
 }
 

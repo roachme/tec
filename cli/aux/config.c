@@ -225,6 +225,7 @@ static int parseconf(tec_cfg_t *tec_config, const char *fname)
 
 int tec_config_init(tec_cfg_t *tec_config)
 {
+    (void)tec_config;
     return 0;
 }
 

@@ -79,9 +79,11 @@ static bool cmd_is_naughty(const char *cmdname)
     return false;
 }
 
+/* TODO: remove cmdname, because it is not used.  */
 static tec_cmd_t *cmd_get(const char *cmdname, tec_argvec_t *argvec,
                           tec_cfg_t *cfg)
 {
+    (void)cmdname;
     tec_cmd_t *cmd;
 
     for (size_t i = 0; i < ARRAY_SIZE(tec_cmd_types); ++i)
@@ -120,6 +122,7 @@ tec_cmd_t *tec_cli_is_plugin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    (void)cfg;
     char *cmdname = argvec->argv[0];
 
     for (size_t idx = 0; idx < ARRAY_SIZE(tec_cmds); ++idx)

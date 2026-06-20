@@ -721,6 +721,7 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int c, i, status;
     int opt_list_cmds;
 
+    (void)cfg;
     status = TEC_OK;
     opt_list_cmds = false;
 
