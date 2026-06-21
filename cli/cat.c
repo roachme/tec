@@ -13,7 +13,7 @@
 
 static int valid_unitkeys(tec_unit_t *units)
 {
-    for (int i = 0; units && i < nunitkey; units = units->next, ++i)
+    for (size_t i = 0; units && i < nunitkey; units = units->next, ++i)
         if (strcmp(units->key, unitkeys[i]) != 0)
             return 1;
     return 0;

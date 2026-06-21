@@ -28,7 +28,7 @@ static int pgn_cmd_add_path(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
     char *cmdptr = cmd->cmd + cmd->offset;
 
     len = snprintf(cmdptr, cmd->size, fmt, cfg->base.pgn, name, name);
-    if (len < 0 || len >= cmd->size)
+    if (len >= cmd->size)
         return EXIT_FAILURE;
 
     cmd->offset = strlen(cmd->cmd);
@@ -42,7 +42,7 @@ static int pgn_cmd_add_opts(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
     char *cmdptr = cmd->cmd + cmd->offset;
 
     len = snprintf(cmdptr, cmd->size, fmt, cfg->base.task, cfg->base.pgn);
-    if (len < 0 || len >= cmd->size)
+    if (len >= cmd->size)
         return EXIT_FAILURE;
 
     cmd->offset = strlen(cmd->cmd);
@@ -56,7 +56,7 @@ static int pgn_cmd_add_args(tec_pgn_cmd_t *cmd, tec_argvec_t *argvec)
     for (int i = 0; i < argvec->used; ++i) {
         char *cmdptr = cmd->cmd + cmd->offset;
         len = snprintf(cmdptr, cmd->size, " %s", argvec->argv[i]);
-        if (len < 0 || len >= cmd->size) {
+        if (len >= cmd->size) {
             return EXIT_FAILURE;
         }
         cmd->offset = strlen(cmd->cmd);
