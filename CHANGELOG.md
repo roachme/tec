@@ -14,6 +14,7 @@
 - `cli`: Fix compiler warnings for unused parameters
 - `cli/tec`: Fix toggle parser
 - `cli`: Fix compiler warnings
+- `test/docker`: Fix Dockerfile
 
 ### Deleted
 
