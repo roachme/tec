@@ -55,6 +55,7 @@ Ideas:
  23. Add option --no-pager to turn pager feature off. like in git.
  24. Maybe let command `set' let not to take any values to change? In that case change nothing.
  25. Add support for plugins to be called from $PATH like git does. `tec-pgnname` files should be called as plugin as well
+ 26. Use pthreads to parse plugin output
 
 
 Prio: high
