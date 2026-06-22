@@ -16,6 +16,7 @@
 - `cli`: Fix compiler warnings
 - `test/docker`: Fix Dockerfile
 - `cli/help`: Fix bug in documentation
+- `utils/install`: Fix util installation
 
 ### Deleted
 

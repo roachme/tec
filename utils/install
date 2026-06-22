@@ -53,20 +53,18 @@ function install_shell()
     echo 'Run if needed: export PATH=$HOME/.local/bin:$PATH'
 }
 
-function install_full()
-{
-    install_hard
-    install_shell
-}
-
 install_prep
 if [ "$CMD" = "full" ]; then
-    install_full
+    install_hard
+    install_shell
 elif [ "$CMD" = "hard" ]; then
     install_hard
+    install_shell
 elif [ "$CMD" = "soft" ]; then
     install_soft
+    install_shell
 elif [ "$CMD" = "shell" ]; then
+    install_shell
     install_shell
 else
     install_help
