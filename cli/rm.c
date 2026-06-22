@@ -1,8 +1,8 @@
 #include <stdlib.h>
-#include "rm.h"
-#include "aux/log.h"
 #include "tec.h"
+#include "aux/log.h"
 #include "aux/aux.h"
+#include "aux/opts.h"
 #include "aux/osdep.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
@@ -34,15 +34,6 @@ static int update_toggles_and_cwd(tec_arg_t *args,
     return status;
 }
 
-void tec_cli_rm_option_init(struct tec_cli_rm_options *opts)
-{
-    opts->help = false;
-    opts->quiet = false;
-    opts->verbose = false;
-    opts->change_dir = false;
-    opts->interactive = RMI_ALWAYS;
-}
-
 int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
@@ -64,13 +55,13 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             args.env = optarg;
             break;
         case 'f':
-            opts.interactive = RMI_NEVER;
+            opts.mode = RMI_NEVER;
             break;
         case 'h':
             opts.help = true;
             break;
         case 'i':
-            opts.interactive = RMI_ALWAYS;
+            opts.mode = RMI_ALWAYS;
             break;
         case 'q':
             opts.quiet = true;
@@ -79,7 +70,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.verbose = true;
             break;
         case 'I':
-            opts.interactive = RMI_SOMETIMES;
+            opts.mode = RMI_SOMETIMES;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -99,7 +90,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
 
-    if (ntasks >= 3 && opts.interactive == RMI_SOMETIMES) {
+    if (ntasks >= 3 && opts.mode == RMI_SOMETIMES) {
         TEC_LOG_P("remove %d tasks? [y/N] ", ntasks);
         if (yesno() == false) {
             return EXIT_SUCCESS;
@@ -112,7 +103,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
             retcode = status == TEC_OK ? retcode : status;
             continue;
-        } else if (opts.interactive == RMI_ALWAYS) {
+        } else if (opts.mode == RMI_ALWAYS) {
             TEC_LOG_P("remove task '%s'? [y/N] ", args.task);
             if (!yesno())
                 continue;

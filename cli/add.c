@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "tec.h"
-#include "cd.h"
+#include "aux/opts.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
@@ -74,7 +74,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.help = true;
             break;
         case 'n':
-            opts.chtog = false;
+            opts.change_tog = false;
             break;
         case 'q':
             opts.quiet = true;
@@ -83,8 +83,8 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             desc = optarg;
             break;
         case 'N':
-            opts.chdir = false;
-            opts.chtog = false;
+            opts.change_dir = false;
+            opts.change_tog = false;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -140,7 +140,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if ((status = hook_action(&args, "add"))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
-        } else if (opts.chtog == true) {
+        } else if (opts.change_tog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
                     TEC_LOG_E("could not update toggles");
@@ -150,7 +150,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
     } while (++argvec->i < argvec->used);
 
-    if (retcode == TEC_OK && opts.chdir)
+    if (retcode == TEC_OK && opts.change_dir)
         retcode = tec_cli_pwd_set(&args);
     return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

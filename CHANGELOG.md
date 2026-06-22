@@ -6,6 +6,8 @@
 
 ### Changed
 
+- `cli`: Unify option structures
+
 ### Fixed
 
 - `shell/_tec.zsh`: Fix version option

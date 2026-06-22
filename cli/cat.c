@@ -6,8 +6,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "cd.h"
 #include "tec.h"
+#include "aux/opts.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 
