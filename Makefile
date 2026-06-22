@@ -63,7 +63,7 @@ style:
 	find . -name '*.[ch]' | xargs indent -nut -nbad -bap -nbc -bbo -hnl -br -brs -c33 -cd33 -ncdb -ce -ci4 -cli0 -d0 -di1 -nfc1 -i4 -ip0 -l80 -lp -npcs -nprs -npsl -sai -saf -saw -ncs -nsc -sob -nfca -cp33 -ss -ts8 -il1
 	find . -name '*.[ch]\~' | xargs	rm
 
-test:
+memcheck:
 	./tests/memleak/memcheck
 
 # Build project in debug configuration into ./build/debug
@@ -79,7 +79,7 @@ build_release:
 
 
 #all_release: clean init check_style test_unit test_integration test_system test_e2e check_static check_security build_release docs_build ;
-release: clean init style check $(PROGRAM) generate
+release: clean init style check $(PROGRAM) generate memcheck
 
 
 #build:
