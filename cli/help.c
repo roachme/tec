@@ -114,7 +114,7 @@ struct help helptab[] = {
       -d DESK desk name (default is current)\n\
       -e ENV  environment name (default is current)\n\
       -h      show this help and exit\n\
-      -n      do not switch to task\n\
+      -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
       -D      provide description (generated if not provided)\n\
       -N      neither switch to task nor to task directory\n\
@@ -359,7 +359,7 @@ struct help helptab[] = {
     Options:\n\
       -e ENV  environment name (default is current)\n\
       -h      show this help and exit\n\
-      -n      do not switch to newly created desk\n\
+      -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
       -N      neither switch to task nor to desk directory\n\
     \n\
@@ -475,7 +475,7 @@ struct help helptab[] = {
     Options:\n\
       -e ENV  environment name (default is current)\n\
       -h      show this help and exit\n\
-      -n      do not switch to task\n\
+      -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
       -N      neither switch to task nor to desk directory\n\
     \n\
@@ -522,7 +522,7 @@ struct help helptab[] = {
     Options:\n\
       -d      desk name (default is 'desk')\n\
       -h      show this help and exit\n\
-      -n      do not switch to newly created environment\n\
+      -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
       -N      neither switch to task nor to environment directory\n\
     \n\
@@ -563,7 +563,7 @@ struct help helptab[] = {
     Options:\n\
       -d DESK desk name (default is current)\n\
       -h      show this help and exit\n\
-      -n      do not switch to environment\n\
+      -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
       -N      neither switch to task nor to environment directory\n\
     \n\

@@ -15,6 +15,7 @@
 - `cli/tec`: Fix toggle parser
 - `cli`: Fix compiler warnings
 - `test/docker`: Fix Dockerfile
+- `cli/help`: Fix bug in documentation
 
 ### Deleted
 
