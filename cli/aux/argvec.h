@@ -12,7 +12,6 @@ typedef struct argvec {
 } tec_argvec_t;
 
 void argvec_init(tec_argvec_t * vec);
-void argvec_show(tec_argvec_t * vec);
 bool argvec_is_empty(tec_argvec_t * vec);
 void argvec_deinit(tec_argvec_t * vec);
 void argvec_offset(tec_argvec_t * vec, int offset);

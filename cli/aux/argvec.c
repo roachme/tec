@@ -25,13 +25,6 @@ void argvec_init(tec_argvec_t *vec)
     vec->size = size;
 }
 
-void argvec_show(tec_argvec_t *vec)
-{
-    for (int i = 0; i < vec->used; ++i) {
-        printf("argvec_show: %s[%d] - used: %d\n", vec->argv[i], i, vec->used);
-    }
-}
-
 bool argvec_is_empty(tec_argvec_t *vec)
 {
     return vec->used == 0;
