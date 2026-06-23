@@ -4,6 +4,7 @@
 
 - `cli/help`: Add TODO for new option for command `cd`
 - `build`: Include memory check into release
+- `build`: Separate project builds
 
 ### Changed
 

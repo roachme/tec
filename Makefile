@@ -1,21 +1,32 @@
+CC=gcc
 MAKE=make
+BUILD_TYPE ?= user
 PROGRAM=build/_tec
+DEPS=$(wildcard lib/*.h cli/*.h cli/aux/*.h)
+SRCS=$(wildcard lib/*.c cli/*.c cli/aux/*.c)
+OBJS=$(patsubst %.c, %.o, $(SRCS))
+LFLAGS=-lconfig
+CFLAGS=-I cli -Wall -fbounds-check -Wpedantic -Wextra
+
+#CXXFLAGS += -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align \
+#            -Wunused -Woverloaded-virtual -Wpedantic -Wconversion \
+#            -Wsign-conversion -Wmisleading-indentation -Wduplicated-cond \
+#            -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast
+
+
 VERSION=$(shell cat VERSION)
 README=README.md
 SHELLSCRIPT=shell/tec.sh
 SHELLNAME=bash
-CC=gcc
-SRCS=$(wildcard lib/*.c cli/*.c cli/aux/*.c)
-OBJS=$(patsubst %.c, %.o, $(SRCS))
-CFLAGS=-I cli -Wall -O3 -fbounds-check -Wpedantic -Wextra
-LFLAGS=-lconfig -g
 PWDFILE=/tmp/tecpwd
 
-# TODO: add debug mode
-# TODO: add user and developer builds
 
-all: init $(PROGRAM)
-.PHONY: clean debug generate release
+
+all: user
+.PHONY: user release debug
+
+
+
 
 init:
 	mkdir -p build
@@ -50,9 +61,6 @@ re: clean init $(PROGRAM)
 check:
 	cppcheck --std=c89 --enable=all --language=c $(SRCS)
 
-valgrind:
-	valgrind  --track-origins=yes --leak-check=full --show-leak-kinds=all ./$(PROGRAM)
-
 install:
 	./utils/install full
 
@@ -66,20 +74,36 @@ style:
 memcheck:
 	./tests/memleak/memcheck
 
-# Build project in debug configuration into ./build/debug
-.PHONY: build_debug
-build_debug:
-	make debug
-
-
-# Build project in release configuraiton into ./build/release
-.PHONY: build_release
-build_release:
-	make
-
 
 #all_release: clean init check_style test_unit test_integration test_system test_e2e check_static check_security build_release docs_build ;
+#.PHONY: build_user
+#build_user: clean init $(PROGRAM)
+#
+#.PHONY: build_debug
+#build_debug: clean init style check $(PROGRAM) generate memcheck
+#
+#.PHONY: build_release
+#build_release: clean init style check $(PROGRAM) generate memcheck
+
+
+
+# Build project just for user without any checks
+user: CFLAGS := $(CFLAGS) -O3
+user: LFLAGS := $(LFLAGS)
+user: clean init $(PROGRAM)
+
+# Build project in release configuraiton into ./build/release
+release: CFLAGS := $(CFLAGS) -O3
+release: LFLAGS := $(LFLAGS)
 release: clean init style check $(PROGRAM) generate memcheck
+
+# Build project in debug configuration into ./build/debug
+debug: CFLAGS := $(CFLAGS) -O0 -g3 -ggdb
+debug: LFLAGS := $(LFLAGS)
+debug: clean init $(PROGRAM)
+
+
+
 
 
 #build:
