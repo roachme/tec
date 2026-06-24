@@ -90,7 +90,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
         return EXIT_FAILURE;
 
-    if (ntasks >= 3 && opts.mode == RMI_SOMETIMES) {
+    if (ntasks > 3 && opts.mode == RMI_SOMETIMES) {
         TEC_LOG_P("remove %d tasks? [y/N] ", ntasks);
         if (yesno() == false) {
             return EXIT_SUCCESS;
