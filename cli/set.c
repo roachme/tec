@@ -82,7 +82,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'T':
             if (valid_type(optarg) == false) {
-                TEC_LOG_E("invalid priority '%s'", optarg);
+                TEC_LOG_E("invalid type '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
             if (tec_unit_get(ctx.units, "type") == NULL)

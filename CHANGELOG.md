@@ -21,6 +21,7 @@
 - `test/docker`: Fix Dockerfile
 - `cli/help`: Fix bug in documentation
 - `utils/install`: Fix util installation
+- `cli/set`: Fix error message
 
 ### Deleted
 
