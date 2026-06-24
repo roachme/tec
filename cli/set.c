@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "tec.h"
@@ -118,15 +119,16 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return tec_cli_help_usage("set");
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
-        return status;
+        return EXIT_FAILURE;
     else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
-        return status;
+        return EXIT_FAILURE;
 
     do {
         args.task = argvec->argv[i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
-            ;
+            retcode = status == TEC_OK ? retcode : status;
+            continue;
         } else if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
             args.task = args.task ? args.task : "NOCURR";
             if (opt_quiet == false)
@@ -136,9 +138,9 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
 
-        ctx.units = tec_unit_free(ctx.units);
         retcode = status == TEC_OK ? retcode : status;
     } while (++i < argvec->used);
 
-    return retcode;
+    ctx.units = tec_unit_free(ctx.units);
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
