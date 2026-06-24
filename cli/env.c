@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
 
@@ -30,7 +31,9 @@ static int generate_units(tec_ctx_t *ctx, char *env)
 
     strcat(desc, env);
     units = tec_unit_add(units, "desc", desc);
-    ctx->units = units;
+
+    if ((ctx->units = units) == NULL)
+        return 1;
     return 0;
 }
 
@@ -102,58 +105,57 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.env = argvec->argv[i];
 
         if (tec_cli_len_valid(args.env, ENVSIZ) == false) {
-            status = 1;
             if (quiet == false)
                 TEC_LOG_E(errfmt, args.env, "env name is too long");
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if ((status = tec_env_valid(cfg->base.task, &args))) {
             if (quiet == false)
                 TEC_LOG_E(errfmt, args.env, tec_strerror(status));
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (!(status = tec_env_exist(cfg->base.task, &args))) {
             char *env = args.env;
             if (quiet == false)
                 TEC_LOG_E(errfmt, env, tec_strerror(TEC_ARG_EXISTS));
-            retcode = !(status == TEC_OK) ? retcode : !status;
+            retcode = EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_desk_valid(cfg->base.task, &args))) {
             if (quiet == false)
                 TEC_LOG_E(errfmt_desk, args.desk, tec_strerror(status));
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
             status = 1;
             if (quiet == false)
                 TEC_LOG_E(errfmt_desk, args.desk, "desk name is too long");
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
             if (quiet == false)
                 TEC_LOG_E(errfmt_desk, args.desk, tec_strerror(TEC_ARG_EXISTS));
-            retcode = !(status == TEC_OK) ? retcode : !status;
+            retcode = EXIT_FAILURE;
             continue;
         }
 
         if (generate_units(&ctx, args.env)) {
             if (quiet == false)
                 TEC_LOG_E(errfmt, args.env, "unit generation failed");
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_env_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
                 TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if ((status = tec_desk_add(cfg->base.task, &args, &ctx))) {
             if (quiet == false)
                 TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         }
         ctx.units = tec_unit_free(ctx.units);
@@ -238,8 +240,8 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     do {
         args.env = argvec->argv[i];
-        if ((status = tec_cli_check_env(&args, errfmt, opt_quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+        if (tec_cli_check_env(&args, errfmt, opt_quiet)) {
+            retcode = EXIT_FAILURE;
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove environment '%s'? [y/N] ", args.env);
@@ -263,9 +265,10 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     // TODO: update current directory if current env got deleted.
 
-    if (retcode == TEC_OK)
-        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
-
+    if (retcode == TEC_OK) {
+        status = tec_cli_pwd_set(&args);
+        retcode = status == TEC_OK ? retcode : status;
+    }
     return retcode;
 }
 

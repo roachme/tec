@@ -25,12 +25,11 @@ static int update_toggles_and_cwd(tec_arg_t *args,
         opts->change_dir = true;
     }
 
-    /* Update current and previos toggles.  */
-    if (toggle_task_is_curr(teccfg.base.task, args)) {
-        toggle_task_unset_curr(teccfg.base.task, args);
-    } else if (toggle_task_is_prev(teccfg.base.task, args)) {
-        toggle_task_unset_prev(teccfg.base.task, args);
-    }
+    /* Update current and/or previous toggles.  */
+    if (toggle_task_is_curr(teccfg.base.task, args))
+        status = toggle_task_unset_curr(teccfg.base.task, args);
+    else if (toggle_task_is_prev(teccfg.base.task, args))
+        status = toggle_task_unset_prev(teccfg.base.task, args);
     return status;
 }
 
@@ -100,8 +99,8 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     do {
         args.task = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+        if (tec_cli_check_task(&args, errfmt, opts.quiet)) {
+            retcode = EXIT_FAILURE;
             continue;
         } else if (opts.mode == RMI_ALWAYS) {
             TEC_LOG_P("remove task '%s'? [y/N] ", args.task);

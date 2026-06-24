@@ -6,7 +6,6 @@
 bool MKDIR(char *path);
 bool RMDIR(char *path);
 bool MOVE(char *src, char *dst);
-bool TOUCH(char *path);
 bool ISFILE(char *fname);
 bool ISDIR(char *fname);
 

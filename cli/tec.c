@@ -51,7 +51,7 @@ static tec_cmd_t tec_cmds[] = {
     {.name = "_pgn_",.func = &tec_cli_pgn,.option = TEC_SETUP_SOFT},
 };
 
-static int is_valid_toggle(char *tog)
+static int is_valid_toggle(const char *tog)
 {
     size_t len = strlen(tog);
 
@@ -62,7 +62,7 @@ static int is_valid_toggle(char *tog)
     return -1;
 }
 
-static int cmd_setup(int setuplvl, tec_cfg_t *cfg)
+static int cmd_setup(int setuplvl, const tec_cfg_t *cfg)
 {
     int status = TEC_OK;
 
@@ -98,7 +98,7 @@ static tec_cmd_t *cmd_get(const char *cmdname, tec_argvec_t *argvec,
 tec_cmd_t *tec_cli_is_alias(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_alias_t *head;
-    char *cmdname = argvec->argv[0];
+    const char *cmdname = argvec->argv[0];
     tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 2];
 
     for (head = cfg->alias; head != NULL; head = head->next)
@@ -111,9 +111,10 @@ tec_cmd_t *tec_cli_is_plugin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     FILE *fp;
     char path[PATH_MAX + 1];
-    char *cmdname = argvec->argv[0];
+    const char *cmdname = argvec->argv[0];
     tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 1];
 
+    // TODO: check for case of buffer overflow
     snprintf(path, sizeof(path), "%s/%s/%s", cfg->base.pgn, cmdname, cmdname);
 
     if ((fp = fopen(path, "r")) == NULL)
@@ -125,7 +126,7 @@ tec_cmd_t *tec_cli_is_plugin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     (void)cfg;
-    char *cmdname = argvec->argv[0];
+    const char *cmdname = argvec->argv[0];
 
     for (size_t idx = 0; idx < ARRAY_SIZE(tec_cmds); ++idx)
         if (strcmp(cmdname, tec_cmds[idx].name) == 0)

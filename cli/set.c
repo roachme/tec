@@ -50,17 +50,16 @@ static int valid_desc(const char *val)
     return isalnum(*--val) != 0;
 }
 
-// TODO: Find a good error message in case option fails.  */
 int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int c, i, retcode, status;
-    int opt_help, opt_interactive, opt_quiet;
+    int opt_help, opt_quiet;
     const char *errfmt = "cannot set task units '%s': %s";
 
     retcode = TEC_OK;
-    opt_help = opt_interactive = opt_quiet = false;
+    opt_help = opt_quiet = false;
     args.env = args.desk = args.task = NULL;
 
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hiqD:T:P:")) != -1) {
@@ -78,9 +77,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opt_help = true;
             break;
         case 'i':
-            opt_interactive = true;
             return TEC_LOG_E("this option is under development");
-            break;
         case 'T':
             if (valid_type(optarg) == false) {
                 TEC_LOG_E("invalid type '%s'", optarg);
@@ -117,17 +114,16 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (opt_help == true)
         return tec_cli_help_usage("set");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
+    else if (tec_cli_check_env(&args, errfmt, opt_quiet))
         return EXIT_FAILURE;
-    else if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet)))
+    else if (tec_cli_check_desk(&args, errfmt, opt_quiet))
         return EXIT_FAILURE;
 
     do {
         args.task = argvec->argv[i];
 
         if ((status = tec_cli_check_task(&args, errfmt, opt_quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
             args.task = args.task ? args.task : "NOCURR";

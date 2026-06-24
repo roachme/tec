@@ -50,9 +50,9 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (opts.help == true)
         return tec_cli_help_usage("cd");
     else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
-        return EXIT_FAILURE;
+        return status;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
-        return EXIT_FAILURE;
+        return status;
 
     /* Check that alias '-' is not passed with other task IDs nor duplicated.  */
     for (int idx = argvec->i; idx < argvec->used; ++idx) {
@@ -62,7 +62,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     /* Resolve alias '-' to switch to previous task ID.  */
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
-        if ((status = toggle_task_get_prev(cfg->base.task, &args)))
+        if (toggle_task_get_prev(cfg->base.task, &args))
             return TEC_LOG_E(errfmt, "PREV", "no previous task ID");
         argvec_replace(argvec, argvec->i, args.task, IDSIZ);
     }
@@ -70,8 +70,8 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     do {
         args.task = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+        if (tec_cli_check_task(&args, errfmt, opts.quiet)) {
+            retcode = EXIT_FAILURE;
             continue;
         }
 

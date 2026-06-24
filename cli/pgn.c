@@ -23,7 +23,7 @@ static void pgn_cmd_init(tec_pgn_cmd_t *cmd, char *name)
 static int pgn_cmd_add_path(tec_pgn_cmd_t *cmd, tec_cfg_t *cfg)
 {
     size_t len;
-    char *name = cmd->name;
+    const char *name = cmd->name;
     const char *fmt = "%s/%s/%s";
     char *cmdptr = cmd->cmd + cmd->offset;
 

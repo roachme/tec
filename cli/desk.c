@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
 
@@ -40,7 +41,9 @@ static int generate_units(tec_ctx_t *ctx, char *desk)
 
     strcat(desc, desk);
     units = tec_unit_add(units, "desc", desc);
-    ctx->units = units;
+
+    if ((ctx->units = units) == NULL)
+        return 1;
     return 0;
 }
 
@@ -100,26 +103,25 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.desk = argvec->argv[i];
 
         if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
-            status = 1;
             if (opt_quiet == false)
                 TEC_LOG_E(errfmt, args.desk, "desk name is too long");
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
-        } else if ((status = tec_desk_valid(cfg->base.task, &args))) {
+        } else if (tec_desk_valid(cfg->base.task, &args)) {
             if (opt_quiet == false)
                 TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
-        } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
+        } else if (!tec_desk_exist(cfg->base.task, &args)) {
             char *desk = args.desk;
             if (opt_quiet == false)
                 TEC_LOG_E(errfmt, desk, tec_strerror(TEC_ARG_EXISTS));
-            retcode = !(status == TEC_OK) ? retcode : !status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (generate_units(&ctx, args.desk)) {
             if (opt_quiet == false)
                 TEC_LOG_E(errfmt, args.desk, "unit generation failed");
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         }
 
@@ -211,7 +213,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.desk = argvec->argv[i];
 
         if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove desk '%s'? [y/N] ", args.desk);

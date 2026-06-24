@@ -59,7 +59,9 @@ clean:
 re: clean init $(PROGRAM)
 
 check:
-	cppcheck --std=c89 --enable=all --language=c $(SRCS)
+	cppcheck --suppress=variableScope --suppress=missingIncludeSystem --std=c89 \
+		--enable=all --language=c --check-level=exhaustive $(SRCS) \
+		--checkers-report=build/cppcheck/report.txt
 
 install:
 	./utils/install full

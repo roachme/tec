@@ -3,9 +3,9 @@
 #include <limits.h>
 #include <stdbool.h>
 
+#include "log.h"
 #include "hook.h"
 #include "config.h"
-#include "../tec.h"
 #include "../../lib/libtec.h"
 
 static char pathname[PATH_MAX + 1];
@@ -31,9 +31,9 @@ int hook_action(tec_arg_t *args, char *cmd)
 
     for (; hooks; hooks = hooks->next) {
         if (strcmp(cmd, hooks->cmd) == 0) {
-            char *cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
-            TEC_LOG_D(cmd);
-            status = system(cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
+            char *_cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
+            TEC_LOG_D(_cmd);
+            status = system(_cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
             retcode = status == TEC_OK ? retcode : status;
         }
     }

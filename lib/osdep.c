@@ -27,13 +27,6 @@ bool MOVE(char *src, char *dst)
     return system(cmd);
 }
 
-bool TOUCH(char *path)
-{
-    char cmd[BUFSIZ + 1];
-    sprintf(cmd, "touch %s", path);
-    return system(cmd);
-}
-
 bool ISFILE(char *fname)
 {
     char cmd[BUFSIZ + 1];
@@ -65,11 +58,6 @@ bool MOVE(char *src, char *dst)
     return 0;
 }
 
-bool TOUCH(char *path)
-{
-    return 0;
-}
-
 bool ISFILE(char *fname)
 {
     return 0;
@@ -93,11 +81,6 @@ bool RMDIR(char *path)
 }
 
 bool MOVE(char *src, char *dst)
-{
-    return 0;
-}
-
-bool TOUCH(char *path)
 {
     return 0;
 }

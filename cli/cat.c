@@ -78,8 +78,8 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     do {
         args.task = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
-            retcode = status == TEC_OK ? retcode : status;
+        if (tec_cli_check_task(&args, errfmt, opts.quiet)) {
+            retcode = EXIT_FAILURE;
             continue;
         }
 

@@ -25,7 +25,7 @@ void argvec_init(tec_argvec_t *vec)
     vec->size = size;
 }
 
-bool argvec_is_empty(tec_argvec_t *vec)
+bool argvec_is_empty(const tec_argvec_t *vec)
 {
     return vec->used == 0;
 }

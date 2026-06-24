@@ -672,26 +672,7 @@ static int help_list_short_commands(void)
     return 0;
 }
 
-int tec_cli_help_list(void)
-{
-    printf("Usage: " PROGRAM " [OPTION]... COMMAND|PLUGIN\n");
-    printf(PADDING "Run '" PROGRAM " help " PROGRAM "' to get more info.\n");
-    printf(PADDING "Run '" PROGRAM
-           " help help' to get more info on command.\n");
-
-    show_cmd_section("System", TAGSYSTEM);
-    show_cmd_section("Basic", TAGBASIC);
-    show_cmd_section("Object", TAGOBJ);
-    return 0;
-}
-
-int tec_cli_help_usage(const char *cmd)
-{
-    fprintf(stderr, "Try '%s help %s' for more information.\n", PROGRAM, cmd);
-    return EXIT_FAILURE;
-}
-
-int tec_cli_help_lookup(const char *cmd)
+static int tec_cli_help_lookup(const char *cmd)
 {
     int found = false;
 
@@ -714,6 +695,25 @@ int tec_cli_help_lookup(const char *cmd)
         }
     }
     return found == true ? 0 : 1;
+}
+
+int tec_cli_help_list(void)
+{
+    printf("Usage: " PROGRAM " [OPTION]... COMMAND|PLUGIN\n");
+    printf(PADDING "Run '" PROGRAM " help " PROGRAM "' to get more info.\n");
+    printf(PADDING "Run '" PROGRAM
+           " help help' to get more info on command.\n");
+
+    show_cmd_section("System", TAGSYSTEM);
+    show_cmd_section("Basic", TAGBASIC);
+    show_cmd_section("Object", TAGOBJ);
+    return 0;
+}
+
+int tec_cli_help_usage(const char *cmd)
+{
+    fprintf(stderr, "Try '%s help %s' for more information.\n", PROGRAM, cmd);
+    return EXIT_FAILURE;
 }
 
 int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)

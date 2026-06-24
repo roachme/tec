@@ -11,7 +11,7 @@
 
 static int generate_task(tec_arg_t *args, tec_argvec_t *argvec)
 {
-    char gentask[IDSIZ + 1] = { 0 };
+    static char gentask[IDSIZ + 1] = { 0 };
 
     args->task = gentask;
     for (register unsigned int i = 1; i < IDLIMIT; ++i) {
@@ -31,7 +31,7 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
     struct tec_unit *units = NULL;
     time_t rawtime = time(NULL);
     const char timefmt[] = "%Y%m%d";
-    struct tm *timeinfo = localtime(&rawtime);
+    const struct tm *timeinfo = localtime(&rawtime);
     char _desc[100] = "Generated desciption for ";
     char *unitvals[] = { "mid", "task", date, _desc, };
 
@@ -46,7 +46,9 @@ static int generate_units(tec_ctx_t *ctx, tec_arg_t *args, char *desc)
 
     for (size_t i = 0; i < nunitkey; ++i)
         units = tec_unit_add(units, unitkeys[i], unitvals[i]);
-    ctx->units = units;
+
+    if ((ctx->units = units) == NULL)
+        return 1;
     return 0;
 }
 
@@ -112,25 +114,24 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.task = argvec->argv[argvec->i];
 
         if (tec_cli_len_valid(args.task, IDSIZ) == false) {
-            status = 1;
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "task ID is too long");
-            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, tec_strerror(status));
-            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, tec_strerror(TEC_ARG_EXISTS));
-            retcode = !(status == TEC_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "unit generation failed");
-            retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+            retcode = EXIT_FAILURE;
             continue;
         }
 
