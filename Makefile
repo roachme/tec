@@ -90,7 +90,7 @@ memcheck:
 # Build project just for user without any checks
 user: CFLAGS := $(CFLAGS) -O3
 user: LFLAGS := $(LFLAGS)
-user: clean init $(PROGRAM)
+user: init $(PROGRAM)
 
 # Build project in release configuraiton into ./build/release
 release: CFLAGS := $(CFLAGS) -O3
