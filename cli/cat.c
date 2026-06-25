@@ -100,8 +100,11 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             units = tec_unit_join(units, ctx.units);
             units = tec_unit_join(units, unitpgn);
 
-            /* Show specific keys only.  */
-            if (argvec_is_empty(&keys) == false) {
+            /* Show all keys.  */
+            if (argvec_is_empty(&keys) == true) {
+                for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
+                    printf(unitfmt, tmp->key, tmp->val);
+            } else {            /* Show specific keys only.  */
                 for (int i = 0; i < keys.used; i++) {
                     int notfound = false;
                     for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
@@ -114,9 +117,6 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
                         TEC_LOG_E(keyfmt, args.task, keys.argv[i]);
                     retcode = notfound == 0 ? retcode : 1;
                 }
-            } else {            /* Show all keys.  */
-                for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
-                    printf(unitfmt, tmp->key, tmp->val);
             }
         }
 
