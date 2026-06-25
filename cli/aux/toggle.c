@@ -1,3 +1,4 @@
+#include <linux/limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -5,25 +6,29 @@
 
 #include "../tec.h"
 
-#define TOGENV          "%s/.tec/toggles"
-#define TOGDESK         "%s/%s/.tec/toggles"
-#define TOGTASK         "%s/%s/%s/.tec/toggles"
+#define TOGSUFF         ".tec/toggles"
+#define TOGENV          "%s/" TOGSUFF
+#define TOGDESK         "%s/%s/" TOGSUFF
+#define TOGTASK         "%s/%s/%s/" TOGSUFF
 
 static char env_curr[ENVSIZ + 1];
 static char env_prev[ENVSIZ + 1];
-
 static char desk_curr[DESKSIZ + 1];
 static char desk_prev[DESKSIZ + 1];
-
 static char task_curr[IDSIZ + 1];
 static char task_prev[IDSIZ + 1];
 
-static char *path_generic(char *buf, const char *fmt, ...)
+static char *path_generic(char *buf, int bufsiz, const char *fmt, ...)
 {
+    int len;
     va_list arg;
+
     va_start(arg, fmt);
-    vsprintf(buf, fmt, arg);
+    len = vsnprintf(buf, bufsiz, fmt, arg);
     va_end(arg);
+
+    if (len >= bufsiz)
+        return NULL;
     return buf;
 }
 
@@ -32,21 +37,21 @@ static char *path_env_toggle(char *base, const tec_arg_t *args)
     (void)args;
     const char *fmt = TOGENV;
     static char pathname[PATH_MAX + 1];
-    return path_generic(pathname, fmt, base);
+    return path_generic(pathname, PATH_MAX, fmt, base);
 }
 
 static char *path_desk_toggle(char *base, const tec_arg_t *args)
 {
     const char *fmt = TOGDESK;
     static char pathname[PATH_MAX + 1];
-    return path_generic(pathname, fmt, base, args->env);
+    return path_generic(pathname, PATH_MAX, fmt, base, args->env);
 }
 
 static char *path_task_toggle(char *base, const tec_arg_t *args)
 {
     const char *fmt = TOGTASK;
     static char pathname[PATH_MAX + 1];
-    return path_generic(pathname, fmt, base, args->env, args->desk);
+    return path_generic(pathname, PATH_MAX, fmt, base, args->env, args->desk);
 }
 
 static char *_get_toggle(const char *fname, char *buf, int bufsiz, char *tog)
