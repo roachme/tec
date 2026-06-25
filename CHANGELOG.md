@@ -25,6 +25,7 @@
 - `cli/set`: Fix potential memory leaks
 - `cli/rm`: Remove when more than 3 task IDs
 - `tec`: Fix cppcheck erorrs
+- `cli`: Fix plugin output login in case of error
 
 ### Deleted
 

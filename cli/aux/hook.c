@@ -52,21 +52,21 @@ int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
 
     /* Execute hooks only if they are enabled.  */
     if (teccfg.opts.hook == false)
-        return 0;
+        return EXIT_SUCCESS;
 
     for (; hooks; hooks = hooks->next) {
         if (strcmp(hooks->cmd, cmd) != 0)
             continue;
 
         char *hook_cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
-        //printf("## hook_cmd: '%s'\n", hook_cmd);
         if (!(pipe = popen(hook_cmd, "r"))) {
-            // TODO: add quiet option and show error message
+            // TODO: add quiet option and show error message of plugin
+            retcode = EXIT_FAILURE;
             continue;
         }
         while (fgets(line, BUFSIZ, pipe))
             *units = tec_unit_parse(*units, line);
-        pclose(pipe);
+        retcode = pclose(pipe) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
     }
     return retcode;
 }

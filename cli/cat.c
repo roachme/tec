@@ -93,8 +93,9 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
+        retcode = status == TEC_OK ? retcode : status;
 
-        if (status == TEC_OK) {
+        if (retcode == TEC_OK) {
             units = tec_unit_add(units, "id", args.task);
             units = tec_unit_join(units, ctx.units);
             units = tec_unit_join(units, unitpgn);

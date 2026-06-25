@@ -20,8 +20,8 @@ struct tec_cli_rm_options {
     bool help;                  /* Output a usage message ad exit */
     bool quiet;                 /* Do not write anything to standard output */
     bool verbose;               /* Explain what is being done */
-    bool change_dir;
-    enum tec_cli_rm_mode mode;
+    bool change_dir;            /* Change working directory, chosen automatically */
+    enum tec_cli_rm_mode mode;  /* Set remove mode */
 };
 
 void tec_cli_rm_option_init(struct tec_cli_rm_options *opts);
