@@ -28,6 +28,7 @@
 - `cli`: Fix plugin output login in case of error
 - `cli/aux/toggle`: Refactor module `toggle`
 - `cli/aux/toggle`: Fix potential buffer overflow
+- `cli/aux/toggle`: Set descriptive return codes
 
 ### Deleted
 

@@ -1,5 +1,6 @@
 #include <linux/limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -117,43 +118,43 @@ static char *task_get_prev(char *base, tec_arg_t *args)
 int toggle_env_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->env && !(args->env = env_get_curr(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int toggle_env_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->env && !(args->env = env_get_prev(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int toggle_desk_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->desk && !(args->desk = desk_get_curr(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int toggle_desk_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->desk && !(args->desk = desk_get_prev(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int toggle_task_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_curr(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 int toggle_task_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_prev(base, args)))
-        return 1;
-    return 0;
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 bool toggle_task_is_curr(char *base, tec_arg_t *args)
