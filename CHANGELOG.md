@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+- `tec`: Update help message
+
+### Fixed
+
+### Deleted
+
+
 ## [0.10.0] - (2026-06-25)
 
 ### Added

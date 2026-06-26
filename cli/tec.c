@@ -168,8 +168,10 @@ int main(int argc, const char **argv)
     argvec_parse(&argvec, argc, argv);
 
     /* Parse util itself options.  */
-    while ((c = getopt(argvec.used, argvec.argv, "+:hvC:D:F:H:P:T:")) != -1) {
+    while ((c = getopt(argvec.used, argvec.argv, "+:f:hvC:D:H:P:T:")) != -1) {
         switch (c) {
+        case 'f':
+            return TEC_LOG_E("option `-%c' under development", c);
         case 'h':
             argvec_add(&argvec, "help");
             break;
@@ -184,8 +186,6 @@ int main(int argc, const char **argv)
             if ((opts.debug = is_valid_toggle(optarg)) == -1)
                 return TEC_LOG_E(togfmt, c);
             break;
-        case 'F':
-            return TEC_LOG_E("option `-%c' under development", c);
         case 'H':
             if ((opts.hook = is_valid_toggle(optarg)) == -1)
                 return TEC_LOG_E(togfmt, c);
