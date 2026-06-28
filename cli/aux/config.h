@@ -1,11 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <libconfig.h>
-
 #include "../../lib/libtec.h"
 
-#define NUMCONFIG       2
 #define CONFIGSIZ       256
 
 // FIXME: add an expression max_hookact + max_hookshow + max_hookls
@@ -15,6 +12,7 @@
 #define CONF_MAXPGNINS  256
 
 typedef struct tec_base {
+    char *cfg;                  /* Path to config filename */
     char *pgn;                  /* Directory where plugins are stored */
     char *task;                 /* Directory where tasks are stored */
 } tec_base_t;
@@ -38,11 +36,11 @@ typedef struct config {
     struct tec_hook *hooks;
 } tec_cfg_t;
 
+#define TEC_CONFIG_SET_OPTS { .opts.color = NONEBOOL, .opts.hook = NONEBOOL, }
+
 extern tec_cfg_t teccfg;
 
-int tec_config_init(tec_cfg_t * tec_config);
-int tec_config_set_base(tec_base_t * base);
-int tec_config_set_options(tec_opt_t * opts);
+void tec_config_init(tec_cfg_t * cfg);
 int tec_config_parse(tec_cfg_t * tec_config);
 void tec_config_destroy(tec_cfg_t * tec_config);
 

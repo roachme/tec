@@ -7,7 +7,6 @@
 struct tec_hook {
     char cmd[10];
     char cmdopt[10];
-    char pgntag[10];
     char pgname[10];
     char pgncmd[10];
     char pgnopt[10];

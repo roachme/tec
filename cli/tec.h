@@ -16,11 +16,6 @@
 #include "aux/config.h"
 #include "../lib/libtec.h"
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
-#define xstr(s) str(s)
-#define str(s) #s
-
 #define IDSIZ               8
 #define DESKSIZ             10
 #define ENVSIZ              10

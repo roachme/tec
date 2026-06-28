@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- `tec`: Refactor module `config`
+
 ### Deleted
 
 

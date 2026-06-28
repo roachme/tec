@@ -41,7 +41,7 @@ struct help helptab[] = {
      .desc_short = "Terminal task and project manager.\n",
      .desc_long = "\n\
     Options:\n\
-      -f PATH path to the config file (under development)\n\
+      -f PATH path to the config file\n\
       -h      show this help and exit\n\
       -v      show version and exit\n\
       -C TOG  enable colors (default: disabled)\n\

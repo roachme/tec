@@ -5,6 +5,7 @@
 #include <libconfig.h>
 
 #include "../../lib/osdep.h"
+#include "aux.h"
 #include "log.h"
 #include "config.h"
 #include "hook.h"
@@ -13,9 +14,12 @@
 
 static int config_set_default_options(struct config *cfg)
 {
-    cfg->opts.hook = false;
-    cfg->opts.debug = false;
-    cfg->opts.color = false;
+    if (cfg->opts.color == NONEBOOL)
+        cfg->opts.color = false;
+    if (cfg->opts.debug == NONEBOOL)
+        cfg->opts.debug = false;
+    if (cfg->opts.hook == NONEBOOL)
+        cfg->opts.hook = false;
     return 0;
 }
 
@@ -76,12 +80,14 @@ static tec_alias_t *make_alias()
 
 static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
 {
+    unsigned int count;
+    struct tec_hook *hook;
     config_setting_t *setting;
+    int retcode = EXIT_SUCCESS;
 
     if ((setting = config_lookup(cfg, "hooks.cat")) != NULL) {
-        unsigned int count = config_setting_length(setting);
+        count = config_setting_length(setting);
         for (unsigned int i = 0; i < count; ++i) {
-            struct tec_hook *hook;
             const char *bincmd, *pgname, *pgncmd;
             config_setting_t *hook_conf = config_setting_get_elem(setting, i);
 
@@ -91,10 +97,10 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    TEC_LOG_E("FAILED: to parse hook.shows");
+                    TEC_LOG_E("FAILED: to parse hook.cat");
+                    retcode = EXIT_FAILURE;
                     continue;
                 }
-                strcpy(hook->pgntag, "HOOKSHOW");
                 strcpy(hook->cmd, bincmd);
                 strcpy(hook->pgname, pgname);
                 strcpy(hook->pgncmd, pgncmd);
@@ -105,9 +111,8 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
     }
 
     if ((setting = config_lookup(cfg, "hooks.action")) != NULL) {
-        unsigned int count = config_setting_length(setting);
+        count = config_setting_length(setting);
         for (unsigned int i = 0; i < count; ++i) {
-            struct tec_hook *hook;
             const char *bincmd, *pgname, *pgncmd;
             config_setting_t *hook_conf = config_setting_get_elem(setting, i);
 
@@ -117,10 +122,10 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    TEC_LOG_E("FAILED: to parse hook.shows");
+                    TEC_LOG_E("FAILED: to parse hook.action");
+                    retcode = EXIT_FAILURE;
                     continue;
                 }
-                strcpy(hook->pgntag, "HOOKCMD");
                 strcpy(hook->cmd, bincmd);
                 strcpy(hook->pgname, pgname);
                 strcpy(hook->pgncmd, pgncmd);
@@ -129,7 +134,8 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
             }
         }
     }
-    return 0;
+    // TODO: ls hooks
+    return retcode;
 }
 
 static int tec_config_get_aliases(config_t *cfg, tec_cfg_t *tec_config)
@@ -159,32 +165,27 @@ static int tec_config_get_aliases(config_t *cfg, tec_cfg_t *tec_config)
 
 static int tec_config_get_base(config_t *cfg, tec_cfg_t *tec_config)
 {
-    const char *task, *pgn;
+    const char *path = NULL;
     config_setting_t *setting;
+    char buf[PATH_MAX + 1] = { 0 };
 
-    task = pgn = NULL;
     if ((setting = config_lookup(cfg, "base")) != NULL) {
-        char pathname[PATH_MAX + 1];
-        if (config_setting_lookup_string(setting, "task", &task)) {
-            pathname[0] = '\0'; /* unset pathname value */
-            resolve_env_var_home(pathname, task);
+        if (config_setting_lookup_string(setting, "task", &path)) {
+            resolve_env_var_home(buf, path);
 
-            /* Free default value.  */
-            if (tec_config->base.task)
-                free(tec_config->base.task);
-            tec_config->base.task = strdup(pathname);
+            /* If option is not passed via CLI then set it from config */
+            if (!tec_config->base.task)
+                tec_config->base.task = strdup(buf);
         }
-        if (config_setting_lookup_string(setting, "pgn", &pgn)) {
-            pathname[0] = '\0'; /* unset pathname value */
-            resolve_env_var_home(pathname, pgn);
+        if (config_setting_lookup_string(setting, "pgn", &path)) {
+            resolve_env_var_home(buf, path);
 
-            /* Free default value.  */
-            if (tec_config->base.pgn)
-                free(tec_config->base.pgn);
-            tec_config->base.pgn = strdup(pathname);
+            /* If option is not passed via CLI then set it from config */
+            if (!tec_config->base.pgn)
+                tec_config->base.pgn = strdup(buf);
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 static int tec_config_get_options(config_t *cfg, tec_cfg_t *tec_config)
@@ -194,10 +195,14 @@ static int tec_config_get_options(config_t *cfg, tec_cfg_t *tec_config)
     if ((setting = config_lookup(cfg, "options")) == NULL)
         return 0;
 
-    config_setting_lookup_bool(setting, "hook", &tec_config->opts.hook);
-    config_setting_lookup_bool(setting, "color", &tec_config->opts.color);
-    config_setting_lookup_bool(setting, "debug", &tec_config->opts.debug);
-    return 0;
+    /* Set these options only if they were not set by CLI options */
+    if (tec_config->opts.color == NONEBOOL)
+        config_setting_lookup_bool(setting, "color", &tec_config->opts.color);
+    if (tec_config->opts.debug == NONEBOOL)
+        config_setting_lookup_bool(setting, "debug", &tec_config->opts.debug);
+    if (tec_config->opts.hook == NONEBOOL)
+        config_setting_lookup_bool(setting, "hook", &tec_config->opts.hook);
+    return EXIT_SUCCESS;
 }
 
 static int parseconf(tec_cfg_t *tec_config, const char *fname)
@@ -205,71 +210,67 @@ static int parseconf(tec_cfg_t *tec_config, const char *fname)
     config_t cfg;
 
     config_init(&cfg);
+    // jq: parse error: Invalid numeric literal at line 3, column 0
     if (!config_read_file(&cfg, fname)) {
         return TEC_LOG_E("%s:%d - %s", config_error_file(&cfg),
                          config_error_line(&cfg), config_error_text(&cfg));
     }
 
     if (tec_config_get_base(&cfg, tec_config))
-        TEC_LOG_E("tec_config_get_base: FAILED\n");
+        TEC_LOG_D("tec_config_get_base: FAILED\n");
     else if (tec_config_get_options(&cfg, tec_config))
-        TEC_LOG_E("tec_config_get_options: FAILED\n");
+        TEC_LOG_D("tec_config_get_options: FAILED\n");
     else if (tec_config_get_hooks(&cfg, tec_config))
-        TEC_LOG_E("tec_config_get_hooks: FAILED\n");
+        TEC_LOG_D("tec_config_get_hooks: FAILED\n");
     else if (tec_config_get_aliases(&cfg, tec_config))
-        TEC_LOG_E("tec_config_get_aliases: FAILED\n");
+        TEC_LOG_D("tec_config_get_aliases: FAILED\n");
 
     config_destroy(&cfg);
     return 0;
 }
 
-int tec_config_init(tec_cfg_t *tec_config)
+void tec_config_init(tec_cfg_t *cfg)
 {
-    (void)tec_config;
-    return 0;
+    cfg->alias = NULL;
+
+    cfg->opts.color = NONEBOOL;
+    cfg->opts.debug = NONEBOOL;
+    cfg->opts.hook = NONEBOOL;
+
+    cfg->base.cfg = NULL;
+    cfg->base.pgn = NULL;
+    cfg->base.task = NULL;
+
+    cfg->hooks = NULL;
 }
 
+// TODO: simplify this mess. add a separate function to find and check config file
 int tec_config_parse(tec_cfg_t *tec_config)
 {
+    int status = TEC_OK;
     char cfgfile[CONFIGSIZ + 1];
-    char *homedir = getenv("HOME");
-    const char cfgfmts[NUMCONFIG][CONFIGSIZ + 1] = {
+    char *homedir = getenv("HOME");     // FIXME: use osdep module
+    const char *cfgfmts[] = {
         "%s/.%s/%s.cfg",
         "%s/.config/%s/%s.cfg",
     };
 
-    /* Set default values first in case there is no config file.  */
+    if (tec_config->base.cfg) {
+        if (!ISFILE(tec_config->base.cfg)) {
+            status = EXIT_FAILURE;
+            TEC_LOG_E("'%s': no such config file", tec_config->base.cfg);
+        } else
+            status = parseconf(tec_config, tec_config->base.cfg);
+    } else {
+        for (unsigned int i = 0; i < ARRAY_SIZE(cfgfmts); ++i) {
+            sprintf(cfgfile, cfgfmts[i], homedir, PROGRAM, PROGRAM);
+            if (ISFILE(cfgfile)) {
+                status = parseconf(tec_config, cfgfile);
+            }
+        }
+    }
     tec_config_set_default_config(tec_config);
-
-    for (int i = 0; i < NUMCONFIG; ++i) {
-        sprintf(cfgfile, cfgfmts[i], homedir, PROGRAM, PROGRAM);
-        if (ISFILE(cfgfile))
-            return parseconf(tec_config, cfgfile);
-    }
-    return 0;
-}
-
-int tec_config_set_base(tec_base_t *base)
-{
-    if (base->task != NULL) {
-        free(teccfg.base.task);
-        teccfg.base.task = strdup(base->task);
-    }
-    if (base->pgn != NULL) {
-        free(teccfg.base.pgn);
-        teccfg.base.pgn = strdup(base->pgn);
-    }
-    return 0;
-}
-
-int tec_config_set_options(tec_opt_t *opts)
-{
-    teccfg.opts.hook = opts->hook != NONEBOOL ? opts->hook : teccfg.opts.hook;
-    teccfg.opts.color =
-        opts->color != NONEBOOL ? opts->color : teccfg.opts.color;
-    teccfg.opts.debug =
-        opts->debug != NONEBOOL ? opts->debug : teccfg.opts.debug;
-    return 0;
+    return status == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 void tec_config_destroy(tec_cfg_t *tec_config)
@@ -289,6 +290,7 @@ void tec_config_destroy(tec_cfg_t *tec_config)
         free(tmp);
     }
 
+    free(tec_config->base.cfg);
     free(tec_config->base.task);
     free(tec_config->base.pgn);
 }

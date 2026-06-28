@@ -148,21 +148,14 @@ int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
 int main(int argc, const char **argv)
 {
     int c;
-    int status;
     tec_cmd_t *cmd;
-    tec_opt_t opts;
-    tec_base_t base;
-    const char *togfmt;
+    int status = TEC_OK;
     tec_argvec_t argvec;
-    const char *cmdname;
     tec_cfg_t *cfg = &teccfg;
+    const char *cmdname = NULL;
+    const char *togfmt = "option `-%c' accepts either 'on' or 'off'";
 
-    cmdname = NULL;
-    status = TEC_OK;
-    base.pgn = base.task = NULL;
-    opts.color = opts.debug = opts.hook = NONEBOOL;
-    togfmt = "option `-%c' accepts either 'on' or 'off'";
-
+    tec_config_init(cfg);
     tec_cli_pwd_unset();
     argvec_init(&argvec);
     argvec_parse(&argvec, argc, argv);
@@ -171,7 +164,8 @@ int main(int argc, const char **argv)
     while ((c = getopt(argvec.used, argvec.argv, "+:f:hvC:D:H:P:T:")) != -1) {
         switch (c) {
         case 'f':
-            return TEC_LOG_E("option `-%c' under development", c);
+            cfg->base.cfg = strdup(optarg);
+            break;
         case 'h':
             argvec_add(&argvec, "help");
             break;
@@ -179,22 +173,26 @@ int main(int argc, const char **argv)
             argvec_add(&argvec, "version");
             break;
         case 'C':
-            if ((opts.color = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.color = is_valid_toggle(optarg)) == -1)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'D':
-            if ((opts.debug = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.debug = is_valid_toggle(optarg)) == -1)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'H':
-            if ((opts.hook = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.hook = is_valid_toggle(optarg)) == -1)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'P':
-            base.pgn = optarg;
+            if (cfg->base.pgn)
+                free(cfg->base.pgn);
+            cfg->base.pgn = strdup(optarg);
             break;
         case 'T':
-            base.task = optarg;
+            if (cfg->base.task)
+                free(cfg->base.task);
+            cfg->base.task = strdup(optarg);
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -209,16 +207,10 @@ int main(int argc, const char **argv)
     tec_getopt_unset();
     argvec_offset(&argvec, argvec.i);   /* Skip program name and options if any.  */
 
-    if (tec_config_init(cfg))
-        return TEC_LOG_E("could init config file");
-    else if (tec_config_parse(cfg))
-        return TEC_LOG_E("could parse config file");
-    else if (tec_config_set_base(&base))
-        return TEC_LOG_E("could set config base directories");
-    else if (tec_config_set_options(&opts))
-        return TEC_LOG_E("could set config options");
-
-    if ((cmdname = argvec.argv[0]) == NULL) {
+    if (tec_config_parse(cfg)) {
+        status = TEC_LOG_E("could not parse config file");
+        goto err;
+    } else if ((cmdname = argvec.argv[0]) == NULL) {
         status = EXIT_FAILURE;
         tec_cli_help_list();
         goto err;
