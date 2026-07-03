@@ -10,6 +10,7 @@
 
 - `tec`: Refactor module `config`
 - `cli`: Refactor command `rm`
+- `tec`: Fix potential errors
 
 ### Deleted
 

@@ -22,9 +22,9 @@ static tec_unit_t *make_node(void)
 
 static char *trim_whitespace_end(char *str)
 {
-    size_t len;
+    int len;
 
-    len = strlen(str) - 1;
+    len = (int)strlen(str) - 1;
     while (len >= 0 && isspace(*(str + len)))
         len--;
     str[len + 1] = '\0';

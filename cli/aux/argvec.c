@@ -9,7 +9,7 @@ void argvec_init(tec_argvec_t *vec)
 {
     int size = 2;
 
-    if ((vec->argv = malloc(size * sizeof(vec->argv))) == NULL) {
+    if ((vec->argv = malloc(size * sizeof(char *))) == NULL) {
         TEC_LOG_E("'%s': memory allocation failed", __func__);
         exit(1);
     }
