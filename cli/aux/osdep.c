@@ -6,12 +6,20 @@
 #endif
 
 #ifdef __linux__
-char *tec_cli_osdep_getenv(char *name)
+static char *tec_cli_osdep_getenv(char *name)
 {
     /* Get logical current working directory via shell variable, because
      * user current working directory might a symlink.  */
     return getenv(name);
 }
+#endif
+
+#ifdef __linux__
+int tec_cli_osdep_chdir(char *path)
+{
+    return chdir(path);
+}
+#endif
 
 char *tec_cli_osdep_getenv_home(void)
 {
@@ -22,9 +30,3 @@ char *tec_cli_osdep_getenv_cwd(void)
 {
     return tec_cli_osdep_getenv("PWD");
 }
-
-int tec_cli_osdep_chdir(char *path)
-{
-    return chdir(path);
-}
-#endif

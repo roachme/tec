@@ -9,7 +9,7 @@ char *unitkeys[] = { "prio", "type", "date", "desc", };
 
 unsigned int nunitkey = sizeof(unitkeys) / sizeof(unitkeys[0]);
 
-bool yesno(void)
+bool tec_aux_yesno(void)
 {
     char choice[10] = { 0 };
 
@@ -19,7 +19,7 @@ bool yesno(void)
     return false;
 }
 
-bool do_change_user_cwd(tec_arg_t *args)
+bool tec_aux_do_change_user_cwd(tec_arg_t *args)
 {
     char *base = teccfg.base.task;
     char buf[FILENAME_MAX + 1] = { 0 };

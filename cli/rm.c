@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "tec.h"
 #include "aux/log.h"
 #include "aux/aux.h"
@@ -7,25 +6,29 @@
 #include "aux/toggle.h"
 #include "aux/config.h"
 
-static int update_toggles_and_cwd(tec_arg_t *args,
-                                  struct tec_cli_rm_options *opts)
+static int update_cwd(tec_arg_t *args, struct tec_cli_rm_options *opts)
 {
     char *home;
     int status = TEC_OK;
 
     /* Not to break shell session in case user CWD gets deleted.  */
-    if (do_change_user_cwd(args) == true) {
+    if (tec_aux_do_change_user_cwd(args) == true) {
         if ((home = tec_cli_osdep_getenv_home()) == NULL) {
-            TEC_LOG_E("could not get env 'HOME' variable");
-            exit(EXIT_FAILURE);
+            TEC_LOG_D("could not get env 'HOME' variable");
+            status = EXIT_FAILURE;
         } else if (tec_cli_osdep_chdir(home)) {
-            TEC_LOG_E("could not change user CWD");
-            exit(EXIT_FAILURE);
+            TEC_LOG_D("could not change user CWD");
+            status = EXIT_FAILURE;
         }
         opts->change_dir = true;
     }
+    return status;
+}
 
-    /* Update current and/or previous toggles.  */
+static int update_toggles(tec_arg_t *args)
+{
+    int status = TEC_OK;
+
     if (toggle_task_is_curr(teccfg.base.task, args))
         status = toggle_task_unset_curr(teccfg.base.task, args);
     else if (toggle_task_is_prev(teccfg.base.task, args))
@@ -38,8 +41,8 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int c;
     int status;
     int ntasks;
-    tec_ctx_t ctx = CTX_INIT;
     int retcode = TEC_OK;
+    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_rm_options opts;
     const char *errfmt = "cannot remove task '%s': %s";
@@ -91,7 +94,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (ntasks > 3 && opts.mode == RMI_SOMETIMES) {
         TEC_LOG_P("remove %d tasks? [y/N] ", ntasks);
-        if (yesno() == false) {
+        if (!tec_aux_yesno()) {
             return EXIT_SUCCESS;
         }
     }
@@ -104,14 +107,17 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         } else if (opts.mode == RMI_ALWAYS) {
             TEC_LOG_P("remove task '%s'? [y/N] ", args.task);
-            if (!yesno())
+            if (!tec_aux_yesno())
                 continue;
         }
 
         if ((status = hook_action(&args, "rm"))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
-        } else if ((status = update_toggles_and_cwd(&args, &opts))) {
+        } else if ((status = update_cwd(&args, &opts))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.task, "could not update CWD");
+        } else if ((status = update_toggles(&args))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "could not update toggles");
         } else if ((status = tec_task_rm(cfg->base.task, &args, &ctx))) {

@@ -204,7 +204,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (opt_ask_once == true) {
         printf("Are you sure to remove desk(s)? [y/N] ");
-        if (yesno() == false) {
+        if (tec_aux_yesno() == false) {
             return TEC_OK;
         }
     }
@@ -217,7 +217,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove desk '%s'? [y/N] ", args.desk);
-            if (yesno() == false) {
+            if (tec_aux_yesno() == false) {
                 continue;
             }
         }

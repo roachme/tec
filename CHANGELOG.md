@@ -9,6 +9,7 @@
 ### Fixed
 
 - `tec`: Refactor module `config`
+- `cli`: Refactor command `rm`
 
 ### Deleted
 

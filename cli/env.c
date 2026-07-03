@@ -233,7 +233,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (opt_ask_once == true) {
         printf("Are you sure to remove environment(s)? [y/N] ");
-        if (yesno() == false) {
+        if (tec_aux_yesno() == false) {
             return TEC_OK;
         }
     }
@@ -245,7 +245,7 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             continue;
         } else if (opt_ask_every == true) {
             printf("Are you sure to remove environment '%s'? [y/N] ", args.env);
-            if (yesno() == false) {
+            if (tec_aux_yesno() == false) {
                 continue;
             }
         }

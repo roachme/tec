@@ -16,8 +16,8 @@
 extern char *unitkeys[];
 extern unsigned int nunitkey;
 
-bool yesno(void);
-bool do_change_user_cwd(tec_arg_t * args);
+bool tec_aux_yesno(void);
+bool tec_aux_do_change_user_cwd(tec_arg_t * args);
 
 int tec_cli_help_list(void);
 int tec_cli_help_usage(const char *cmd);
