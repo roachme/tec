@@ -11,6 +11,7 @@
 - `tec`: Refactor module `config`
 - `cli`: Refactor command `rm`
 - `tec`: Fix potential errors
+- `lib/path`: Fix potential buffer overflow
 
 ### Deleted
 
