@@ -81,11 +81,8 @@ static bool cmd_is_naughty(const char *cmdname)
     return false;
 }
 
-/* TODO: remove cmdname, because it is not used.  */
-static tec_cmd_t *cmd_get(const char *cmdname, tec_argvec_t *argvec,
-                          tec_cfg_t *cfg)
+static tec_cmd_t *cmd_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    (void)cmdname;
     tec_cmd_t *cmd;
 
     for (size_t i = 0; i < ARRAY_SIZE(tec_cmd_types); ++i)
@@ -217,7 +214,7 @@ int main(int argc, const char **argv)
     } else if (cmd_is_naughty(cmdname) == true) {
         status = TEC_LOG_E("'%s': naughty command", cmdname);
         goto err;
-    } else if ((cmd = cmd_get(cmdname, &argvec, cfg)) == NULL) {
+    } else if ((cmd = cmd_get(&argvec, cfg)) == NULL) {
         status = TEC_LOG_E("'%s': no such command, alias or plugin", cmdname);
         goto err;
     } else if ((status = tec_cli_cmd_run(cmd, &argvec, cfg))) {
