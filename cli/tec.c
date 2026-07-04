@@ -51,7 +51,7 @@ static tec_cmd_t tec_cmds[] = {
     {.name = "_pgn_",.func = &tec_cli_pgn,.option = TEC_SETUP_SOFT},
 };
 
-static int is_valid_toggle(const char *tog)
+static int toggle2bool(const char *tog)
 {
     size_t len = strlen(tog);
 
@@ -59,7 +59,7 @@ static int is_valid_toggle(const char *tog)
         return true;
     else if (len <= 3 && strcmp(tog, "off") == 0)
         return false;
-    return -1;
+    return NONEBOOL;
 }
 
 static int cmd_setup(int setuplvl, const tec_cfg_t *cfg)
@@ -91,33 +91,46 @@ static tec_cmd_t *cmd_get(tec_argvec_t *argvec, tec_cfg_t *cfg)
     return NULL;
 }
 
-// TODO: what if alias returns pointer to builtin or plugin function?
+static char *path_generic(char *buf, int bufsiz, const char *fmt, ...)
+{
+    int len;
+    va_list arg;
+
+    va_start(arg, fmt);
+    len = vsnprintf(buf, bufsiz, fmt, arg);
+    va_end(arg);
+    return len >= bufsiz ? NULL : buf;
+}
+
+static char *path_pgn(const char *taskdir, const char *pgn)
+{
+    const char *fmt = "%s/%s/%s";
+    static char pathname[PATH_MAX + 1];
+    return path_generic(pathname, PATH_MAX, fmt, taskdir, pgn, pgn);
+}
+
 tec_cmd_t *tec_cli_is_alias(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_alias_t *head;
     const char *cmdname = argvec->argv[0];
-    tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 2];
 
     for (head = cfg->alias; head != NULL; head = head->next)
         if (strcmp(cmdname, head->name) == 0)
-            return cmd;
+            return &tec_cmds[ARRAY_SIZE(tec_cmds) - 2];
     return NULL;
 }
 
 tec_cmd_t *tec_cli_is_plugin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     FILE *fp;
-    char path[PATH_MAX + 1];
     const char *cmdname = argvec->argv[0];
-    tec_cmd_t *cmd = &tec_cmds[ARRAY_SIZE(tec_cmds) - 1];
+    char *path = path_pgn(cfg->base.pgn, cmdname);
 
-    // TODO: check for case of buffer overflow
-    snprintf(path, sizeof(path), "%s/%s/%s", cfg->base.pgn, cmdname, cmdname);
-
-    if ((fp = fopen(path, "r")) == NULL)
-        return NULL;
-    fclose(fp);
-    return cmd;
+    if ((fp = fopen(path, "r"))) {
+        fclose(fp);
+        return &tec_cmds[ARRAY_SIZE(tec_cmds) - 1];
+    }
+    return NULL;
 }
 
 tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
@@ -135,10 +148,8 @@ int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int status = TEC_OK;
 
-    if ((status = cmd_setup(cmd->option, cfg)) != TEC_OK) {
+    if ((status = cmd_setup(cmd->option, cfg)) != TEC_OK)
         return TEC_LOG_E("setup failed: %s", tec_strerror(status));
-    }
-
     return cmd->func(argvec, cfg);
 }
 
@@ -170,15 +181,15 @@ int main(int argc, const char **argv)
             argvec_add(&argvec, "version");
             break;
         case 'C':
-            if ((cfg->opts.color = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.color = toggle2bool(optarg)) == NONEBOOL)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'D':
-            if ((cfg->opts.debug = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.debug = toggle2bool(optarg)) == NONEBOOL)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'H':
-            if ((cfg->opts.hook = is_valid_toggle(optarg)) == -1)
+            if ((cfg->opts.hook = toggle2bool(optarg)) == NONEBOOL)
                 return TEC_LOG_E(togfmt, c);
             break;
         case 'P':
