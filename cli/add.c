@@ -58,7 +58,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int status;
     char *desc = NULL;
     int retcode = TEC_OK;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
     const char *errfmt = "cannot add task '%s': %s";

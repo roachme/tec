@@ -42,7 +42,7 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int status;
     int ntasks;
     int retcode = TEC_OK;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_rm_options opts;
     const char *errfmt = "cannot remove task '%s': %s";

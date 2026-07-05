@@ -52,7 +52,7 @@ static int valid_desc(const char *val)
 
 int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int c, i, retcode, status;
     int opt_help, opt_quiet;

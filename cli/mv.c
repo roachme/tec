@@ -272,7 +272,7 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
 int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     int i, showhelp, status, nargs, is_dir;
     tec_arg_t dst, src;
     char *errfmt;

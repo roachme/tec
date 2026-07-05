@@ -26,7 +26,7 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_argvec_t keys;
     int retcode = TEC_OK;
     tec_unit_t *units = NULL;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_unit_t *unitpgn = NULL;
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cat_options opts;

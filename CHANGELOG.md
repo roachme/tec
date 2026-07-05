@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `tec`: Unify CTX_INIT() macro function API
+
+### Deleted
+
+
 ## [0.11.0] - (2026-07-05)
 
 ### Added

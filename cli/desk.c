@@ -51,7 +51,7 @@ static int generate_units(tec_ctx_t *ctx, char *desk)
 static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int i, retcode, status;
     const char *errfmt = "cannot add desk '%s': %s";
@@ -150,7 +150,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int c, i, retcode, status;
     int opt_quiet, opt_help;
@@ -244,7 +244,7 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char *desc = NULL;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int c, i, status;
     int opt_help, opt_quiet;
@@ -311,7 +311,7 @@ static int _desk_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int atleast_one_key_set;
     int opt_quiet, opt_help;
@@ -381,7 +381,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int opt_quiet, opt_help;
     int c, i, retcode, status;

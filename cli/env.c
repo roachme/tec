@@ -51,10 +51,10 @@ static int valid_desc(const char *val)
 static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
-    tec_ctx_t ctx = CTX_INIT;
     tec_arg_t args;
     int switch_dir, switch_env;
     int i, quiet, showhelp, retcode, status;
+    tec_ctx_t ctx = CTX_INIT();
     const char *errfmt = "cannot add env '%s': %s";
     const char *errfmt_desk = "cannot add desk '%s': %s";
 
@@ -180,7 +180,7 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int i, c, retcode, status;
     const char *errfmt = "cannot delete env '%s': %s";
@@ -276,7 +276,7 @@ static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
     char *desc = NULL;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int status = TEC_OK;
     int opt_help, opt_quiet;
@@ -384,7 +384,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int atleast_one_key_set;
     int c, i, retcode, status;
@@ -453,7 +453,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int c, i, quiet, showhelp, status;
     struct tec_unit *unitbin, *unitpgn;

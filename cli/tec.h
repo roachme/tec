@@ -37,8 +37,8 @@
     color_print_str("%s\n", (_desc), WHT, enabled); \
 } while (0)
 
-#define CTX_INIT { .units = NULL, .list = NULL }
-#define ARGS_INIT(args) { .env = NULL, .desk = NULL, .task = NULL }
+#define CTX_INIT() { .units = NULL, .list = NULL }
+#define ARGS_INIT() { .env = NULL, .desk = NULL, .task = NULL }
 
 enum tec_setup_level {
     TEC_PAGER,

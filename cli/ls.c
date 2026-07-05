@@ -106,7 +106,7 @@ static void show_rows(tec_ctx_t *ctx, tec_arg_t *args,
 int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
-    tec_ctx_t ctx = CTX_INIT;
+    tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args;
     int i, quiet, show_headers, status;
 
