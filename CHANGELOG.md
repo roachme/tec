@@ -9,6 +9,7 @@
 ### Fixed
 
 - `tec`: Unify CTX_INIT() macro function API
+- `cli/set`: Refactor code for command `set`
 
 ### Deleted
 
