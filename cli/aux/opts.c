@@ -22,3 +22,9 @@ void tec_cli_rm_option_init(struct tec_cli_rm_options *opts)
     opts->change_dir = false;
     opts->mode = RMI_ALWAYS;
 }
+
+void tec_cli_set_option_init(struct tec_cli_set_options *opts)
+{
+    opts->help = false;
+    opts->quiet = false;
+}
