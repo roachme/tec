@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "../../lib/libtec.h"
+#include "argvec.h"
 
 #define PROGRAM     "tec"
 
@@ -21,5 +22,6 @@ bool tec_aux_do_change_user_cwd(tec_arg_t * args);
 
 int tec_cli_help_list(void);
 int tec_cli_help_usage(const char *cmd);
+bool tec_aux_check_cd_alias(tec_argvec_t * argvec);
 
 #endif

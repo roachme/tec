@@ -487,12 +487,8 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
         return status;
-
-    /* Check that alias '-' is not passed with other desks nor duplicated.  */
-    for (int idx = i; idx < argvec->used; ++idx) {
-        if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - i > 1)
-            return TEC_LOG_E("alias '-' is used alone");
-    }
+    else if (!tec_aux_check_cd_alias(argvec))
+        return TEC_LOG_E("alias '-' is used alone");
 
     /* Resolve alias '-' to switch to previous environment.  */
     if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {

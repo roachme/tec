@@ -53,12 +53,8 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return status;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
         return status;
-
-    /* Check that alias '-' is not passed with other task IDs nor duplicated.  */
-    for (int idx = argvec->i; idx < argvec->used; ++idx) {
-        if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - argvec->i > 1)
-            return TEC_LOG_E("alias '-' is used alone");
-    }
+    else if (!tec_aux_check_cd_alias(argvec))
+        return TEC_LOG_E("alias '-' is used alone");
 
     /* Resolve alias '-' to switch to previous task ID.  */
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
 #include "aux.h"
 #include "osdep.h"
 #include "config.h"
@@ -26,4 +27,13 @@ bool tec_aux_do_change_user_cwd(tec_arg_t *args)
 
     sprintf(buf, "%s/%s/%s/%s", base, args->env, args->desk, args->task);
     return strcmp(buf, tec_cli_osdep_getenv_cwd()) == 0;
+}
+
+bool tec_aux_check_cd_alias(tec_argvec_t *argvec)
+{
+    for (int idx = argvec->i; idx < argvec->used; ++idx) {
+        if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - argvec->i > 1)
+            return false;
+    }
+    return true;
 }
