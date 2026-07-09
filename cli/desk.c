@@ -4,6 +4,7 @@
 #include <dirent.h>
 
 #include "tec.h"
+#include "aux/opts.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
 
@@ -34,14 +35,21 @@ static int valid_desc(const char *val)
     return isalnum(*--val) != 0;
 }
 
-static int generate_units(tec_ctx_t *ctx, char *desk)
+static int generate_units(tec_ctx_t *ctx, char *desk, char *desc)
 {
+    char buf[BUFSIZ + 1] = { 0 };
     struct tec_unit *units = NULL;
-    char desc[100] = "Generated desciption for desk ";
+    char _desc[100] = "Generated desciption for ";
+    char *unitvals[] = { _desc, };
 
-    strcat(desc, desk);
-    units = tec_unit_add(units, "desc", desc);
+    /* Set custom description if provided.  */
+    if (desc) {
+        unitvals[ARRAY_SIZE(unitvals) - 1] = desc;
+    } else {                    /* Generate description.  */
+        strcat(_desc, desk);
+    }
 
+    units = tec_unit_add(units, "desc", buf);
     if ((ctx->units = units) == NULL)
         return 1;
     return 0;
@@ -51,34 +59,35 @@ static int generate_units(tec_ctx_t *ctx, char *desk)
 static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char c;
+    int status;
+    char *desc = NULL;
+    int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT();
-    tec_arg_t args;
-    int i, retcode, status;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_cli_cd_options opts;
     const char *errfmt = "cannot add desk '%s': %s";
-    int opt_quiet, opt_help, opt_cd_dir, opt_cd_toggle;
 
-    retcode = TEC_OK;
-    opt_help = opt_quiet = false;
-    opt_cd_dir = opt_cd_toggle = true;
-    args.env = args.desk = args.task = NULL;
-
-    while ((c = getopt(argvec->used, argvec->argv, ":e:hnqN")) != -1) {
+    tec_cli_cd_option_init(&opts);
+    while ((c = getopt(argvec->used, argvec->argv, ":e:hnqD:N")) != -1) {
         switch (c) {
         case 'e':
             args.env = optarg;
             break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'n':
-            opt_cd_toggle = false;
+            opts.change_tog = false;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
+            break;
+        case 'D':
+            desc = optarg;
             break;
         case 'N':
-            opt_cd_dir = false;
-            opt_cd_toggle = false;
+            opts.change_dir = false;
+            opts.change_tog = false;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -88,103 +97,93 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("desk-add");
         }
     }
-    i = optind;
+    argvec->i = optind;
 
-    if (opt_help)
+    if (opts.help == true)
         return tec_cli_help_usage("desk-add");
-
-    if (optind == argvec->used)
+    else if (optind == argvec->used)
         return TEC_LOG_E("desk name required");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
-        return status;
+    else if (tec_cli_check_env(&args, errfmt, opts.quiet))
+        return EXIT_FAILURE;
 
     do {
-        args.desk = argvec->argv[i];
+        args.desk = argvec->argv[argvec->i];
 
         if (tec_cli_len_valid(args.desk, DESKSIZ) == false) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.desk, "desk name is too long");
             retcode = EXIT_FAILURE;
             continue;
-        } else if (tec_desk_valid(cfg->base.task, &args)) {
-            if (opt_quiet == false)
+        } else if ((status = tec_desk_valid(cfg->base.task, &args))) {
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
             retcode = EXIT_FAILURE;
             continue;
-        } else if (!tec_desk_exist(cfg->base.task, &args)) {
-            char *desk = args.desk;
-            if (opt_quiet == false)
-                TEC_LOG_E(errfmt, desk, tec_strerror(TEC_ARG_EXISTS));
+        } else if (!(status = tec_desk_exist(cfg->base.task, &args))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, tec_strerror(TEC_ARG_EXISTS));
             retcode = EXIT_FAILURE;
             continue;
-        } else if (generate_units(&ctx, args.desk)) {
-            if (opt_quiet == false)
+        } else if ((status = generate_units(&ctx, args.desk, desc))) {
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.desk, "unit generation failed");
             retcode = EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_desk_add(cfg->base.task, &args, &ctx))) {
-            if (opt_quiet == false)
-                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
             ctx.units = tec_unit_free(ctx.units);
         } else if ((status = hook_action(&args, "desk-add"))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
-        } else if (opt_cd_toggle == true) {
+        } else if (opts.change_tog == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
-                if (opt_quiet == false)
+                if (opts.quiet == false)
                     TEC_LOG_E("could not update toggles");
             }
         }
         ctx.units = tec_unit_free(ctx.units);
-        retcode = status == TEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+        retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    } while (++argvec->i < argvec->used);
 
-    if (retcode == TEC_OK && opt_cd_dir)
+    if (retcode == TEC_OK && opts.change_dir)
         retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
-
     return retcode;
 }
 
 static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    int c;
+    int status;
+    int ntasks;
+    int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT();
-    tec_arg_t args;
-    int c, i, retcode, status;
-    int opt_quiet, opt_help;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_cli_rm_options opts;
     const char *errfmt = "cannot remove desk '%s': %s";
-    int opt_ask_once, opt_ask_every, opt_verbose;
 
-    retcode = TEC_OK;
-    opt_ask_every = true;       /* prompt before every removal.  */
-    opt_ask_once = false;       /* prompt before once for all desks.  */
-    args.env = args.desk = args.task = NULL;
-    opt_quiet = opt_help = opt_verbose = false;
-
-    while ((c = getopt(argvec->used, argvec->argv, ":fhiqvI")) != -1) {
+    tec_cli_rm_option_init(&opts);
+    while ((c = getopt(argvec->used, argvec->argv, ":e:fhiqvI")) != -1) {
         switch (c) {
         case 'f':
-            opt_ask_every = false;
-            opt_ask_once = false;
+            opts.mode = RMI_NEVER;
             break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'i':
-            opt_ask_every = true;
-            opt_ask_once = false;
+            opts.mode = RMI_ALWAYS;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'v':
-            opt_verbose = false;
+            opts.verbose = true;
             break;
         case 'I':
-            opt_ask_every = false;
-            opt_ask_once = true;
+            opts.mode = RMI_SOMETIMES;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -194,49 +193,50 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("desk-rm");
         }
     }
-    i = optind;
+    argvec->i = optind;
+    ntasks = argvec->used - argvec->i;
 
-    if (opt_help)
+    if (opts.help)
         return tec_cli_help_usage("desk-rm");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return status;
 
-    if (opt_ask_once == true) {
-        printf("Are you sure to remove desk(s)? [y/N] ");
-        if (tec_aux_yesno() == false) {
-            return TEC_OK;
+    if (ntasks > 3 && opts.mode == RMI_SOMETIMES) {
+        TEC_LOG_P("remove %d desks? [y/N] ", ntasks);
+        if (!tec_aux_yesno()) {
+            return EXIT_SUCCESS;
         }
     }
 
     do {
-        args.desk = argvec->argv[i];
+        args.desk = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
+        if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet))) {
             retcode = EXIT_FAILURE;
             continue;
-        } else if (opt_ask_every == true) {
-            printf("Are you sure to remove desk '%s'? [y/N] ", args.desk);
-            if (tec_aux_yesno() == false) {
+        } else if (opts.mode == RMI_ALWAYS) {
+            TEC_LOG_P("remove desk '%s'? [y/N] ", args.task);
+            if (!tec_aux_yesno())
                 continue;
-            }
         }
-
+        // TODO: update current directory if current env got deleted.
         if ((status = hook_action(&args, "desk-rm"))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.desk, "failed to execute hooks");
         } else if ((status = tec_desk_rm(cfg->base.task, &args, &ctx))) {
-            if (opt_quiet == false)
-                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
-        }
-        /* TODO: handle current and previos task IDs.  */
-
-        if (opt_verbose == true)
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
+        } else if (opts.verbose == true)
             TEC_LOG_I("removed desk '%s'", args.task);
         retcode = status == TEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+    } while (++argvec->i < argvec->used);
 
-    // TODO: update current directory if current env got deleted.
+    if (retcode == TEC_OK && opts.change_dir) {
+        args.desk = NULL;       /* Force to get current task ID.  */
+        if (toggle_desk_get_curr(cfg->base.task, &args))
+            args.desk = "";
+        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
+    }
     return retcode == TEC_OK ? tec_cli_pwd_set(&args) : retcode;
 }
 
@@ -244,16 +244,15 @@ static int _desk_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 static int _desk_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     char *desc = NULL;
-    tec_ctx_t ctx = CTX_INIT();
-    tec_arg_t args;
     int c, i, status;
+    tec_ctx_t ctx = CTX_INIT();
+    tec_arg_t args = ARGS_INIT();
     int opt_help, opt_quiet;
     const char *errfmt = "cannot list desk(s) '%s': %s";
 
     opt_help = opt_quiet = false;
-    args.env = args.desk = args.task = NULL;
 
-    while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":e:hq")) != -1) {
         switch (c) {
         case 'q':
             opt_quiet = true;
@@ -311,32 +310,28 @@ static int _desk_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    int c;
+    int status;
+    int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT();
-    tec_arg_t args;
-    int atleast_one_key_set;
-    int opt_quiet, opt_help;
-    int c, i, retcode, status;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_cli_set_options opts;
     const char *errfmt = "could not set desk unit value '%s': %s";
 
-    retcode = TEC_OK;
-    opt_quiet = opt_help = false;
-    atleast_one_key_set = false;
-    args.env = args.desk = args.task = NULL;
-
-    while ((c = getopt(argvec->used, argvec->argv, ":hqD:")) != -1) {
+    tec_cli_set_option_init(&opts);
+    while ((c = getopt(argvec->used, argvec->argv, ":e:hqD:")) != -1) {
         switch (c) {
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'D':
             if (valid_desc(optarg) == false) {
                 TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("desk-set");
             }
-            atleast_one_key_set = true;
             ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case ':':
@@ -347,59 +342,67 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("desk-set");
         }
     }
+    argvec->i = optind;
 
-    if (opt_help)
+    if (opts.help)
         return tec_cli_help_usage("desk-set");
-    if (atleast_one_key_set == false) {
-        TEC_LOG_E("gotta supply one of the options");
-        return tec_cli_help_usage("desk-set");
-    }
 
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
+    if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return status;
 
-    i = optind;
     do {
-        args.desk = argvec->argv[i];
+        args.desk = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
-            ;
-        } else if ((status = tec_desk_set(cfg->base.task, &args, &ctx))) {
-            if (opt_quiet == false)
-                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
+        if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet))) {
+            retcode = EXIT_FAILURE;
+            continue;
+        }
+
+        if ((status = tec_desk_set(cfg->base.task, &args, &ctx))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
         } else if ((status = hook_action(&args, "desk-set"))) {
-            if (opt_quiet == false)
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         }
 
-        ctx.units = tec_unit_free(ctx.units);
         retcode = status == TEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+    } while (++argvec->i < argvec->used);
 
-    return retcode;
+    ctx.units = tec_unit_free(ctx.units);
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
+    int c;
+    int status;
+    tec_argvec_t keys;
+    int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT();
-    tec_arg_t args;
-    int opt_quiet, opt_help;
-    int c, i, retcode, status;
-    struct tec_unit *units, *unitpgn;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_unit *units = NULL;
+    struct tec_unit *unitpgn = NULL;
+    struct tec_cli_cd_options opts;
     const char *errfmt = "cannot show env units '%s': %s";
+    const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
+    const char *keyfmt = "cannot show units '%s': '%s' no such key";
 
-    retcode = TEC_OK;
-    units = unitpgn = NULL;
-    opt_quiet = opt_help = false;
-    args.env = args.desk = args.task = NULL;
-
-    while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
+    argvec_init(&keys);
+    tec_cli_cd_option_init(&opts);
+    while ((c = getopt(argvec->used, argvec->argv, ":e:hk:q")) != -1) {
         switch (c) {
+        case 'e':
+            args.env = optarg;
+            break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
+            break;
+        case 'k':
+            argvec_add(&keys, optarg);
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -409,67 +412,95 @@ static int _desk_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("desk-cat");
         }
     }
-    i = optind;
+    argvec->i = optind;
 
-    if (opt_help)
-        return tec_cli_help_usage("desk-cat");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
-        return status;
+    if (opts.help) {
+        retcode = TEC_OK;
+        tec_cli_help_usage("desk-cat");
+        goto err;
+    } else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet))) {
+        retcode = EXIT_FAILURE;
+        goto err;
+    }
 
     do {
-        args.desk = argvec->argv[i];
-        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
-            ;
-        } else if ((status = tec_desk_get(cfg->base.task, &args, &ctx))) {
-            if (opt_quiet == false)
-                TEC_LOG_E(errfmt, argvec->argv[i], tec_strerror(status));
-            ;
-        } else {
-            printf("%-7s : %s\n", "desk", args.desk);
-            for (units = ctx.units; units; units = units->next)
-                printf("%-7s : %s\n", units->key, units->val);
+        args.desk = argvec->argv[argvec->i];
 
-            // TODO: add plugin output
+        if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet))) {
+            retcode = EXIT_FAILURE;
+            continue;
+        }
+        // TODO: validate unit keys and values
+        if ((status = tec_desk_get(cfg->base.task, &args, &ctx))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, tec_strerror(status));
+        } else if ((status = hook_cat(&unitpgn, &args, "desk-cat"))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.desk, "failed to execute hooks");
+        }
+        retcode = status == TEC_OK ? retcode : status;
+
+        if (retcode == TEC_OK) {
+            units = tec_unit_add(units, "id", args.desk);
+            units = tec_unit_join(units, ctx.units);
+            units = tec_unit_join(units, unitpgn);
+
+            /* Show all keys.  */
+            if (argvec_is_empty(&keys) == true) {
+                for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
+                    printf(unitfmt, tmp->key, tmp->val);
+            } else {            /* Show specific keys only.  */
+                for (int i = 0; i < keys.used; i++) {
+                    int notfound = false;
+                    for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
+                        if ((notfound = strcmp(keys.argv[i], tmp->key)) == 0) {
+                            printf("%s\n", tmp->val);
+                            break;
+                        }
+                    }
+                    if (notfound && opts.quiet == false)
+                        TEC_LOG_E(keyfmt, args.task, keys.argv[i]);
+                    retcode = notfound == 0 ? retcode : 1;
+                }
+            }
         }
 
-        unitpgn = tec_unit_free(unitpgn);
-        ctx.units = tec_unit_free(ctx.units);
+        units = ctx.units = unitpgn = tec_unit_free(units);
         retcode = status == TEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+    } while (++argvec->i < argvec->used);
 
-    return retcode;
+ err:
+    argvec_deinit(&keys);
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    tec_arg_t args;
-    int c, i, retcode, status;
+    int c;
+    int status;
+    int retcode = TEC_OK;
+    tec_arg_t args = ARGS_INIT();
+    struct tec_cli_cd_options opts;
     const char *errfmt = "cannot switch to '%s': %s";
-    int opt_cd_dir, opt_cd_toggle, opt_help, opt_quiet;
 
-    retcode = TEC_OK;
-    opt_quiet = opt_help = false;
-    opt_cd_toggle = opt_cd_dir = true;
-    args.env = args.desk = args.task = NULL;
-
+    tec_cli_cd_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":e:hnqN")) != -1) {
         switch (c) {
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
         case 'n':
-            opt_cd_toggle = false;
+            opts.change_tog = false;
             break;
         case 'e':
             args.env = optarg;
             break;
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'N':
-            opt_cd_dir = false;
-            opt_cd_toggle = false;
+            opts.change_dir = false;
+            opts.change_tog = false;
             break;
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
@@ -479,45 +510,45 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("desk-cd");
         }
     }
+    argvec->i = optind;
 
-    i = optind;
-
-    if (opt_help == true)
+    if (opts.help == true)
         return tec_cli_help_usage("desk-cd");
-
-    if ((status = tec_cli_check_env(&args, errfmt, opt_quiet)))
+    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
         return status;
     else if (!tec_aux_check_cd_alias(argvec))
         return TEC_LOG_E("alias '-' is used alone");
 
     /* Resolve alias '-' to switch to previous environment.  */
-    if (argvec->argv[i] && strcmp("-", argvec->argv[i]) == 0) {
+    if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if ((status = toggle_desk_get_prev(cfg->base.task, &args)))
             return TEC_LOG_E(errfmt, "PREV", "no previous desk");
-        argvec_replace(argvec, i, args.desk, DESKSIZ);
+        argvec_replace(argvec, argvec->i, args.desk, DESKSIZ);
     }
 
     do {
-        args.desk = argvec->argv[i];
+        args.desk = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_desk(&args, errfmt, opt_quiet))) {
-            ;
-        } else if ((status = hook_action(&args, "desk-cd"))) {
-            if (opt_quiet == false)
+        if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet))) {
+            retcode = EXIT_FAILURE;
+            continue;
+        }
+
+        if ((status = hook_action(&args, "desk-cd"))) {
+            if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
-        } else if (opt_cd_toggle == true) {
+        } else if (opts.change_tog == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
-                if (opt_quiet == false)
+                if (opts.quiet == false)
                     TEC_LOG_E("could not update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;
-    } while (++i < argvec->used);
+    } while (++argvec->i < argvec->used);
 
-    if (retcode == TEC_OK && opt_cd_dir)
-        retcode = tec_cli_pwd_set(&args) == TEC_OK ? retcode : status;
-
-    return retcode;
+    if (retcode == TEC_OK && opts.change_dir)
+        retcode = tec_cli_pwd_set(&args);
+    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static const tec_cmd_t desk_commands[] = {

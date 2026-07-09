@@ -12,6 +12,7 @@
 
 - `tec`: Unify CTX_INIT() macro function API
 - `cli/set`: Refactor code for command `set`
+- `cli/desk`: Refactor code for command `desk`
 
 ### Deleted
 
