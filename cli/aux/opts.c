@@ -1,5 +1,11 @@
 #include "opts.h"
 
+void tec_cli_cat_option_init(struct tec_cli_cat_options *opts)
+{
+    opts->help = false;
+    opts->quiet = false;
+}
+
 void tec_cli_cd_option_init(struct tec_cli_cd_options *opts)
 {
     opts->help = false;

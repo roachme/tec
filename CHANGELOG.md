@@ -3,6 +3,7 @@
 ### Added
 
 - `tec`: Add BDD tests
+- `tec/cat`: Add option structure for `cat`
 
 ### Changed
 

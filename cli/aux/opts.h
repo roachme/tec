@@ -9,6 +9,11 @@ enum tec_cli_rm_mode {
     RMI_NEVER,
 };
 
+struct tec_cli_cat_options {
+    bool help;                  /* Output a usage message ad exit */
+    bool quiet;                 /* Do not write anything to standard output */
+};
+
 struct tec_cli_cd_options {
     bool help;                  /* Output a usage message ad exit */
     bool quiet;                 /* Do not write anything to standard output */
@@ -24,7 +29,8 @@ struct tec_cli_rm_options {
     enum tec_cli_rm_mode mode;  /* Set remove mode */
 };
 
-void tec_cli_rm_option_init(struct tec_cli_rm_options *opts);
+void tec_cli_cat_option_init(struct tec_cli_cat_options *opts);
 void tec_cli_cd_option_init(struct tec_cli_cd_options *opts);
+void tec_cli_rm_option_init(struct tec_cli_rm_options *opts);
 
 #endif

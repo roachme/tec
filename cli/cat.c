@@ -29,13 +29,13 @@ int tec_cli_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_ctx_t ctx = CTX_INIT;
     tec_unit_t *unitpgn = NULL;
     tec_arg_t args = ARGS_INIT();
-    struct tec_cli_cd_options opts;
+    struct tec_cli_cat_options opts;
     const char *errfmt = "cannot show units '%s': %s";
     const char *unitfmt = "%-" xstr(PADDING_UNIT) "s : %s\n";
     const char *keyfmt = "cannot show units '%s': '%s' no such key";
 
     argvec_init(&keys);
-    tec_cli_cd_option_init(&opts);
+    tec_cli_cat_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hk:q")) != -1) {
         switch (c) {
         case 'd':
