@@ -2,6 +2,8 @@
 
 ### Added
 
+- `tec`: Add option for custom description
+
 ### Changed
 
 - `lib/errmod`: Update error messages
