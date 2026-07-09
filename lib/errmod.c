@@ -14,13 +14,13 @@ const char *errcodes[__TEC_STATUS_LAST] = {
     [TEC_ARG_NOSUCH] = "no such object",
     [TEC_ARG_EXISTS] = "object already exists",
 
-    [TEC_DIR_RM] = "could not delete directory",
+    [TEC_DIR_RM] = "could not remove directory",
     [TEC_DIR_MAKE] = "could not create directory",
     [TEC_DIR_MOVE] = "could not rename directory",
     [TEC_DIR_OPEN] = "could not open directory",
 
     [TEC_UNIT_ADD] = "could not add unit node",
-    [TEC_UNIT_RM] = "could not delete unit node",
+    [TEC_UNIT_RM] = "could not remove unit node",
     [TEC_UNIT_GET] = "could not get unit values",
     [TEC_UNIT_ILLEG] = "illegal unit value",
     [TEC_UNIT_KEY] = "unit key does not exist",
@@ -28,7 +28,7 @@ const char *errcodes[__TEC_STATUS_LAST] = {
     [TEC_UNIT_SAVE] = "could not save unit values",
     [TEC_UNIT_SET] = "could not set unit values",
 
-    /* HOTFIX: delete it once error code table is filled.  */
+    /* HOTFIX: remove it once error code table is filled.  */
     /* Not yet defined error messages.  */
     [TEC_NODEF_ERR] = "not yet defined error messages",
 };

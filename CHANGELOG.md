@@ -4,6 +4,8 @@
 
 ### Changed
 
+- `lib/errmod`: Update error messages
+
 ### Fixed
 
 - `tec`: Unify CTX_INIT() macro function API
