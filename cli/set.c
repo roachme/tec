@@ -1,7 +1,6 @@
-#include <ctype.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "aux/aux.h"
 #include "aux/opts.h"
 #include "tec.h"
 #include "aux/config.h"
@@ -15,41 +14,6 @@
 // "teams"  /* list of teams */
 // "label"  /* list of labels */
 // "time"   /* time tracker */
-
-/* roachme: replace all prios if user specifies any in config file */
-static int valid_prio(const char *val)
-{
-    char *prios[] = { "lowest", "low", "mid", "high", "highest" };
-    int size = sizeof(prios) / sizeof(prios[0]);
-
-    for (int i = 0; i < size; ++i)
-        if (strncmp(val, prios[i], 10) == 0)
-            return true;
-    return false;
-}
-
-/* roachme: replace all types if user specifies any in config file */
-static int valid_type(const char *val)
-{
-    char *types[] = { "task", "bugfix", "feature", "hotfix" };
-    int size = sizeof(types) / sizeof(types[0]);
-
-    for (int i = 0; i < size; ++i) {
-        if (strncmp(val, types[i], 10) == 0)
-            return true;
-    }
-    return false;
-}
-
-static int valid_desc(const char *val)
-{
-    if (!isalnum(*val++))
-        return false;
-    for (; *val; ++val)
-        if (!(isalnum(*val) || isspace(*val) || *val == '_' || *val == '-'))
-            return false;
-    return isalnum(*--val) != 0;
-}
 
 int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
@@ -79,7 +43,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         case 'i':
             return TEC_LOG_E("this option is under development");
         case 'T':
-            if (valid_type(optarg) == false) {
+            if (tec_aux_is_valid_type(optarg) == false) {
                 TEC_LOG_E("invalid type '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
@@ -87,7 +51,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 ctx.units = tec_unit_add(ctx.units, "type", optarg);
             break;
         case 'D':
-            if (valid_desc(optarg) == false) {
+            if (tec_aux_is_valid_desc(optarg) == false) {
                 TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("set");
             }
@@ -95,7 +59,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 ctx.units = tec_unit_add(ctx.units, "desc", optarg);
             break;
         case 'P':
-            if (valid_prio(optarg) == false) {
+            if (tec_aux_is_valid_prio(optarg) == false) {
                 TEC_LOG_E("invalid priority '%s'", optarg);
                 return tec_cli_help_usage("set");
             }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "aux.h"
 #include "osdep.h"
@@ -36,4 +37,39 @@ bool tec_aux_check_cd_alias(tec_argvec_t *argvec)
             return false;
     }
     return true;
+}
+
+int tec_aux_is_valid_desc(const char *val)
+{
+    if (!isalnum(*val++))
+        return false;
+    for (; *val; ++val)
+        if (!(isalnum(*val) || isspace(*val) || *val == '_' || *val == '-'))
+            return false;
+    return isalnum(*--val) != 0;
+}
+
+/* roachme: replace all prios if user specifies any in config file */
+int tec_aux_is_valid_prio(const char *val)
+{
+    char *prios[] = { "lowest", "low", "mid", "high", "highest" };
+    int size = sizeof(prios) / sizeof(prios[0]);
+
+    for (int i = 0; i < size; ++i)
+        if (strncmp(val, prios[i], 10) == 0)
+            return true;
+    return false;
+}
+
+/* roachme: replace all types if user specifies any in config file */
+int tec_aux_is_valid_type(const char *val)
+{
+    char *types[] = { "task", "bugfix", "feature", "hotfix" };
+    int size = sizeof(types) / sizeof(types[0]);
+
+    for (int i = 0; i < size; ++i) {
+        if (strncmp(val, types[i], 10) == 0)
+            return true;
+    }
+    return false;
 }

@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
@@ -37,16 +36,6 @@ static int generate_units(tec_ctx_t *ctx, char *env)
     if ((ctx->units = units) == NULL)
         return 1;
     return 0;
-}
-
-static int valid_desc(const char *val)
-{
-    if (!isalnum(*val++))
-        return false;
-    for (; *val; ++val)
-        if (!(isalnum(*val) || isspace(*val) || *val == '_' || *val == '-'))
-            return false;
-    return isalnum(*--val) != 0;
 }
 
 static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
@@ -396,7 +385,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.quiet = true;
             break;
         case 'D':
-            if (valid_desc(optarg) == false) {
+            if (tec_aux_is_valid_desc(optarg) == false) {
                 TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("env-set");
             }

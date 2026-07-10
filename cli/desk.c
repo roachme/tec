@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
@@ -23,16 +22,6 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet,
             TEC_LOG_E("'%s': %s", args->desk, "description not found");
     }
     return desc;
-}
-
-static int valid_desc(const char *val)
-{
-    if (!isalnum(*val++))
-        return false;
-    for (; *val; ++val)
-        if (!(isalnum(*val) || isspace(*val) || *val == '_' || *val == '-'))
-            return false;
-    return isalnum(*--val) != 0;
 }
 
 static int generate_units(tec_ctx_t *ctx, char *desk, char *desc)
@@ -328,7 +317,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.quiet = true;
             break;
         case 'D':
-            if (valid_desc(optarg) == false) {
+            if (tec_aux_is_valid_desc(optarg) == false) {
                 TEC_LOG_E("invalid description '%s'", optarg);
                 return tec_cli_help_usage("desk-set");
             }

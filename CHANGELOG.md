@@ -14,6 +14,7 @@
 - `cli/set`: Refactor code for command `set`
 - `cli/desk`: Refactor code for command `desk`
 - `cli/env`: Refactor code for command `env`
+- `cli`: Unify check functions
 
 ### Deleted
 
