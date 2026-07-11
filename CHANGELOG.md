@@ -30,6 +30,7 @@
 ### Changed
 
 - `tec`: Update help message
+- `cli`: Unify error messages
 
 ### Fixed
 

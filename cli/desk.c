@@ -305,7 +305,7 @@ static int _desk_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_set_options opts;
-    const char *errfmt = "could not set desk unit value '%s': %s";
+    const char *errfmt = "cannot set desk unit value '%s': %s";
 
     tec_cli_set_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":e:hqD:")) != -1) {

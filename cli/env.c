@@ -315,7 +315,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_arg_t src = ARGS_INIT();
     tec_arg_t dst = ARGS_INIT();
     struct tec_cli_rm_options opts;
-    const char *errfmt = "could not rename env '%s': %s";
+    const char *errfmt = "cannot rename env '%s': %s";
 
     tec_cli_rm_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
@@ -370,7 +370,7 @@ static int _env_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
     tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_set_options opts;
-    const char *errfmt = "could not set env unit value '%s': %s";
+    const char *errfmt = "cannot set env unit value '%s': %s";
 
     tec_cli_set_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:hqD:")) != -1) {

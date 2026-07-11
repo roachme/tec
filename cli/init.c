@@ -8,7 +8,7 @@ int tec_cli_init(tec_argvec_t *argvec, tec_cfg_t *cfg)
     (void)cfg;
 
     if ((status = tec_make_db(teccfg.base.task)) != TEC_OK) {
-        const char *errfmt = "could not make core filesystem: %s";
+        const char *errfmt = "cannot make core filesystem: %s";
         return TEC_LOG_E(errfmt, tec_strerror(status));
     }
     return TEC_OK;
