@@ -22,12 +22,11 @@ static tec_unit_t *make_node(void)
 
 static char *trim_whitespace_end(char *str)
 {
-    int len;
+    char *end = str + strlen(str) - 1;
 
-    len = (int)strlen(str) - 1;
-    while (len >= 0 && isspace(*(str + len)))
-        len--;
-    str[len + 1] = '\0';
+    while (end >= str && isspace(*end))
+        end--;
+    *++end = '\0';
     return str;
 }
 

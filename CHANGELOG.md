@@ -15,6 +15,7 @@
 - `cli/desk`: Refactor code for command `desk`
 - `cli/env`: Refactor code for command `env`
 - `cli`: Unify check functions
+- `lib/unit`: Remove suspicious type conversion
 
 ### Deleted
 
