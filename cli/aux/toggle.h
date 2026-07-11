@@ -24,4 +24,7 @@ int toggle_task_update(char *base, tec_arg_t * args,
                        const char *old_id, const char *new_id);
 int toggle_task_clear(char *base, tec_arg_t * args, const char *task);
 
+int toggle_env_update(char *base, tec_arg_t * args, const char *src,
+                      const char *dst);
+
 #endif

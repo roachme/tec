@@ -129,6 +129,52 @@ int toggle_env_get_prev(char *base, tec_arg_t *args)
     return EXIT_SUCCESS;
 }
 
+bool toggle_env_is_curr(char *base, tec_arg_t *args)
+{
+    char *env;
+
+    /* There is no current env - immediately return false.  */
+    if ((env = env_get_curr(base, args)) == NULL)
+        return false;
+    return !strcmp(env, args->env);
+}
+
+int toggle_env_update(char *base, tec_arg_t *args, const char *src,
+                      const char *dst)
+{
+    char *curr, *prev;
+    tec_unit_t *toggles;
+    int changed = 0;
+
+    toggles = NULL;
+    curr = env_get_curr(base, args);
+    prev = env_get_prev(base, args);
+
+    /* Check if old_id matches curr or prev and update */
+    if (curr && strcmp(curr, src) == 0) {
+        curr = (char *)dst;
+        changed = 1;
+    }
+    if (prev && strcmp(prev, src) == 0) {
+        prev = (char *)dst;
+        changed = 1;
+    }
+
+    if (!changed)
+        return 0;               /* Nothing to update */
+
+    if (curr)
+        toggles = tec_unit_add(toggles, "curr", curr);
+    if (prev)
+        toggles = tec_unit_add(toggles, "prev", prev);
+
+    if (toggles) {
+        tec_unit_save(path_env_toggle(base, args), toggles);
+        tec_unit_free(toggles);
+    }
+    return 0;
+}
+
 int toggle_desk_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->desk && !(args->desk = desk_get_curr(base, args)))
@@ -195,6 +241,27 @@ int toggle_env_set_curr(char *base, tec_arg_t *args)
         tec_unit_save(path_env_toggle(base, args), toggles);
     tec_unit_free(toggles);
     return 0;
+}
+
+int toggle_env_unset_prev(char *base, tec_arg_t *args)
+{
+    int status;
+    char *curr, *prev;
+    tec_unit_t *toggles;
+
+    toggles = NULL;
+    curr = env_get_curr(base, args);
+    prev = env_get_prev(base, args);
+
+    if (prev == NULL)
+        return 1;               // do nothing
+    if (curr != NULL) {
+        // rewrite curr with the same value
+        toggles = tec_unit_add(toggles, "curr", curr);
+    }
+    status = tec_unit_save(path_env_toggle(base, args), toggles);
+    tec_unit_free(toggles);
+    return status;
 }
 
 int toggle_desk_set_curr(char *base, tec_arg_t *args)

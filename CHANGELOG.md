@@ -17,6 +17,7 @@
 - `cli/env`: Refactor code for command `env`
 - `cli`: Unify check functions
 - `lib/unit`: Remove suspicious type conversion
+- `cli/env`: Update toggle when env gets renamed
 
 ### Deleted
 

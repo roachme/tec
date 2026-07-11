@@ -358,6 +358,12 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if (opts.quiet == false)
             TEC_LOG_E(errfmt, dst.env, "failed to execute hooks");
         return status;
+    } else
+        if ((status =
+             toggle_env_update(cfg->base.task, &dst, src.env, dst.env))) {
+        if (opts.quiet == false)
+            TEC_LOG_E(errfmt, dst.env, "could not update toggles");
+        return status;
     }
     return tec_cli_pwd_set(&dst);
 }
