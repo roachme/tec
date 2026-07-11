@@ -512,7 +512,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if ((status = toggle_desk_get_prev(cfg->base.task, &args)))
             return TEC_LOG_E(errfmt, "PREV", "no previous desk");
-        argvec_replace(argvec, argvec->i, args.desk, DESKSIZ);
+        argvec_replace(argvec, argvec->i, args.desk);
     }
 
     do {

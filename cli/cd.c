@@ -60,7 +60,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if (toggle_task_get_prev(cfg->base.task, &args))
             return TEC_LOG_E(errfmt, "PREV", "no previous task ID");
-        argvec_replace(argvec, argvec->i, args.task, IDSIZ);
+        argvec_replace(argvec, argvec->i, args.task);
     }
 
     do {

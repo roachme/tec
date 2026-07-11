@@ -56,8 +56,10 @@ void argvec_parse(tec_argvec_t *vec, int argc, const char **argv)
         argvec_add(vec, argv[i]);
 }
 
-void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg, int argsiz)
+void argvec_replace(tec_argvec_t *vec, int vec_idx, char *arg)
 {
+    int argsiz = strlen(arg);
+
     assert(vec_idx >= 0 && vec_idx < vec->used);
     free(vec->argv[vec_idx]);   /* free previous key value.  */
     if ((vec->argv[vec_idx] = strndup(arg, argsiz)) == NULL) {

@@ -26,7 +26,7 @@ static char *resolve_alias(tec_argvec_t *argvec, tec_alias_t *alias)
     char *tok, *cmdname;
 
     tok = cmdname = strtok(alias->cmd, " ");
-    argvec_replace(argvec, 0, tok, strlen(tok));
+    argvec_replace(argvec, 0, tok);
 
     while ((tok = strtok(NULL, " ")) != NULL)
         argvec_add(argvec, tok);

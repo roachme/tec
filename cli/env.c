@@ -578,7 +578,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
         if ((status = toggle_env_get_prev(cfg->base.task, &args)))
             return TEC_LOG_E(errfmt, "PREV", "no previous environment");
-        argvec_replace(argvec, argvec->i, args.env, ENVSIZ);
+        argvec_replace(argvec, argvec->i, args.env);
     }
 
     do {
