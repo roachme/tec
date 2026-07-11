@@ -7,6 +7,7 @@
 ### Changed
 
 - `lib/errmod`: Update error messages
+- `cli/cfg`: Let command work without initialization
 
 ### Fixed
 

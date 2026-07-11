@@ -37,7 +37,7 @@ static tec_cmd_t tec_cmds[] = {
     {.name = "add",.func = &tec_cli_add,.option = TEC_SETUP_HARD},
     {.name = "cat",.func = &tec_cli_cat,.option = TEC_SETUP_HARD},
     {.name = "cd",.func = &tec_cli_cd,.option = TEC_SETUP_HARD},
-    {.name = "cfg",.func = &tec_cli_cfg,.option = TEC_SETUP_HARD},
+    {.name = "cfg",.func = &tec_cli_cfg,.option = TEC_SETUP_SOFT},
     {.name = "env",.func = &tec_cli_env,.option = TEC_SETUP_HARD},
     {.name = "desk",.func = &tec_cli_desk,.option = TEC_SETUP_HARD},
     {.name = "help",.func = &tec_cli_help,.option = TEC_SETUP_SOFT},
