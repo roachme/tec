@@ -139,6 +139,16 @@ bool toggle_env_is_curr(char *base, tec_arg_t *args)
     return !strcmp(env, args->env);
 }
 
+bool toggle_env_is_prev(char *base, tec_arg_t *args)
+{
+    char *env;
+
+    /* There is no current env - immediately return false.  */
+    if ((env = env_get_prev(base, args)) == NULL)
+        return false;
+    return !strcmp(env, args->env);
+}
+
 int toggle_env_update(char *base, tec_arg_t *args, const char *src,
                       const char *dst)
 {

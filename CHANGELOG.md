@@ -3,6 +3,7 @@
 ### Added
 
 - `tec`: Add option for custom description
+- `cli/env`: Add option to list toggles
 
 ### Changed
 

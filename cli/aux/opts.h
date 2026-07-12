@@ -21,6 +21,13 @@ struct tec_cli_cd_options {
     bool change_tog;            /* Update toggles */
 };
 
+struct tec_cli_ls_options {
+    bool help;                  /* Output a usage message ad exit */
+    bool quiet;                 /* Do not write anything to standard output */
+    bool togg;                  /* Show only toggle objects */
+    bool head;                  /* Show headers */
+};
+
 struct tec_cli_rm_options {
     bool help;                  /* Output a usage message ad exit */
     bool quiet;                 /* Do not write anything to standard output */
@@ -36,6 +43,7 @@ struct tec_cli_set_options {
 
 void tec_cli_cat_option_init(struct tec_cli_cat_options *opts);
 void tec_cli_cd_option_init(struct tec_cli_cd_options *opts);
+void tec_cli_ls_option_init(struct tec_cli_ls_options *opts);
 void tec_cli_rm_option_init(struct tec_cli_rm_options *opts);
 void tec_cli_set_option_init(struct tec_cli_set_options *opts);
 

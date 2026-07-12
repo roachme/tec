@@ -2,28 +2,13 @@
 #include <string.h>
 #include <dirent.h>
 
+#include "aux/log.h"
 #include "tec.h"
 #include "aux/aux.h"
 #include "aux/opts.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
-
-// TODO: remove parameter 'quiet', return status, and let the caller to
-static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet)
-{
-    int status;
-    char *desc = NULL;
-
-    if ((status = tec_env_get(teccfg.base.task, args, ctx))) {
-        if (quiet == false)
-            TEC_LOG_E("'%s': %s", args->env, tec_strerror(status));
-    } else if ((desc = tec_unit_get(ctx->units, "desc")) == NULL) {
-        if (quiet == false)
-            TEC_LOG_E("'%s': %s", args->env, "description not found");
-    }
-    return desc;
-}
 
 static int generate_units(tec_ctx_t *ctx, char *env)
 {
@@ -258,23 +243,28 @@ static int _env_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
 static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
+    int status;
     char *desc = NULL;
     int retcode = TEC_OK;
     tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
-    int opt_help, opt_quiet;
+    struct tec_cli_ls_options opts;
+    const char *errfmt = "cannot list env '%s': %s";
 
-    opt_quiet = false;
-    opt_help = false;
-
-    while ((c = getopt(argvec->used, argvec->argv, ":hq")) != -1) {
+    tec_cli_ls_option_init(&opts);
+    while ((c = getopt(argvec->used, argvec->argv, ":hqtv")) != -1) {
         switch (c) {
         case 'q':
-            opt_quiet = true;
+            opts.quiet = true;
             break;
         case 'h':
-            opt_help = true;
+            opts.help = true;
             break;
+        case 't':
+            opts.togg = true;
+            break;
+        case 'v':
+            return TEC_LOG_E("'-%c': is under development", c);
         case ':':
             TEC_LOG_E(FMT_OPT_ARG_REQ, optopt);
             return tec_cli_help_usage("env-ls");
@@ -283,24 +273,38 @@ static int _env_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
             return tec_cli_help_usage("env-ls");
         }
     }
+    argvec->i = optind;
 
-    if (opt_help == true)
+    if (opts.help == true) {
         return tec_cli_help_usage("env-ls");
-
-    if ((retcode = tec_env_list(cfg->base.task, &args, &ctx))) {
-        if (opt_quiet == false) {
-            const char *errfmt = "cannot list env(s) '%s': %s";
-            TEC_LOG_E(errfmt, "ENV", tec_strerror(retcode));
-            return retcode;
-        }
+    } else if ((retcode = tec_env_list(cfg->base.task, &args, &ctx))) {
+        if (opts.quiet == false)
+            return TEC_LOG_E(errfmt, "ENV", tec_strerror(retcode));
     }
 
     for (tec_list_t * obj = ctx.list; obj != NULL; obj = obj->next) {
         args.env = obj->name;
-        if ((desc = get_unit_desc(&ctx, &args, opt_quiet)) == NULL) {
+
+        if ((status = tec_env_get(teccfg.base.task, &args, &ctx))) {
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.env, tec_strerror(status));
+            continue;
+        } else if ((desc = tec_unit_get(ctx.units, "desc")) == NULL) {
+            retcode = EXIT_FAILURE;
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.env, "description not found");
             continue;
         }
-        LIST_OBJ_UNITS(obj->name, "", desc, ENVSIZ, teccfg.opts.color);
+
+        if (opts.togg && toggle_env_is_curr(cfg->base.task, &args)) {
+            LIST_OBJ_UNITS(obj->name, "", desc, ENVSIZ, teccfg.opts.color);
+        } else if (opts.togg && toggle_env_is_prev(cfg->base.task, &args)) {
+            LIST_OBJ_UNITS(obj->name, "", desc, ENVSIZ, teccfg.opts.color);
+        } else if (!opts.togg) {
+            LIST_OBJ_UNITS(obj->name, "", desc, ENVSIZ, teccfg.opts.color);
+        }
+
+        retcode = status == TEC_OK ? retcode : status;
         ctx.units = tec_unit_free(ctx.units);
     }
 

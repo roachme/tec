@@ -593,6 +593,7 @@ struct help helptab[] = {
     Options:\n\
       -h      show this help and exit\n\
       -q      do not write anything to standard error output\n\
+      -t      show ONLY toggles (current and previous)\n\
       -v      under development: show more info\n\
     \n\
     Exit status:\n\

@@ -5,6 +5,8 @@
 
 int toggle_env_get_curr(char *base, tec_arg_t * args);
 int toggle_env_get_prev(char *base, tec_arg_t * args);
+bool toggle_env_is_curr(char *base, tec_arg_t * args);
+bool toggle_env_is_prev(char *base, tec_arg_t * args);
 int toggle_env_set_curr(char *base, tec_arg_t * args);
 
 int toggle_desk_get_curr(char *base, tec_arg_t * args);
