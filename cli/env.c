@@ -10,6 +10,18 @@
 #include "aux/config.h"
 #include "aux/toggle.h"
 
+// TODO: unify it (env, desk, task)
+static int valid_unitkeys(tec_unit_t *units)
+{
+    const char *keys[] = { "id", "desc" };
+    unsigned int nkeys = ARRAY_SIZE(keys);
+
+    for (size_t i = 0; units && i < nkeys; units = units->next, ++i)
+        if (strcmp(units->key, keys[i]) != 0)
+            return EXIT_FAILURE;
+    return EXIT_SUCCESS;
+}
+
 static int generate_units(tec_ctx_t *ctx, char *env)
 {
     struct tec_unit *units = NULL;
@@ -486,37 +498,41 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
     do {
         args.env = argvec->argv[argvec->i];
 
+        // TODO: check hook unit keys validity
         if ((status = tec_cli_check_env(&args, errfmt, opts.quiet))) {
             retcode = EXIT_FAILURE;
             continue;
-        }
-        // TODO: validate unit keys and values
-        if ((status = tec_env_get(cfg->base.task, &args, &ctx))) {
+        } else if ((status = tec_env_get(cfg->base.task, &args, &ctx))) {
+            retcode = EXIT_FAILURE;
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.env, tec_strerror(status));
             continue;
-        } else if ((status = hook_cat(&unitpgn, &args, "env-cat"))) {
+        } else if ((status = valid_unitkeys(ctx.units))) {
+            retcode = EXIT_FAILURE;
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.env, "invalid unit keys");
+            continue;
+        } else if ((status = hook_cat(&unitpgn, &args, "env-cat"))) {
+            retcode = EXIT_FAILURE;
+            if (opts.quiet == false)
+                TEC_LOG_E(errfmt, args.env, "failed to execute hooks");
+            continue;
         }
-        retcode = status == TEC_OK ? retcode : status;
 
-        if (retcode == TEC_OK) {
-            units = tec_unit_add(units, "id", args.env);
-            units = tec_unit_join(units, ctx.units);
-            units = tec_unit_join(units, unitpgn);
+        units = tec_unit_add(units, "id", args.env);
+        units = tec_unit_join(units, ctx.units);
+        units = tec_unit_join(units, unitpgn);
 
-            /* Show all keys.  */
-            if (argvec_is_empty(&keys) == true) {
-                for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
-                    printf(unitfmt, tmp->key, tmp->val);
-            } else {            /* Show specific keys only.  */
-                for (int i = 0; i < keys.used; i++) {
-                    status = aux_show_key(keys.argv[i], units);
-                    if (status && opts.quiet == false)
-                        TEC_LOG_E(keyfmt, args.env, keys.argv[i]);
-                    retcode = status == EXIT_SUCCESS ? retcode : EXIT_FAILURE;
-                }
+        /* Show all keys.  */
+        if (argvec_is_empty(&keys) == true) {
+            for (tec_unit_t * tmp = units; tmp; tmp = tmp->next)
+                printf(unitfmt, tmp->key, tmp->val);
+        } else {                /* Show specific keys only.  */
+            for (int i = 0; i < keys.used; i++) {
+                status = aux_show_key(keys.argv[i], units);
+                if (status && opts.quiet == false)
+                    TEC_LOG_E(keyfmt, args.env, keys.argv[i]);
+                retcode = status == EXIT_SUCCESS ? retcode : EXIT_FAILURE;
             }
         }
 

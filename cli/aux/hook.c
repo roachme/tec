@@ -59,6 +59,7 @@ int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
             continue;
 
         char *hook_cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
+        TEC_LOG_D(hook_cmd);
         if (!(pipe = popen(hook_cmd, "r"))) {
             // TODO: add quiet option and show error message of plugin
             retcode = EXIT_FAILURE;
