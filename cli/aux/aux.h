@@ -28,4 +28,6 @@ int tec_aux_is_valid_desc(const char *val);
 int tec_aux_is_valid_prio(const char *val);
 int tec_aux_is_valid_type(const char *val);
 
+int aux_show_key(char *key, tec_unit_t * units);
+
 #endif

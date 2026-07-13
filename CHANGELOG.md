@@ -10,6 +10,7 @@
 - `lib/errmod`: Update error messages
 - `cli/cfg`: Let command work without initialization
 - `cli`: Simplify API for module argvec
+- `cli`: Unify function to show specific key
 
 ### Fixed
 

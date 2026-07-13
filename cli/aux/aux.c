@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
@@ -72,4 +73,15 @@ int tec_aux_is_valid_type(const char *val)
             return true;
     }
     return false;
+}
+
+int aux_show_key(char *key, tec_unit_t *units)
+{
+    for (; units; units = units->next) {
+        if (!strcmp(key, units->key)) {
+            printf("%s\n", units->val);
+            return EXIT_SUCCESS;
+        }
+    }
+    return EXIT_FAILURE;
 }

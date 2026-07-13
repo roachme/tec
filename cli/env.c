@@ -512,16 +512,10 @@ static int _env_cat(tec_argvec_t *argvec, tec_cfg_t *cfg)
                     printf(unitfmt, tmp->key, tmp->val);
             } else {            /* Show specific keys only.  */
                 for (int i = 0; i < keys.used; i++) {
-                    int notfound = false;
-                    for (tec_unit_t * tmp = units; tmp; tmp = tmp->next) {
-                        if ((notfound = strcmp(keys.argv[i], tmp->key)) == 0) {
-                            printf("%s\n", tmp->val);
-                            break;
-                        }
-                    }
-                    if (notfound && opts.quiet == false)
+                    status = aux_show_key(keys.argv[i], units);
+                    if (status && opts.quiet == false)
                         TEC_LOG_E(keyfmt, args.env, keys.argv[i]);
-                    retcode = notfound == 0 ? retcode : 1;
+                    retcode = status == EXIT_SUCCESS ? retcode : EXIT_FAILURE;
                 }
             }
         }
