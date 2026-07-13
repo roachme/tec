@@ -64,7 +64,7 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     const char *errfmt = "cannot add task '%s': %s";
 
     tec_cli_cd_option_init(&opts);
-    while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnD:N")) != -1) {
+    while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnvD:N")) != -1) {
         switch (c) {
         case 'd':
             args.desk = optarg;
@@ -80,6 +80,9 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
             break;
         case 'q':
             opts.quiet = true;
+            break;
+        case 'v':
+            opts.verbose = true;
             break;
         case 'D':
             desc = optarg;
@@ -147,6 +150,10 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
                     TEC_LOG_E("could not update toggles");
             }
         }
+
+        if (opts.verbose == true)
+            TEC_LOG_I("added task '%s'", args.task);
+
         ctx.units = tec_unit_free(ctx.units);
         retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
     } while (++argvec->i < argvec->used);

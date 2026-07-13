@@ -116,6 +116,7 @@ struct help helptab[] = {
       -h      show this help and exit\n\
       -n      do not update toggles\n\
       -q      do not write anything to standard error output\n\
+      -v      explain what is being done\n\
       -D DESC provide description (generated if not provided)\n\
       -N      neither switch to task nor to task directory\n\
     \n\

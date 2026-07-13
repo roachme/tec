@@ -5,6 +5,7 @@
 - `tec`: Add option for custom description
 - `cli/env`: Add option to list toggles
 - `cli`: Add unit key validation
+- `cli/add`: Add option for verbose output
 
 ### Changed
 

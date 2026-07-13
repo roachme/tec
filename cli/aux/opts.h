@@ -17,6 +17,7 @@ struct tec_cli_cat_options {
 struct tec_cli_cd_options {
     bool help;                  /* Output a usage message ad exit */
     bool quiet;                 /* Do not write anything to standard output */
+    bool verbose;               /* Explain what is being done */
     bool change_dir;            /* Change working directory */
     bool change_tog;            /* Update toggles */
 };
