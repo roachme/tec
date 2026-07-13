@@ -123,7 +123,9 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if ((status = tec_task_rm(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, tec_strerror(status));
-        } else if (opts.verbose == true)
+        }
+
+        if (opts.verbose == true)
             TEC_LOG_I("removed task '%s'", args.task);
         retcode = status == TEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);

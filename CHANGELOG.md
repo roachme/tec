@@ -23,6 +23,7 @@
 - `cli`: Unify check functions
 - `lib/unit`: Remove suspicious type conversion
 - `cli/env`: Update toggle when env gets renamed
+- `cli/rm`: Fix verbose output potential bug
 
 ### Deleted
 
