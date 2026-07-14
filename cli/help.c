@@ -734,7 +734,7 @@ int tec_cli_help(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int opt_list_cmds;
 
     (void)cfg;
-    status = TEC_OK;
+    status = ETEC_OK;
     opt_list_cmds = false;
 
     while ((c = getopt(argvec->used, argvec->argv, ":dls")) != -1) {

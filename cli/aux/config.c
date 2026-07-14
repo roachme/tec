@@ -97,7 +97,6 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    TEC_LOG_E("FAILED: to parse hook.cat");
                     retcode = EXIT_FAILURE;
                     continue;
                 }
@@ -122,7 +121,6 @@ static int tec_config_get_hooks(config_t *cfg, tec_cfg_t *tec_config)
                                                       &pgname)
                       && config_setting_lookup_string(hook_conf, "pgncmd",
                                                       &pgncmd))) {
-                    TEC_LOG_E("FAILED: to parse hook.action");
                     retcode = EXIT_FAILURE;
                     continue;
                 }
@@ -247,7 +245,7 @@ void tec_config_init(tec_cfg_t *cfg)
 // TODO: simplify this mess. add a separate function to find and check config file
 int tec_config_parse(tec_cfg_t *tec_config)
 {
-    int status = TEC_OK;
+    int status = ETEC_OK;
     char cfgfile[CONFIGSIZ + 1];
     char *homedir = getenv("HOME");     // FIXME: use osdep module
     const char *cfgfmts[] = {

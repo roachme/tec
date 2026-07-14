@@ -1,8 +1,9 @@
 #include <stdlib.h>
 
+#include "tec.h"
 #include "aux/aux.h"
 #include "aux/opts.h"
-#include "tec.h"
+#include "aux/errno.h"
 #include "aux/config.h"
 
 // "prio",  /* task priority */
@@ -18,12 +19,11 @@
 int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     int c;
-    int status;
-    int retcode = TEC_OK;
+    int status = ETEC_OK;
+    int retcode = ETEC_OK;
     tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_set_options opts;
-    const char *errfmt = "cannot set task units '%s': %s";
 
     tec_cli_set_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hiqD:T:P:")) != -1) {
@@ -41,7 +41,7 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
             opts.help = true;
             break;
         case 'i':
-            return TEC_LOG_E("this option is under development");
+            return TEC_LOG_E(EFMT_DEV, c);
         case 'T':
             if (tec_aux_is_valid_type(optarg) == false) {
                 TEC_LOG_E("invalid type '%s'", optarg);
@@ -78,15 +78,25 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (opts.help == true)
         return tec_cli_help_usage("set");
-    else if (tec_cli_check_env(&args, errfmt, opts.quiet))
+    else if ((status = tec_cli_check_env(&args))) {
+        args.env = args.env ? args.env : ETEC_NOCURR;
+        if (opts.quiet == false)
+            TEC_LOG_E(EFMT_TASK_SET, args.env, tec_strerror(status));
         return EXIT_FAILURE;
-    else if (tec_cli_check_desk(&args, errfmt, opts.quiet))
+    } else if ((status = tec_cli_check_desk(&args))) {
+        args.desk = args.desk ? args.desk : ETEC_NOCURR;
+        if (opts.quiet == false)
+            TEC_LOG_E(EFMT_TASK_SET, args.desk, tec_strerror(status));
         return EXIT_FAILURE;
+    }
 
     do {
         args.task = argvec->argv[argvec->i];
 
-        if ((status = tec_cli_check_task(&args, errfmt, opts.quiet))) {
+        if ((status = tec_cli_check_task(&args))) {
+            args.task = args.task ? args.task : ETEC_NOCURR;
+            if (opts.quiet == false)
+                TEC_LOG_E(EFMT_TASK_SET, args.task, tec_strerror(status));
             retcode = EXIT_FAILURE;
             continue;
         }
@@ -94,15 +104,15 @@ int tec_cli_set(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status = tec_task_set(cfg->base.task, &args, &ctx))) {
             args.task = args.task ? args.task : "NOCURR";
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(EFMT_TASK_SET, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "set"))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(EFMT_TASK_SET, args.task, tec_strerror(status));
         }
 
-        retcode = status == TEC_OK ? retcode : status;
+        retcode = status == ETEC_OK ? retcode : status;
     } while (++argvec->i < argvec->used);
 
     ctx.units = tec_unit_free(ctx.units);
-    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == ETEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

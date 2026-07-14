@@ -5,6 +5,7 @@
 
 #include "tec.h"
 #include "aux/opts.h"
+#include "aux/errno.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
@@ -16,7 +17,7 @@ static int generate_task(tec_arg_t *args, tec_argvec_t *argvec)
     args->task = gentask;
     for (register unsigned int i = 1; i < IDLIMIT; ++i) {
         sprintf(gentask, IDFMT, i);
-        if (tec_task_exist(teccfg.base.task, args) != TEC_OK) {
+        if (tec_task_exist(teccfg.base.task, args) != ETEC_OK) {
             argvec_add(argvec, gentask);
             args->task = argvec->argv[argvec->used];
             return 0;
@@ -57,11 +58,10 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     int c;
     int status;
     char *desc = NULL;
-    int retcode = TEC_OK;
+    int retcode = ETEC_OK;
     tec_ctx_t ctx = CTX_INIT();
     tec_arg_t args = ARGS_INIT();
     struct tec_cli_cd_options opts;
-    const char *errfmt = "cannot add task '%s': %s";
 
     tec_cli_cd_option_init(&opts);
     while ((c = getopt(argvec->used, argvec->argv, ":d:e:hqnvD:N")) != -1) {
@@ -103,11 +103,17 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
     if (opts.help == true)
         return tec_cli_help_usage("add");
-    else if ((status = tec_cli_check_env(&args, errfmt, opts.quiet)))
+    else if ((status = tec_cli_check_env(&args))) {
+        args.env = args.env ? args.env : ETEC_NOCURR;
+        if (opts.quiet == false)
+            TEC_LOG_E(EFMT_TASK_ADD, args.env, tec_strerror(status));
         return EXIT_FAILURE;
-    else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
+    } else if ((status = tec_cli_check_desk(&args))) {
+        args.desk = args.desk ? args.desk : ETEC_NOCURR;
+        if (opts.quiet == false)
+            TEC_LOG_E(EFMT_TASK_ADD, args.desk, tec_strerror(status));
         return EXIT_FAILURE;
-    else if (optind == argvec->used && generate_task(&args, argvec)) {
+    } else if (optind == argvec->used && generate_task(&args, argvec)) {
         if (opts.quiet == false)
             TEC_LOG_E("cannot generate task ID: limit is %d", IDLIMIT);
         return EXIT_FAILURE;
@@ -117,48 +123,51 @@ int tec_cli_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         args.task = argvec->argv[argvec->i];
 
         if (tec_cli_len_valid(args.task, IDSIZ) == false) {
+            status = ETEC_ARG_TASK_TOO_LONG;
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "task ID is too long");
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, tec_strerror(status));
             retcode = EXIT_FAILURE;
             continue;
         } else if ((status = tec_task_valid(cfg->base.task, &args))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, tec_strerror(status));
             retcode = EXIT_FAILURE;
             continue;
         } else if (!(status = tec_task_exist(cfg->base.task, &args))) {
+            status = ETEC_ARG_TASK_EXIST;
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, tec_strerror(TEC_ARG_EXISTS));
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, tec_strerror(status));
             retcode = EXIT_FAILURE;
             continue;
         } else if ((status = generate_units(&ctx, &args, desc))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "unit generation failed");
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, "unit generation failed");
             retcode = EXIT_FAILURE;
             continue;
         }
 
         if ((status = tec_task_add(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, tec_strerror(status));
         } else if ((status = hook_action(&args, "add"))) {
+            // TODO: remove task directory if hook has failed
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(EFMT_TASK_ADD, args.task, tec_strerror(status));
         } else if (opts.change_tog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("cannot update toggles");
+                    TEC_LOG_E(tec_strerror(ETEC_TOGG_UPDATE));
             }
         }
 
-        if (opts.verbose == true)
+        if (status == ETEC_OK && opts.verbose == true)
             TEC_LOG_I("added task '%s'", args.task);
 
         ctx.units = tec_unit_free(ctx.units);
-        retcode = status == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+        retcode = status == ETEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
     } while (++argvec->i < argvec->used);
 
-    if (retcode == TEC_OK && opts.change_dir)
+    if (retcode == ETEC_OK && opts.change_dir)
         retcode = tec_cli_pwd_set(&args);
-    return retcode == TEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
+    return retcode == ETEC_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

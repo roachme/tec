@@ -1,8 +1,6 @@
 #ifndef TEC_H
 #define TEC_H
 
-#define TEC_ERRMSGSIZ   100
-
 typedef struct tec_arg {
     char *task;
     char *desk;
@@ -27,42 +25,45 @@ typedef struct tec_context {
 } tec_ctx_t;
 
 enum tec_errno {
-    TEC_OK,
+    ETEC_OK,
 
-    TEC_SYS_DB,
-    TEC_SYS_MALLOC,
+    ETEC_SYS_DB,
+    ETEC_SYS_MALLOC,
 
-    TEC_ARG_ILLEG,
-    TEC_ARG_NOSUCH,
-    TEC_ARG_EXISTS,
+    ETEC_ARG_TASK_ILLEG,
+    ETEC_ARG_DESK_ILLEG,
+    ETEC_ARG_ENV_ILLEG,
 
-    TEC_DIR_RM,
-    TEC_DIR_MAKE,
-    TEC_DIR_MOVE,
-    TEC_DIR_OPEN,
-    TEC_DIR_RENAME,
+    ETEC_ARG_TASK_NOSUCH,
+    ETEC_ARG_DESK_NOSUCH,
+    ETEC_ARG_ENV_NOSUCH,
 
-    TEC_UNIT_ADD,
-    TEC_UNIT_RM,
-    TEC_UNIT_GET,
-    TEC_UNIT_ILLEG,
-    TEC_UNIT_KEY,
-    TEC_UNIT_LOAD,
-    TEC_UNIT_SAVE,
-    TEC_UNIT_SET,
+    ETEC_ARG_TASK_EXIST,
+    ETEC_ARG_DESK_EXIST,
+    ETEC_ARG_ENV_EXIST,
 
-    __TEC_STATUS_LAST
-};
+    ETEC_DIR_RM,
+    ETEC_DIR_MAKE,
+    ETEC_DIR_MOVE,
+    ETEC_DIR_OPEN,
+    ETEC_DIR_RENAME,
 
-struct tec_err_codes {
-    enum tec_errno err;
-    char desc[TEC_ERRMSGSIZ + 1];
+    ETEC_UNIT_ADD,
+    ETEC_UNIT_RM,
+    ETEC_UNIT_GET,
+    ETEC_UNIT_ILLEG,
+    ETEC_UNIT_KEY,
+    ETEC_UNIT_LOAD,
+    ETEC_UNIT_SAVE,
+    ETEC_UNIT_SET,
+
+    E__TEC_STATUS_LAST
 };
 
 /* Core functions.  */
 int tec_make_db(const char *taskdir);
 int tec_check_db(const char *taskdir);
-char *tec_strerror(int errnum);
+char *tec_geterr(int errnum);
 
 /* Data structure for unit values.  */
 tec_unit_t *tec_unit_add(tec_unit_t * head, char *key, char *val);

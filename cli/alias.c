@@ -36,7 +36,7 @@ static char *resolve_alias(tec_argvec_t *argvec, tec_alias_t *alias)
 int tec_cli_alias(tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
     tec_cmd_t *cmd;
-    int status = TEC_OK;
+    int status = ETEC_OK;
     tec_alias_t *alias = NULL;
     char *cmdname = argvec->argv[0];
 

@@ -1,4 +1,3 @@
-#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +5,7 @@
 #include <stdarg.h>
 
 #include "../tec.h"
+#include "errno.h"
 
 #define TOGSUFF         ".tec/toggles"
 #define TOGENV          "%s/" TOGSUFF
@@ -118,8 +118,8 @@ static char *task_get_prev(char *base, tec_arg_t *args)
 int toggle_env_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->env && !(args->env = env_get_curr(base, args)))
-        return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+        return ETEC_TOGG_ENV_GET_CURR;
+    return ETEC_OK;
 }
 
 int toggle_env_get_prev(char *base, tec_arg_t *args)
@@ -188,29 +188,29 @@ int toggle_env_update(char *base, tec_arg_t *args, const char *src,
 int toggle_desk_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->desk && !(args->desk = desk_get_curr(base, args)))
-        return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+        return ETEC_TOGG_DESK_GET_CURR;
+    return ETEC_OK;
 }
 
 int toggle_desk_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->desk && !(args->desk = desk_get_prev(base, args)))
-        return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+        return ETEC_TOGG_DESK_GET_PREV;
+    return ETEC_OK;
 }
 
 int toggle_task_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_curr(base, args)))
-        return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+        return ETEC_TOGG_TASK_GET_CURR;
+    return ETEC_OK;
 }
 
 int toggle_task_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_prev(base, args)))
-        return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+        return ETEC_TOGG_TASK_GET_PREV;
+    return ETEC_OK;
 }
 
 bool toggle_task_is_curr(char *base, tec_arg_t *args)
@@ -311,7 +311,7 @@ int toggle_task_set_curr(char *base, tec_arg_t *args)
     if (!(prev && strcmp(curr, prev) == 0))
         tec_unit_save(path_task_toggle(base, args), toggles);
     tec_unit_free(toggles);
-    return 0;
+    return ETEC_OK;
 }
 
 int toggle_task_unset_curr(char *base, tec_arg_t *args)
@@ -345,7 +345,7 @@ int toggle_task_unset_prev(char *base, tec_arg_t *args)
     prev = task_get_prev(base, args);
 
     if (prev == NULL)
-        return 1;               // do nothing
+        return ETEC_TOGG_TASK_UNSET_PREV;       // do nothing
     if (curr != NULL) {
         // rewrite curr with the same value
         toggles = tec_unit_add(toggles, "curr", curr);

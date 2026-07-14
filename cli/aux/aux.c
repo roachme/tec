@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "aux.h"
+#include "errno.h"
 #include "osdep.h"
 #include "config.h"
 
@@ -31,13 +32,13 @@ bool tec_aux_do_change_user_cwd(tec_arg_t *args)
     return strcmp(buf, tec_cli_osdep_getenv_cwd()) == 0;
 }
 
-bool tec_aux_check_cd_alias(tec_argvec_t *argvec)
+int tec_aux_check_cd_alias(tec_argvec_t *argvec)
 {
     for (int idx = argvec->i; idx < argvec->used; ++idx) {
         if (strcmp(argvec->argv[idx], "-") == 0 && argvec->used - argvec->i > 1)
-            return false;
+            return ETEC_ALIAS;
     }
-    return true;
+    return ETEC_OK;
 }
 
 int tec_aux_is_valid_desc(const char *val)

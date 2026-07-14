@@ -9,6 +9,7 @@
 #include "aux/aux.h"
 #include "aux/log.h"
 #include "aux/pwd.h"
+#include "aux/errno.h"
 #include "aux/argvec.h"
 
 #define tec_getopt_unset()  \
@@ -64,7 +65,7 @@ static int toggle2bool(const char *tog)
 
 static int cmd_setup(int setuplvl, const tec_cfg_t *cfg)
 {
-    int status = TEC_OK;
+    int status = ETEC_OK;
 
     if (setuplvl == TEC_SETUP_SOFT)     /* no filesystem check.  */
         ;
@@ -146,9 +147,9 @@ tec_cmd_t *tec_cli_is_builtin(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
 int tec_cli_cmd_run(tec_cmd_t *cmd, tec_argvec_t *argvec, tec_cfg_t *cfg)
 {
-    int status = TEC_OK;
+    int status = ETEC_OK;
 
-    if ((status = cmd_setup(cmd->option, cfg)) != TEC_OK)
+    if ((status = cmd_setup(cmd->option, cfg)) != ETEC_OK)
         return TEC_LOG_E("setup failed: %s", tec_strerror(status));
     return cmd->func(argvec, cfg);
 }
@@ -157,7 +158,7 @@ int main(int argc, const char **argv)
 {
     int c;
     tec_cmd_t *cmd;
-    int status = TEC_OK;
+    int status = ETEC_OK;
     tec_argvec_t argvec;
     tec_cfg_t *cfg = &teccfg;
     const char *cmdname = NULL;

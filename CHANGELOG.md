@@ -14,6 +14,7 @@
 - `cli`: Simplify API for module argvec
 - `cli`: Unify function to show specific key
 - `tec`: Change and unify error messages
+- `tec`: Unify errno module for cli and lib parts
 
 ### Fixed
 

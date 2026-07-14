@@ -6,6 +6,7 @@
 #include "log.h"
 #include "hook.h"
 #include "config.h"
+#include "errno.h"
 #include "../../lib/libtec.h"
 
 static char pathname[PATH_MAX + 1];
@@ -23,7 +24,7 @@ int hook_action(tec_arg_t *args, char *cmd)
     int retcode, status;
     struct tec_hook *hooks = teccfg.hooks;
 
-    retcode = status = TEC_OK;
+    retcode = status = ETEC_OK;
 
     /* Execute hooks only if they are enabled.  */
     if (teccfg.opts.hook == false)
@@ -34,11 +35,11 @@ int hook_action(tec_arg_t *args, char *cmd)
             char *_cmd = _hook_cmd(args, hooks->pgname, hooks->pgncmd);
             TEC_LOG_D(_cmd);
             status = system(_cmd) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
-            retcode = status == TEC_OK ? retcode : status;
+            retcode = status == ETEC_OK ? retcode : status;
         }
     }
 
-    return retcode;
+    return retcode == ETEC_OK ? ETEC_OK : ETEC_HOOK_EXEC;
 }
 
 int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
@@ -48,7 +49,7 @@ int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
     char line[BUFSIZ + 1] = { 0 };
     struct tec_hook *hooks = teccfg.hooks;
 
-    retcode = status = TEC_OK;
+    retcode = status = ETEC_OK;
 
     /* Execute hooks only if they are enabled.  */
     if (teccfg.opts.hook == false)
@@ -69,7 +70,7 @@ int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)
             *units = tec_unit_parse(*units, line);
         retcode = pclose(pipe) == EXIT_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
     }
-    return retcode;
+    return retcode == ETEC_OK ? ETEC_OK : ETEC_HOOK_EXEC;
 }
 
 /*
@@ -106,7 +107,7 @@ char *hook_list(struct tec_hook *hooks, char *pgnout, char *env, char *task)
         pgnout[1] = '[';
         strcat(pgnout, "]");
     }
-    //return TEC_OK;
+    //return ETEC_OK;
     return pgnout;
 }
 */

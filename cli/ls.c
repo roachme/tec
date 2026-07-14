@@ -1,15 +1,7 @@
 #include "tec.h"
+#include "aux/errno.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
-
-static const char *errfmt = "cannot list tasks '%s': %s";
-
-/*
-Options:
-    -a      show alls
-    -t      show only toggles
-
-*/
 
 struct list_filter {
     int all;
@@ -68,11 +60,12 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
 
     args->task = NULL;
     if ((status = toggle_task_get_curr(teccfg.base.task, args)) == 0) {
-        if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
-            ;
+        if ((status = tec_cli_check_task(args))) {
+            if (opt_quiet == false)
+                TEC_LOG_E(EFMT_TASK_LS, args->task, tec_strerror(status));
         } else {
             obj.next = NULL;
-            obj.status = TEC_OK;
+            obj.status = ETEC_OK;
             obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }
@@ -80,11 +73,12 @@ static int show_toggles(tec_ctx_t *ctx, tec_arg_t *args)
 
     args->task = NULL;
     if ((status = toggle_task_get_prev(teccfg.base.task, args)) == 0) {
-        if ((status = tec_cli_check_task(args, errfmt, opt_quiet))) {
-            ;
+        if ((status = tec_cli_check_task(args))) {
+            if (opt_quiet == false)
+                TEC_LOG_E(EFMT_TASK_LS, args->task, tec_strerror(status));
         } else {
             obj.next = NULL;
-            obj.status = TEC_OK;
+            obj.status = ETEC_OK;
             obj.name = args->task;
             show_row(ctx, args, &obj, false);
         }
@@ -150,13 +144,19 @@ int tec_cli_ls(tec_argvec_t *argvec, tec_cfg_t *cfg)
     do {
         args.env = argvec->argv[i];
 
-        if ((status = tec_cli_check_env(&args, errfmt, quiet)))
-            continue;
-        else if ((status = tec_cli_check_desk(&args, errfmt, quiet)))
-            continue;
-        else if ((status = tec_task_list(cfg->base.task, &args, &ctx))) {
+        if ((status = tec_cli_check_env(&args))) {
+            args.env = args.env ? args.env : ETEC_NOCURR;
             if (quiet == false)
-                TEC_LOG_E(errfmt, args.env, tec_strerror(status));
+                TEC_LOG_E(EFMT_TASK_LS, args.task, tec_strerror(status));
+            continue;
+        } else if ((status = tec_cli_check_desk(&args))) {
+            args.desk = args.desk ? args.desk : ETEC_NOCURR;
+            if (quiet == false)
+                TEC_LOG_E(EFMT_TASK_LS, args.task, tec_strerror(status));
+            continue;
+        } else if ((status = tec_task_list(cfg->base.task, &args, &ctx))) {
+            if (quiet == false)
+                TEC_LOG_E(EFMT_TASK_LS, args.env, tec_strerror(status));
             continue;
         }
 
