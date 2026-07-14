@@ -44,11 +44,11 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
     if (path == NULL || *path == '\0') {
         /* Empty path means use current for all */
         if ((status = toggle_env_get_curr(cfg->base.task, args)))
-            return TEC_LOG_E(errfmt, ".", "could not get current env");
+            return TEC_LOG_E(errfmt, ".", "cannot get current env");
         if ((status = toggle_desk_get_curr(cfg->base.task, args)))
-            return TEC_LOG_E(errfmt, ".", "could not get current desk");
+            return TEC_LOG_E(errfmt, ".", "cannot get current desk");
         if ((status = toggle_task_get_curr(cfg->base.task, args)))
-            return TEC_LOG_E(errfmt, ".", "could not get current task");
+            return TEC_LOG_E(errfmt, ".", "cannot get current task");
         return 0;
     }
 
@@ -67,22 +67,22 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         /* Just task ID: "task1" or "." or ".." */
         if ((status = toggle_env_get_curr(cfg->base.task, args))) {
             free(buf);
-            return TEC_LOG_E(errfmt, ".", "could not get current env");
+            return TEC_LOG_E(errfmt, ".", "cannot get current env");
         }
         if ((status = toggle_desk_get_curr(cfg->base.task, args))) {
             free(buf);
-            return TEC_LOG_E(errfmt, ".", "could not get current desk");
+            return TEC_LOG_E(errfmt, ".", "cannot get current desk");
         }
 
         if (strcmp(parts[0], ".") == 0) {
             if ((status = toggle_task_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current task");
+                return TEC_LOG_E(errfmt, ".", "cannot get current task");
             }
         } else if (strcmp(parts[0], "..") == 0) {
             if ((status = toggle_task_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous task");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous task");
             }
         } else {
             args->task = strdup(parts[0]);
@@ -91,18 +91,18 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         /* desk/task: "desk/task1" or "./." */
         if ((status = toggle_env_get_curr(cfg->base.task, args))) {
             free(buf);
-            return TEC_LOG_E(errfmt, ".", "could not get current env");
+            return TEC_LOG_E(errfmt, ".", "cannot get current env");
         }
 
         if (strcmp(parts[0], ".") == 0) {
             if ((status = toggle_desk_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current desk");
+                return TEC_LOG_E(errfmt, ".", "cannot get current desk");
             }
         } else if (strcmp(parts[0], "..") == 0) {
             if ((status = toggle_desk_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous desk");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous desk");
             }
         } else {
             args->desk = strdup(parts[0]);
@@ -111,12 +111,12 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         if (strcmp(parts[1], ".") == 0) {
             if ((status = toggle_task_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current task");
+                return TEC_LOG_E(errfmt, ".", "cannot get current task");
             }
         } else if (strcmp(parts[1], "..") == 0) {
             if ((status = toggle_task_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous task");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous task");
             }
         } else {
             args->task = strdup(parts[1]);
@@ -126,12 +126,12 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         if (strcmp(parts[0], ".") == 0) {
             if ((status = toggle_env_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current env");
+                return TEC_LOG_E(errfmt, ".", "cannot get current env");
             }
         } else if (strcmp(parts[0], "..") == 0) {
             if ((status = toggle_env_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous env");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous env");
             }
         } else {
             args->env = strdup(parts[0]);
@@ -140,12 +140,12 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         if (strcmp(parts[1], ".") == 0) {
             if ((status = toggle_desk_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current desk");
+                return TEC_LOG_E(errfmt, ".", "cannot get current desk");
             }
         } else if (strcmp(parts[1], "..") == 0) {
             if ((status = toggle_desk_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous desk");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous desk");
             }
         } else {
             args->desk = strdup(parts[1]);
@@ -154,12 +154,12 @@ static int parse_path(const char *path, tec_arg_t *args, const char *errfmt,
         if (strcmp(parts[2], ".") == 0) {
             if ((status = toggle_task_get_curr(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current task");
+                return TEC_LOG_E(errfmt, ".", "cannot get current task");
             }
         } else if (strcmp(parts[2], "..") == 0) {
             if ((status = toggle_task_get_prev(cfg->base.task, args))) {
                 free(buf);
-                return TEC_LOG_E(errfmt, "..", "could not get previous task");
+                return TEC_LOG_E(errfmt, "..", "cannot get previous task");
             }
         } else {
             args->task = strdup(parts[2]);
@@ -207,13 +207,12 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
             if (strcmp(buf, ".") == 0) {
                 if (toggle_desk_get_curr(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, ".", "could not get current desk");
+                    return TEC_LOG_E(errfmt, ".", "cannot get current desk");
                 }
             } else if (strcmp(buf, "..") == 0) {
                 if (toggle_desk_get_prev(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, "..",
-                                     "could not get previous desk");
+                    return TEC_LOG_E(errfmt, "..", "cannot get previous desk");
                 }
             } else {
                 args->desk = strdup(buf);
@@ -221,7 +220,7 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
             /* Use current env */
             if (toggle_env_get_curr(cfg->base.task, args)) {
                 free(buf);
-                return TEC_LOG_E(errfmt, ".", "could not get current env");
+                return TEC_LOG_E(errfmt, ".", "cannot get current env");
             }
         } else if (slashes == 1) {
             /* "env/desk/" */
@@ -233,13 +232,12 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
             if (strcmp(env, ".") == 0) {
                 if (toggle_env_get_curr(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, ".", "could not get current env");
+                    return TEC_LOG_E(errfmt, ".", "cannot get current env");
                 }
             } else if (strcmp(env, "..") == 0) {
                 if (toggle_env_get_prev(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, "..",
-                                     "could not get previous env");
+                    return TEC_LOG_E(errfmt, "..", "cannot get previous env");
                 }
             } else {
                 args->env = strdup(env);
@@ -248,13 +246,12 @@ static int parse_dest(const char *path, tec_arg_t *args, int *is_dir,
             if (strcmp(desk, ".") == 0) {
                 if (toggle_desk_get_curr(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, ".", "could not get current desk");
+                    return TEC_LOG_E(errfmt, ".", "cannot get current desk");
                 }
             } else if (strcmp(desk, "..") == 0) {
                 if (toggle_desk_get_prev(cfg->base.task, args)) {
                     free(buf);
-                    return TEC_LOG_E(errfmt, "..",
-                                     "could not get previous desk");
+                    return TEC_LOG_E(errfmt, "..", "cannot get previous desk");
                 }
             } else {
                 args->desk = strdup(desk);
@@ -335,7 +332,7 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
             dst.desk = src.desk;
 
         if ((status = tec_task_move(cfg->base.task, &src, &dst, &ctx))) {
-            return TEC_LOG_E("could not (re)move '%s': %s", src.task,
+            return TEC_LOG_E("cannot (re)move '%s': %s", src.task,
                              tec_strerror(status));
         }
 
@@ -369,7 +366,7 @@ int tec_cli_mv(tec_argvec_t *argvec, tec_cfg_t *cfg)
             move_dst.task = src.task;   /* Keep same task ID */
 
             if ((status = tec_task_move(cfg->base.task, &src, &move_dst, &ctx))) {
-                TEC_LOG_E("could not move '%s': %s", src.task,
+                TEC_LOG_E("cannot move '%s': %s", src.task,
                           tec_strerror(status));
                 last_status = status;
             } else {

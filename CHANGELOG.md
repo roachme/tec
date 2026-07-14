@@ -13,6 +13,7 @@
 - `cli/cfg`: Let command work without initialization
 - `cli`: Simplify API for module argvec
 - `cli`: Unify function to show specific key
+- `tec`: Change and unify error messages
 
 ### Fixed
 

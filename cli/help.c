@@ -93,7 +93,7 @@ struct help helptab[] = {
      .desc_short = "Init directory structure.\n",
      .desc_long = "\n\
     Exit status:\n\
-    The return code is zero, unless one of the database directory could not\n\
+    The return code is zero, unless one of the database directory cannot\n\
     be created or hook failed to execute.\n"},
     {
      .tag = TAGSYSTEM,

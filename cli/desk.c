@@ -142,7 +142,7 @@ static int _desk_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if (opts.change_tog == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("could not update toggles");
+                    TEC_LOG_E("cannot update toggles");
             }
         }
         ctx.units = tec_unit_free(ctx.units);
@@ -540,7 +540,7 @@ static int _desk_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if (opts.change_tog == true) {
             if ((status = toggle_desk_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("could not update toggles");
+                    TEC_LOG_E("cannot update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;

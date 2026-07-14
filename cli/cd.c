@@ -77,7 +77,7 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if (opts.change_tog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("could not update toggles");
+                    TEC_LOG_E("cannot update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;

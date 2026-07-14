@@ -216,7 +216,7 @@ int main(int argc, const char **argv)
     argvec_offset(&argvec, argvec.i);   /* Skip program name and options if any.  */
 
     if (tec_config_parse(cfg)) {
-        status = TEC_LOG_E("could not parse config file");
+        status = TEC_LOG_E("cannot parse config file");
         goto err;
     } else if ((cmdname = argvec.argv[0]) == NULL) {
         status = EXIT_FAILURE;

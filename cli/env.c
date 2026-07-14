@@ -148,12 +148,12 @@ static int _env_add(tec_argvec_t *argvec, tec_cfg_t *cfg)
     if ((opts.change_tog && status == TEC_OK)
         && toggle_env_set_curr(cfg->base.task, &args)) {
         if (opts.quiet == false)
-            TEC_LOG_E("could not update env toggles");
+            TEC_LOG_E("cannot update env toggles");
         return 1;
     } else if ((opts.change_tog && status == TEC_OK)
                && toggle_desk_set_curr(cfg->base.task, &args)) {
         if (opts.quiet == false)
-            TEC_LOG_E("could not update desk toggles");
+            TEC_LOG_E("cannot update desk toggles");
         return 1;
     }
 
@@ -378,7 +378,7 @@ static int _env_rename(tec_argvec_t *argvec, tec_cfg_t *cfg)
         if ((status =
              toggle_env_update(cfg->base.task, &dst, src.env, dst.env))) {
         if (opts.quiet == false)
-            TEC_LOG_E(errfmt, dst.env, "could not update toggles");
+            TEC_LOG_E(errfmt, dst.env, "cannot update toggles");
         return status;
     }
     return tec_cli_pwd_set(&dst);
@@ -609,7 +609,7 @@ static int _env_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         } else if (opts.change_tog == true) {
             if ((status = toggle_env_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("could not update toggles");
+                    TEC_LOG_E("cannot update toggles");
             }
         }
         retcode = status == TEC_OK ? retcode : status;

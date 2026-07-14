@@ -14,10 +14,10 @@ static int update_cwd(tec_arg_t *args, struct tec_cli_rm_options *opts)
     /* Not to break shell session in case user CWD gets deleted.  */
     if (tec_aux_do_change_user_cwd(args) == true) {
         if ((home = tec_cli_osdep_getenv_home()) == NULL) {
-            TEC_LOG_D("could not get env 'HOME' variable");
+            TEC_LOG_D("cannot get env 'HOME' variable");
             status = EXIT_FAILURE;
         } else if (tec_cli_osdep_chdir(home)) {
-            TEC_LOG_D("could not change user CWD");
+            TEC_LOG_D("cannot change user CWD");
             status = EXIT_FAILURE;
         }
         opts->change_dir = true;
@@ -116,10 +116,10 @@ int tec_cli_rm(tec_argvec_t *argvec, tec_cfg_t *cfg)
                 TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
         } else if ((status = update_cwd(&args, &opts))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "could not update CWD");
+                TEC_LOG_E(errfmt, args.task, "cannot update CWD");
         } else if ((status = update_toggles(&args))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "could not update toggles");
+                TEC_LOG_E(errfmt, args.task, "cannot update toggles");
         } else if ((status = tec_task_rm(cfg->base.task, &args, &ctx))) {
             if (opts.quiet == false)
                 TEC_LOG_E(errfmt, args.task, tec_strerror(status));
