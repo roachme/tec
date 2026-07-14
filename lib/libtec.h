@@ -51,9 +51,6 @@ enum tec_errno {
     TEC_UNIT_SAVE,
     TEC_UNIT_SET,
 
-    /* HOTFIX: delete it once error code table is filled.  */
-    TEC_NODEF_ERR,
-
     __TEC_STATUS_LAST
 };
 

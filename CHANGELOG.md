@@ -28,6 +28,8 @@
 
 ### Deleted
 
+- `lib/errmod`: Delete unused error code message
+
 
 ## [0.11.0] - (2026-07-05)
 

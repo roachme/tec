@@ -27,10 +27,6 @@ const char *errcodes[__TEC_STATUS_LAST] = {
     [TEC_UNIT_LOAD] = "cannot load units",
     [TEC_UNIT_SAVE] = "cannot save unit values",
     [TEC_UNIT_SET] = "cannot set unit values",
-
-    /* HOTFIX: remove it once error code table is filled.  */
-    /* Not yet defined error messages.  */
-    [TEC_NODEF_ERR] = "not yet defined error messages",
 };
 
 int emod_set(int err)
