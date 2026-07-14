@@ -1,8 +1,9 @@
 #include <stdlib.h>
 
+#include "tec.h"
 #include "aux/aux.h"
 #include "aux/opts.h"
-#include "tec.h"
+#include "aux/errno.h"
 #include "aux/config.h"
 
 // "prio",  /* task priority */

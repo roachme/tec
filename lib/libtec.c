@@ -292,7 +292,7 @@ void *tec_list_free(tec_list_t *list)
     return NULL;
 }
 
-char *tec_strerror(int errnum)
+char *tec_geterr(int errnum)
 {
     return emod_strerror(errnum);
 }

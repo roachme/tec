@@ -3,6 +3,7 @@
 
 #include "tec.h"
 #include "aux/opts.h"
+#include "aux/errno.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
 
@@ -53,13 +54,13 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
         return status;
     else if ((status = tec_cli_check_desk(&args, errfmt, opts.quiet)))
         return status;
-    else if (!tec_aux_check_cd_alias(argvec))
-        return TEC_LOG_E("alias '-' is used alone");
+    else if ((status = tec_aux_check_cd_alias(argvec)))
+        return TEC_LOG_E(tec_strerror(status));
 
     /* Resolve alias '-' to switch to previous task ID.  */
     if (argvec->argv[argvec->i] && strcmp("-", argvec->argv[argvec->i]) == 0) {
-        if (toggle_task_get_prev(cfg->base.task, &args))
-            return TEC_LOG_E(errfmt, "PREV", "no previous task ID");
+        if ((status = toggle_task_get_prev(cfg->base.task, &args)))
+            return TEC_LOG_E(errfmt, "PREV", tec_strerror(status));
         argvec_replace(argvec, argvec->i, args.task);
     }
 
@@ -73,11 +74,11 @@ int tec_cli_cd(tec_argvec_t *argvec, tec_cfg_t *cfg)
 
         if ((status = hook_action(&args, "cd"))) {
             if (opts.quiet == false)
-                TEC_LOG_E(errfmt, args.task, "failed to execute hooks");
+                TEC_LOG_E(errfmt, args.task, tec_strerror(status));
         } else if (opts.change_tog == true) {
             if ((status = toggle_task_set_curr(cfg->base.task, &args))) {
                 if (opts.quiet == false)
-                    TEC_LOG_E("cannot update toggles");
+                    TEC_LOG_E(tec_strerror(status));
             }
         }
         retcode = status == TEC_OK ? retcode : status;

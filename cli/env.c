@@ -2,10 +2,11 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "aux/log.h"
 #include "tec.h"
+#include "aux/log.h"
 #include "aux/aux.h"
 #include "aux/opts.h"
+#include "aux/errno.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"

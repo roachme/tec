@@ -6,7 +6,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "tec.h"
+#include "aux/errno.h"
 #include "aux/opts.h"
 #include "aux/argvec.h"
 #include "aux/config.h"

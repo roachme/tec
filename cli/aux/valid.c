@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "valid.h"
+#include "errno.h"
 #include "toggle.h"
 #include "config.h"
 

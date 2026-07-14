@@ -9,6 +9,7 @@
 #include "aux/aux.h"
 #include "aux/log.h"
 #include "aux/pwd.h"
+#include "aux/errno.h"
 #include "aux/argvec.h"
 
 #define tec_getopt_unset()  \

@@ -1,4 +1,3 @@
-#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +5,7 @@
 #include <stdarg.h>
 
 #include "../tec.h"
+#include "errno.h"
 
 #define TOGSUFF         ".tec/toggles"
 #define TOGENV          "%s/" TOGSUFF
@@ -202,14 +202,14 @@ int toggle_desk_get_prev(char *base, tec_arg_t *args)
 int toggle_task_get_curr(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_curr(base, args)))
-        return EXIT_FAILURE;
+        return TEC_TOGG_GET_CURR;
     return EXIT_SUCCESS;
 }
 
 int toggle_task_get_prev(char *base, tec_arg_t *args)
 {
     if (!args->task && !(args->task = task_get_prev(base, args)))
-        return EXIT_FAILURE;
+        return TEC_TOGG_GET_PREV;
     return EXIT_SUCCESS;
 }
 
@@ -311,7 +311,7 @@ int toggle_task_set_curr(char *base, tec_arg_t *args)
     if (!(prev && strcmp(curr, prev) == 0))
         tec_unit_save(path_task_toggle(base, args), toggles);
     tec_unit_free(toggles);
-    return 0;
+    return TEC_OK;
 }
 
 int toggle_task_unset_curr(char *base, tec_arg_t *args)

@@ -2,6 +2,7 @@
 #include "aux/log.h"
 #include "aux/aux.h"
 #include "aux/opts.h"
+#include "aux/errno.h"
 #include "aux/osdep.h"
 #include "aux/toggle.h"
 #include "aux/config.h"

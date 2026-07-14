@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "tec.h"
+#include "aux/errno.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
 

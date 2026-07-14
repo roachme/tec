@@ -6,6 +6,7 @@
 #include "log.h"
 #include "hook.h"
 #include "config.h"
+#include "errno.h"
 #include "../../lib/libtec.h"
 
 static char pathname[PATH_MAX + 1];
@@ -38,7 +39,7 @@ int hook_action(tec_arg_t *args, char *cmd)
         }
     }
 
-    return retcode;
+    return retcode == TEC_OK ? TEC_OK : TEC_HOOK;
 }
 
 int hook_cat(tec_unit_t **units, tec_arg_t *args, char *cmd)

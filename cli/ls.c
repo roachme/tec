@@ -1,4 +1,5 @@
 #include "tec.h"
+#include "aux/errno.h"
 #include "aux/toggle.h"
 #include "aux/config.h"
 

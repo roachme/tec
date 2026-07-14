@@ -62,7 +62,7 @@ struct tec_err_codes {
 /* Core functions.  */
 int tec_make_db(const char *taskdir);
 int tec_check_db(const char *taskdir);
-char *tec_strerror(int errnum);
+char *tec_geterr(int errnum);
 
 /* Data structure for unit values.  */
 tec_unit_t *tec_unit_add(tec_unit_t * head, char *key, char *val);

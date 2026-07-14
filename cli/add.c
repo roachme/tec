@@ -5,6 +5,7 @@
 
 #include "tec.h"
 #include "aux/opts.h"
+#include "aux/errno.h"
 #include "aux/argvec.h"
 #include "aux/config.h"
 #include "aux/toggle.h"
