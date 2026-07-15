@@ -1,6 +1,11 @@
 Milestones:
 + 1. Need to refactor task column switch. There're many questions: should I
      add builtin columns, can it be moved to plugin, etc.
+     Decided: plugin, not core (see Ideas #7). Keeps core minimal - columns,
+     transitions, board rendering all live in a (first-party) plugin. Only
+     real core dependency is giving `ls` hook support (`cli/ls.c:166`, already
+     flagged there); without it a plugin can annotate `tec cat` via
+     `hook_cat` but has no way to group/filter/render `tec ls`.
   2. Command to list task needs brainstorming as well.
   3. How to implement workflow engine. Yeah, there is such thing.
   4. How to add support for multi-users. Will it break existing code
@@ -35,7 +40,16 @@ Ideas:
 + 4. Add support to pass system config values via option to util.
 + 5. Add option to show task columns in command `tec col`.
 + 6. Add plugin `note` to take notes. Synopsis: tec note [OPTION]... COMMAND
-  7. Add plugin workflow to move task from columns to column
+  7. Add plugin workflow to move task from columns to column. See Milestone
+     #1: decided to keep this fully in a plugin, not core. Plugin owns column
+     names/transitions/board rendering and reads/writes the task's
+     `.tec/units` file directly (stable `key : val` format, `lib/path.c`) -
+     no new unit key or `set` flag needed in core. `ls` renders one row per
+     task though (unlike `cat`'s one task per call), so a naive per-row
+     `hook_cat`-style popen would add N subprocess spawns to a command
+     that's already flagged as too slow (see Prio: low #3). Plan: plugin
+     uses threads (pthreads, see idea #26) to query/print rows in parallel
+     instead of a single batched call.
 + 8. Add libtec NOT as submodule but dependency
   9. Use command `gh` to generate releases
 +10. Unify environment/desk/task's unit and column modules.
@@ -55,6 +69,38 @@ Ideas:
 +24. Maybe let command `set' let not to take any values to change? In that case change nothing.
  25. Add support for plugins to be called from $PATH like git does. `tec-pgnname` files should be called as plugin as well
  26. Use pthreads to parse plugin output
+ 27. Add fuzzy picker (fzf-style) for `tec cd`/`tec ls` to interactively select
+     task/desk/env. Core pitch of tec is fewest keystrokes; picking by exact ID
+     doesn't scale once there're more than a handful of tasks.
+ 28. Add support for `tec cd -N` to jump back N switches, not just one. Toggle
+     module currently only tracks curr/prev (two slots), would need a small
+     history stack instead.
+ 29. Add frecency-based ordering in `tec ls` (most-used/most-recent first).
+     Needs a last-accessed timestamp per task, similar to how `add` already
+     stores a creation date in units.
+ 30. Add tags/labels for tasks, independent of env/desk hierarchy. Support
+     `tec ls --tag <tag>` to search across envs/desks without moving anything.
+ 31. Add archive state for tasks so `tec rm` doesn't hard-delete. Right now
+     `tec_task_rm()` (lib/libtec.c) -> `dir_task_rm()` -> lib/osdep.c runs
+     `rm -rf` on the whole task dir, notes/sketches included, unrecoverable.
+     Instead move it to `$TASKDIR/.trash/<env>/<desk>/<id>-<timestamp>/`, add
+     `tec rm --purge` (or age/size-based sweep) to actually reclaim space.
+ 32. Show task creation date in `tec ls` output. `cli/add.c` (generate_units)
+     already stores a "date" unit on every `add`, it's just never displayed.
+ 33. Add command `tec stats` to show counts per env/desk/column and oldest
+     open tasks, using unit data already on disk, no new storage needed.
+ 34. Show git branch/status inline in `tec ls` via existing show hook.
+     `hooks.show` in tec.cfg already wires e.g. `gmux show` to per-task
+     display, just needs a column in `ls` output.
+ 35. Add `--json` output option for `ls`/`cat` for scripting, e.g. piping
+     into `jq`/`fzf`/other plugins.
+ 36. Add plugin for time tracking (start/stop timer per task), same shape as
+     the existing `gmux`/`nine`/`find` plugins.
+ 37. Add `tec restore <id>` to bring a task back from the trash before purge
+     (undo companion to idea 31).
+ 38. Add command `tec cfg check` to validate config file and that
+     `base.pgn`/`base.task` directories actually exist, so bad config fails
+     fast with a clear message instead of obscurely later.
 
 
 Prio: high
