@@ -107,7 +107,7 @@ The script runs each feature separately to avoid state pollution.
 ## Files Created
 
 1. **14 feature files**: env-*.feature, desk-*.feature
-2. **14 step files**: steps/env-*.py, steps/desk-*.py
+2. Shared step definitions in steps/cli.py and steps/fixtures.py (no per-command step files anymore)
 3. **run_tests.sh**: Automated test runner
 4. **TEST_GUIDE.md**: Complete testing documentation
 5. **COVERAGE_ANALYSIS.md**: Gap analysis vs help.c

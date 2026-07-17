@@ -39,19 +39,16 @@ static char *get_unit_desc(tec_ctx_t *ctx, tec_arg_t *args, int quiet,
 
 static int generate_units(tec_ctx_t *ctx, char *desk, char *desc)
 {
-    char buf[BUFSIZ + 1] = { 0 };
     struct tec_unit *units = NULL;
     char _desc[100] = "Generated desciption for ";
-    char *unitvals[] = { _desc, };
 
     /* Set custom description if provided.  */
-    if (desc) {
-        unitvals[ARRAY_SIZE(unitvals) - 1] = desc;
-    } else {                    /* Generate description.  */
+    if (desc == NULL) {         /* Generate description.  */
         strcat(_desc, desk);
+        desc = _desc;
     }
 
-    units = tec_unit_add(units, "desc", buf);
+    units = tec_unit_add(units, "desc", desc);
     if ((ctx->units = units) == NULL)
         return 1;
     return 0;

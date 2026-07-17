@@ -1,25 +1,34 @@
 @add
 Feature: add
-  Scenario: TestAdd1 Add single valid task ID
-    Given TestAdd1 Single task ID 'task1'
-    When TestAdd1 Add single valid task ID 'task1'
-    Then TestAdd1 Return value is '0'
-    Then TestAdd1 There empty stderr
-    Then TestAdd1 PWD changes to task created 'task1'
-    Then TestAdd1 Task is added to toggles
+  Scenario: Add a single new task
+    When I run "add task1"
+    Then the exit code should be 0
+    And stderr should be
+      """
+      """
+    And the PWD should be the task "task1"
+    And the current task should be "task1"
 
-  Scenario: TestAdd3 Add multiple valid task ID
-    Given TestAdd3 Single multiple task IDs 'task2' 'task3'
-    When TestAdd3 Add multiple valid task IDs 'task2' 'task3'
-    Then TestAdd3 Return value is '0'
-    And TestAdd3 There is empty stderr
-    And TestAdd3 Last task is added to toggles
+  Scenario: Add multiple new tasks at once
+    When I run "add task2 task3"
+    Then the exit code should be 0
+    And stderr should be
+      """
+      """
+    And the current task should be "task3"
 
-  Scenario Outline: Validate bunch of task IDs
-    Given Bunch of task IDs "<taskid>"
-    Then Bunch of task IDs result should be "<result>" and "<error>" and empty "<pwd>"
+  Scenario Outline: Reject invalid task IDs
+    Given a task "task1" exists
+    When I run "add <taskid>"
+    Then the exit code should be <exitcode>
+    And stderr should be
+      """
+      <error>
+      """
+    And the PWD file should be empty
+
     Examples: Invalid task IDs
-      | taskid         | result | pwd | error                                                      |
-      | task1          | 1      | 0   | tec: cannot add task 'task1': object already exists        |
-      | toolongtaskid  | 1      | 0   | tec: cannot add task 'toolongtaskid': task ID is too long  |
-      | @illegal       | 1      | 0   | tec: cannot add task '@illegal': illegal object name       |
+      | taskid        | exitcode | error                                                      |
+      | task1         | 1        | tec: cannot add task 'task1': task ID already exists       |
+      | toolongtaskid | 1        | tec: cannot add task 'toolongtaskid': task ID is too long  |
+      | @illegal      | 1        | tec: cannot add task '@illegal': illegal task ID           |

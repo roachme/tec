@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 from steps import common
 
@@ -7,58 +8,52 @@ class Task:
         self.cmd = [ common.program, '-H', 'off', '-T', common.taskbase ]
 
     def task_init(self):
-        res = subprocess.run(self.cmd + [ 'init' ])
-        res = subprocess.run(self.cmd + [ 'env', 'add', 'test' ])
+        res = subprocess.run(self.cmd + [ 'init' ], capture_output=True)
+        res = subprocess.run(self.cmd + [ 'env', 'add', 'test' ], capture_output=True)
 
-    def add_before(self):
-        pass
+    def reset_test_env(self):
+        """Drop and recreate the 'test' env, so each scenario starts from a
+        clean slate regardless of what earlier scenarios in the feature did."""
+        res = subprocess.run(self.cmd + [ 'env', 'rm', '-f', 'test' ], capture_output=True)
+        res = subprocess.run(self.cmd + [ 'env', 'add', 'test' ], capture_output=True)
 
-    def add_after(self):
-        res = subprocess.run(self.cmd + [ 'env', 'rm', '-f', 'test' ])
+    def cleanup_test_env(self):
+        # Best-effort: may legitimately fail (e.g. a @skip'd feature whose
+        # scenarios never ran before_scenario, so 'test' was never created).
+        # Never let this internal plumbing print to the terminal.
+        res = subprocess.run(self.cmd + [ 'env', 'rm', '-f', 'test' ], capture_output=True)
 
-    def cat_before(self):
-        tasks = [ 'test1', 'test2', 'test3' ]
-        res = subprocess.run( self.cmd + [ 'add' ] + tasks)
+    def full_reset(self):
+        """Wipe the whole task database and re-init from scratch. 'tec init'
+        on an existing database is a no-op (doesn't clear it - verified
+        empirically), so tags that manage top-level envs themselves (env-*)
+        need the directory removed outright to get a clean slate per scenario."""
+        shutil.rmtree(common.taskbase, ignore_errors=True)
+        res = subprocess.run(self.cmd + [ 'init' ], capture_output=True)
 
-    def cat_after(self):
-        tasks = [ 'test1', 'test2', 'test3' ]
-        res = subprocess.run(self.cmd + [ 'rm', '-f' ] + tasks)
+    def full_reset_with_test_env(self):
+        """Same as full_reset(), but also recreates the 'test' env - for tags
+        whose scenarios assume an ambient default env is already current
+        (desk-* commands run against 'test' unless -e names another env)."""
+        shutil.rmtree(common.taskbase, ignore_errors=True)
+        self.task_init()
 
-    def cd_before(self):
-        pass
-    def cd_after(self):
-        pass
+# Feature tags whose scenarios each get a freshly reset 'test' env, so
+# scenarios (including Scenario Outline rows) never depend on state left
+# behind by an earlier scenario in the same feature. Fixtures for these
+# tags are declared per-scenario in the .feature file itself (see
+# steps/fixtures.py) instead of being pre-seeded here.
+PER_SCENARIO_RESET_TAGS = { "add", "cat", "rm" }
 
-    def ls_before(self):
-        pass
-    def ls_after(self):
-        pass
+# Feature tags that manage top-level envs themselves (env-add creates and
+# removes arbitrary env names). These get a full task-database wipe before
+# each scenario instead of just resetting the 'test' env.
+FULL_RESET_TAGS = { "env-add", "env-ls", "env-cd", "env-cat", "env-rm", "env-set", "env-rename" }
 
-    def mv_before(self):
-        pass
-    def mv_after(self):
-        pass
-
-    def rm_before(self):
-        pass
-    def rm_after(self):
-        pass
-
-    def set_before(self):
-        pass
-    def set_after(self):
-        pass
-
-class Desk:
-    pass
-
-class Env:
-    pass
-
-class Cfg:
-    pass
-
-
+# Feature tags whose fixtures mix 'test'-env desks with arbitrary custom envs
+# (envtest4b, envmv2, ...). Same full wipe as FULL_RESET_TAGS, but also
+# recreates 'test' as the ambient default env desk-* scenarios expect.
+DESK_RESET_TAGS = { "desk-add", "desk-cat", "desk-cd", "desk-ls", "desk-mv", "desk-rm", "desk-set" }
 
 """
 feature members:
@@ -68,57 +63,43 @@ feature members:
 """
 def before_feature(context, feature):
     task = Task()
-    desk = Desk()
-    env = Env()
-    tags = [ "add", "cat", "cd", "ls", "mv", "rm", "set", "desk", "env", "env-add",
-             "env-ls", "env-cd", "env-cat", "env-rm", "env-set", "env-rename",
-             "desk-add", "desk-ls", "desk-cd", "desk-cat", "desk-rm", "desk-set", "desk-mv",
-             "cfg", "init", "version" ]
 
     tag = feature.tags[0] if feature.tags else None
 
-    if tag == "add":
+    if tag in PER_SCENARIO_RESET_TAGS:
         task.task_init()
-        task.add_before()
-    elif tag == "cat":
-        task.task_init()
-        task.cat_before()
-    elif tag == "cd":
-        task.task_init()
-        task.cd_before()
-    elif tag == "ls":
-        task.task_init()
-        task.ls_before()
-    elif tag == "mv":
-        task.task_init()
-        task.mv_before()
-    elif tag == "rm":
-        task.task_init()
-        task.rm_before()
-    elif tag == "set":
-        task.task_init()
-        task.set_before()
-    elif tag in ["desk", "env", "env-add", "env-ls", "env-cd", "env-cat", "env-rm", "env-set", "env-rename",
-                 "desk-add", "desk-ls", "desk-cd", "desk-cat", "desk-rm", "desk-set", "desk-mv"]:
-        task.task_init()
-    elif tag == "cfg":
+    elif tag in FULL_RESET_TAGS or tag in DESK_RESET_TAGS:
+        pass  # before_scenario fully resets the database ahead of every scenario
+    elif tag in ["cd", "ls", "mv", "set", "desk", "env", "cfg"]:
         task.task_init()
     elif tag == "init":
         pass  # No initialization needed for init tests
     elif tag == "version":
         pass  # No initialization needed for version tests
 
+def before_scenario(context, scenario):
+    tag = scenario.feature.tags[0] if scenario.feature.tags else None
+    if tag in PER_SCENARIO_RESET_TAGS:
+        Task().reset_test_env()
+    elif tag in FULL_RESET_TAGS:
+        Task().full_reset()
+    elif tag in DESK_RESET_TAGS:
+        Task().full_reset_with_test_env()
+
 def after_feature(context, feature):
     task = Task()
 
     tag = feature.tags[0] if feature.tags else None
 
-    if tag == "add":
-        task.add_after()
-    elif tag == "cat":
-        task.cat_after()
-    elif tag in ["desk", "env", "env-add", "env-ls", "env-cd", "env-cat", "env-rm", "env-set", "env-rename",
-                 "desk-add", "desk-ls", "desk-cd", "desk-cat", "desk-rm", "desk-set", "desk-mv",
-                 "cfg", "cd", "ls", "mv", "set", "rm"]:
+    if tag in PER_SCENARIO_RESET_TAGS or tag in DESK_RESET_TAGS:
+        # DESK_RESET_TAGS scenarios recreate 'test' via full_reset_with_test_env().
+        # Remove it here so the next feature's unconditional 'env add test'
+        # (task_init) succeeds and re-switches into a fresh one, instead of
+        # silently failing against a leftover 'test' and stranding the
+        # ambient current-env/desk wherever this feature's last scenario left it.
+        task.cleanup_test_env()
+    elif tag in FULL_RESET_TAGS:
+        pass  # full_reset() never creates 'test'; nothing to persist
+    elif tag in ["desk", "env", "cfg", "cd", "ls", "mv", "set"]:
         # Cleanup test environment
-        task.add_after()
+        task.cleanup_test_env()

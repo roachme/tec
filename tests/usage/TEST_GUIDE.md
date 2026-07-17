@@ -6,29 +6,36 @@ This directory contains comprehensive BDD (Behavior-Driven Development) tests fo
 ## Test Structure
 
 ### ENV Subcommand Tests
-Each env subcommand has its own feature file and step implementation:
+Each env subcommand has its own feature file:
 
-| Subcommand | Feature File | Step File | Description |
-|------------|-------------|-----------|-------------|
-| `env ls` | `env-ls.feature` | `steps/env-ls.py` | List environments |
-| `env cd` | `env-cd.feature` | `steps/env-cd.py` | Change to environment |
-| `env cat` | `env-cat.feature` | `steps/env-cat.py` | Show environment properties |
-| `env rm` | `env-rm.feature` | `steps/env-rm.py` | Remove environment |
-| `env set` | `env-set.feature` | `steps/env-set.py` | Set environment properties |
-| `env rename` | `env-rename.feature` | `steps/env-rename.py` | Rename environment |
-| `env add` | `env-add.feature` | `steps/env-add.py` | Add new environment |
+| Subcommand | Feature File | Description |
+|------------|-------------|-------------|
+| `env ls` | `env-ls.feature` | List environments |
+| `env cd` | `env-cd.feature` | Change to environment |
+| `env cat` | `env-cat.feature` | Show environment properties |
+| `env rm` | `env-rm.feature` | Remove environment |
+| `env set` | `env-set.feature` | Set environment properties |
+| `env rename` | `env-rename.feature` | Rename environment |
+| `env add` | `env-add.feature` | Add new environment |
 
 ### DESK Subcommand Tests
-Each desk subcommand has its own feature file and step implementation:
+Each desk subcommand has its own feature file:
 
-| Subcommand | Feature File | Step File | Description |
-|------------|-------------|-----------|-------------|
-| `desk add` | `desk-add.feature` | `steps/desk-add.py` | Add new desk |
-| `desk ls` | `desk-ls.feature` | `steps/desk-ls.py` | List desks |
-| `desk cd` | `desk-cd.feature` | `steps/desk-cd.py` | Change to desk |
-| `desk cat` | `desk-cat.feature` | `steps/desk-cat.py` | Show desk properties |
-| `desk rm` | `desk-rm.feature` | `steps/desk-rm.py` | Remove desk |
-| `desk set` | `desk-set.feature` | `steps/desk-set.py` | Set desk properties |
+| Subcommand | Feature File | Description |
+|------------|-------------|-------------|
+| `desk add` | `desk-add.feature` | Add new desk |
+| `desk ls` | `desk-ls.feature` | List desks |
+| `desk cd` | `desk-cd.feature` | Change to desk |
+| `desk cat` | `desk-cat.feature` | Show desk properties |
+| `desk rm` | `desk-rm.feature` | Remove desk |
+| `desk set` | `desk-set.feature` | Set desk properties |
+
+None of these have their own step file anymore. All scenarios are written
+against a small set of shared, generic steps in `steps/cli.py` (running the
+CLI and asserting on exit code/stdout/stderr) and `steps/fixtures.py`
+(creating tasks/envs/desks as preconditions, and checking PWD/toggle state).
+`steps/togg.py` and `steps/common.py` are small shared helpers those two
+files build on.
 
 ## How to Run Tests
 
@@ -140,7 +147,7 @@ behave tests/usage/version.feature
 - **env rm**: 4 scenarios (force, verbose, nonexistent, with desk)
 - **env set**: 3 scenarios (set description, nonexistent, with desk)
 - **env rename**: 2 scenarios (rename, nonexistent)
-- **env add**: 6 scenarios (single, invalid, multiple, mixed, existing, cleanup)
+- **env add**: 5 scenarios (single, invalid, multiple, mixed, existing)
 
 ### DESK Subcommands Coverage
 - **desk add**: 4 scenarios (basic, specific env, nonexistent env, -n flag)
@@ -215,11 +222,23 @@ chmod +x build/_tec
 
 To add new tests for a subcommand:
 
-1. Create feature file: `tests/usage/env-newcmd.feature`
-2. Add feature tag: `@env-newcmd`
-3. Create step file: `tests/usage/steps/env-newcmd.py`
-4. Update `environment.py` to include new tag
-5. Follow existing naming conventions (TestNewCmd1, TestNewCmd2, etc.)
+1. Create feature file: `tests/usage/env-newcmd.feature`, tagged `@env-newcmd`
+2. Write scenarios in plain Gherkin against the existing shared steps:
+   `Given a task/env/desk "..." exists`, `When I run "<cli args>"`,
+   `Then the exit code should be N`, `stdout`/`stderr should be`/`should
+   contain "..."`, `the PWD should be ...`, `the current task should be
+   "..."` (see `steps/cli.py` and `steps/fixtures.py` for the full list).
+   Only add a new step function if no existing one fits - most new
+   subcommands don't need one.
+3. Decide on isolation in `environment.py`: does the tag need a full
+   per-scenario reset (add it to `PER_SCENARIO_RESET_TAGS`,
+   `FULL_RESET_TAGS`, or `DESK_RESET_TAGS`, depending on what it touches),
+   or is feature-level `task_init()` enough because scenarios use disjoint
+   fixture names? Prefer per-scenario reset for anything that reuses names
+   across scenarios - see the comments above those sets.
+4. Do **not** invent a new numbered step-per-scenario convention
+   (`TestNewCmd1`, `TestNewCmd2`, ...) - that pattern was replaced because
+   it duplicated the same subprocess-and-assert logic dozens of times over.
 
 ## Debugging Tests
 

@@ -1,3 +1,16 @@
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- `tests/usage`: Refactor usage tests
+
+### Deleted
+
+
 ## [0.12.0] - (2026-07-15)
 
 ### Added
