@@ -7,6 +7,7 @@
 ### Fixed
 
 - `tests/usage`: Refactor usage tests
+- `.github`: Fix Github CI/CD
 
 ### Deleted
 

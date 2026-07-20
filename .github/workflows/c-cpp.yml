@@ -10,10 +10,12 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Install dependencies
-      run: sudo apt install -y indent cppcheck libconfig-dev python3-pip
+      run: sudo apt install -y indent cppcheck libconfig-dev python3-pip valgrind
     - name: Install Python dependencies
       run: pip3 install -r tests/usage/requirements.txt
     - name: make
       run: make
+    - name: Run memcheck (valgrind)
+      run: make memcheck
     - name: Run Behave tests
-      run: make test-bdd
+      run: make test_bdd
