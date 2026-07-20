@@ -20,9 +20,12 @@ Feature: env cd
 
   Scenario: Change to environment with -n flag (no toggle)
     Given an env "envtest2c" exists
-    When I run "env cd -n envtest2c"
+    And an env "envtest2d" exists
+    And I run "env cd envtest2c"
+    When I run "env cd -n envtest2d"
     Then the exit code should be 0
-    And the PWD should be the env "envtest2c"
+    And the PWD should be the env "envtest2d"
+    And the current environment should be "envtest2c"
 
   Scenario: Change to previous environment using "-" alias
     Given an env "envprev1" exists
@@ -32,3 +35,27 @@ Feature: env cd
     When I run "env cd -"
     Then the exit code should be 0
     And the PWD should be the env "envprev1"
+
+  Scenario: Change to environment with -N flag (no toggle, no directory)
+    Given an env "envtest2e" exists
+    When I run "env cd -N envtest2e"
+    Then the exit code should be 0
+    And the PWD file should be empty
+
+  Scenario: Change to nonexistent environment with -q suppresses the error
+    When I run "env cd -q nonexistent"
+    Then the exit code should not be 0
+    And stderr should be
+      """
+      """
+
+  Scenario: Reject the "-" alias combined with another environment name
+    Given an env "envtest2f" exists
+    When I run "env cd envtest2f -"
+    Then the exit code should not be 0
+    And stderr should contain "alias '-' is used alone"
+
+  Scenario: Reject a double "-" alias
+    When I run "env cd - -"
+    Then the exit code should not be 0
+    And stderr should contain "alias '-' is used alone"

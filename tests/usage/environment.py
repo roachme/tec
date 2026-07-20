@@ -43,7 +43,7 @@ class Task:
 # behind by an earlier scenario in the same feature. Fixtures for these
 # tags are declared per-scenario in the .feature file itself (see
 # steps/fixtures.py) instead of being pre-seeded here.
-PER_SCENARIO_RESET_TAGS = { "add", "cat", "rm" }
+PER_SCENARIO_RESET_TAGS = { "cat", "rm" }
 
 # Feature tags that manage top-level envs themselves (env-add creates and
 # removes arbitrary env names). These get a full task-database wipe before
@@ -52,8 +52,9 @@ FULL_RESET_TAGS = { "env-add", "env-ls", "env-cd", "env-cat", "env-rm", "env-set
 
 # Feature tags whose fixtures mix 'test'-env desks with arbitrary custom envs
 # (envtest4b, envmv2, ...). Same full wipe as FULL_RESET_TAGS, but also
-# recreates 'test' as the ambient default env desk-* scenarios expect.
-DESK_RESET_TAGS = { "desk-add", "desk-cat", "desk-cd", "desk-ls", "desk-mv", "desk-rm", "desk-set" }
+# recreates 'test' as the ambient default env desk-* (and add's -e option)
+# scenarios expect.
+DESK_RESET_TAGS = { "add", "desk-add", "desk-cat", "desk-cd", "desk-ls", "desk-mv", "desk-rm", "desk-set" }
 
 """
 feature members:

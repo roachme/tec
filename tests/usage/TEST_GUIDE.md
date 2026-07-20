@@ -140,38 +140,23 @@ behave tests/usage/version.feature
 
 ## Test Coverage
 
-### ENV Subcommands Coverage
-- **env ls**: 3 scenarios (list single, multiple, empty)
-- **env cd**: 4 scenarios (basic, with desk option, nonexistent, with -n flag)
-- **env cat**: 3 scenarios (show properties, nonexistent, with desk)
-- **env rm**: 4 scenarios (force, verbose, nonexistent, with desk)
-- **env set**: 3 scenarios (set description, nonexistent, with desk)
-- **env rename**: 2 scenarios (rename, nonexistent)
-- **env add**: 5 scenarios (single, invalid, multiple, mixed, existing)
+Every builtin command and subcommand has its own feature file, and every
+documented CLI option has at least one scenario (see `COVERAGE_ANALYSIS.md`
+for the option-by-option breakdown and a list of implementation quirks the
+tests deliberately pin down).
 
-### DESK Subcommands Coverage
-- **desk add**: 4 scenarios (basic, specific env, nonexistent env, -n flag)
-- **desk ls**: 3 scenarios (list single, multiple, empty)
-- **desk cd**: 4 scenarios (basic, specific env, nonexistent, -n flag)
-- **desk cat**: 3 scenarios (show properties, nonexistent, in specific env)
-- **desk rm**: 4 scenarios (force, verbose, nonexistent, specific env)
-- **desk set**: 3 scenarios (set description, nonexistent, in specific env)
-
-**Total Coverage:**
-- 12 feature files (6 env + 6 desk)
-- 40+ test scenarios
-- 120+ test steps
-- All major command options tested (-f, -v, -n, -e, -d, -D, etc.)
+**Total Coverage (`behave --tags=-skip` from `tests/usage/`):**
+- 25 feature files
+- 190+ test scenarios (4 `@skip`, describing not-yet-implemented `desk mv`
+  behavior)
+- 750+ test steps
 
 ## Test Results
 
 Last test run: **All tests passing ✓**
-- 12 features passed
-- 0 features failed
-- 40 scenarios passed
-- 0 scenarios failed
-- 120 steps passed
-- 0 steps failed
+- 25 features passed, 0 failed
+- 191 scenarios passed, 0 failed, 4 skipped
+- 755 steps passed, 0 failed, 12 skipped
 
 ## Common Issues and Solutions
 

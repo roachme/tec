@@ -2,6 +2,8 @@
 
 ### Added
 
+- `tests/usage`: Add missing usage tests
+
 ### Changed
 
 ### Fixed

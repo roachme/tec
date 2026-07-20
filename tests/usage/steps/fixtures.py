@@ -57,6 +57,10 @@ def step_pwd_is_env(context, env):
 def step_pwd_is_desk(context, desk, env):
     common.verify_pwd(common.get_expected_path(env, desk))
 
+@then('the PWD should be the task "{taskid}" in desk "{desk}" in env "{env}"')
+def step_pwd_is_task_full(context, taskid, desk, env):
+    common.verify_pwd(common.get_expected_path(env, desk, taskid))
+
 @given('a desk "{desk}" exists')
 def step_desk_exists(context, desk):
     res = subprocess.run(
@@ -110,6 +114,20 @@ def step_current_task_is(context, taskid):
     actual = togg.gettask()['curr']
     assert actual == taskid, \
         f"Expected current task '{taskid}', but got '{actual}'"
+
+@then('the current environment should be "{env}"')
+def step_current_env_is(context, env):
+    togg = Togg(common.taskbase, {})
+    actual = togg.getenv()['curr']
+    assert actual == env, \
+        f"Expected current environment '{env}', but got '{actual}'"
+
+@then('the current desk should be "{desk}" in env "{env}"')
+def step_current_desk_is(context, desk, env):
+    togg = Togg(common.taskbase, { 'env': env })
+    actual = togg.getdesk()['curr']
+    assert actual == desk, \
+        f"Expected current desk '{desk}', but got '{actual}'"
 
 @then('the PWD should be the task "{taskid}"')
 def step_pwd_is_task(context, taskid):

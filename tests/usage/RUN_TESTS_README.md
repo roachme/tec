@@ -64,17 +64,14 @@ behave env-*.feature desk-*.feature --tags=-skip
 - ✅ **desk-set.feature** - Set desk properties (3 scenarios)
 - ⏭️ **desk-mv.feature** - Move/rename desks (4 scenarios, ALL skipped - under development)
 
-### Total Test Coverage (make test-bdd)
-- **23 feature files** (includes all env, desk, and other commands)
-- **87 test scenarios** (4 skipped - desk-mv under development)
-- **301 test steps** (11 skipped)
+### Total Test Coverage (`behave --tags=-skip` from `tests/usage/`)
+- **25 feature files** (includes all env, desk, and other commands)
+- **191 test scenarios** (4 skipped - desk-mv under development)
+- **755 test steps** (12 skipped)
 - **All functional tests PASS** ✅
 
-### ENV & DESK Coverage Only
-- **14 feature files**
-- **50 test scenarios** (4 from desk-mv skipped)
-- **155 test steps** (6 skipped)
-- **All functional tests PASS** ✅
+See `COVERAGE_ANALYSIS.md` for the current option-by-option coverage
+breakdown and a list of real implementation quirks the tests pin down.
 
 ## Special Features Tested
 
@@ -85,10 +82,11 @@ behave env-*.feature desk-*.feature --tags=-skip
 
 ## What's Not Tested (Yet)
 
-See **COVERAGE_ANALYSIS.md** for detailed gap analysis. Main gaps:
-- Command flags: `-q` (quiet), `-h` (help), `-i/-I` (interactive), `-N` (no dir switch)
-- Advanced features: `-k KEY` for cat commands
-- Edge cases: multiple arguments, double "-" errors
+The only functional gap is `desk mv` itself, which isn't implemented in the
+CLI (always returns "under development" - see `desk-mv.feature`). Everything
+else documented in `help.c`, including `-q`, `-h`, `-i`/`-I`, `-N`, `-k`, and
+the `"-"` cd alias, now has scenario coverage. See **COVERAGE_ANALYSIS.md**
+for details and for a list of real implementation quirks the tests pin down.
 
 ## Troubleshooting
 

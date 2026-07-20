@@ -27,3 +27,26 @@ Feature: ls
     Given a task "lstest8" exists
     When I run "ls -H"
     Then the exit code should be 0
+
+  Scenario: List all tasks including done
+    Given a task "lstest9" exists
+    When I run "ls -a"
+    Then the exit code should be 0
+    And stdout should contain "lstest9"
+
+  Scenario: -a and -t are not compatible
+    When I run "ls -a -t"
+    Then the exit code should not be 0
+    And stderr should contain "are not compatible"
+
+  Scenario: -q suppresses errors for a non-existent env
+    When I run "ls -q bogusenv"
+    Then the exit code should not be 0
+    And stderr should be
+      """
+      """
+
+  Scenario: -v is under development
+    When I run "ls -v"
+    Then the exit code should not be 0
+    And stderr should contain "under development"

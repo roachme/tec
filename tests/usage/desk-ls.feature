@@ -19,3 +19,16 @@ Feature: desk ls
   Scenario: List when no desks exist
     When I run "desk ls"
     Then the exit code should be 0
+
+  Scenario: List desks for a specific environment argument
+    Given an env "envtest2c" with desk "desktest2c" exists
+    When I run "desk ls envtest2c"
+    Then the exit code should be 0
+    And stdout should contain "desktest2c"
+
+  Scenario: -q suppresses the error for a nonexistent environment
+    When I run "desk ls -q bogusenv"
+    Then the exit code should not be 0
+    And stderr should be
+      """
+      """

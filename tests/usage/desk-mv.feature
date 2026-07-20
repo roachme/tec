@@ -1,7 +1,22 @@
 @desk-mv @wip
 Feature: desk mv
   Move or rename desk
-  Note: desk mv is documented but may not be fully implemented yet
+  Note: desk mv is documented but not implemented yet - it currently always
+  fails with "under development", regardless of arguments. The scenarios
+  below pin down that actual current behavior; the @skip scenarios further
+  down describe the intended (not yet implemented) behavior for when it
+  eventually lands.
+
+  Scenario: desk mv is under development and always fails
+    Given a desk "deskmv1" exists
+    When I run "desk mv deskmv1 deskmv2"
+    Then the exit code should not be 0
+    And stderr should contain "under development"
+
+  Scenario: desk mv with no arguments is also under development
+    When I run "desk mv"
+    Then the exit code should not be 0
+    And stderr should contain "under development"
 
   @skip
   Scenario: Rename desk

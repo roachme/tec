@@ -19,6 +19,25 @@ def step_run(context, args):
         text = True,
     )
 
+@step('I run with no arguments')
+def step_run_no_args(context):
+    context.result = subprocess.run(
+        common.cmd,
+        capture_output = True,
+        text = True,
+    )
+
+# For commands with interactive [y/N] prompts (-i/-I on rm/env-rm/desk-rm):
+# feeds a line on stdin instead of leaving the child blocked waiting for input.
+@step('I answer "{stdin}" when running "{args}"')
+def step_run_with_input(context, args, stdin):
+    context.result = subprocess.run(
+        common.cmd + shlex.split(args),
+        input = stdin + "\n",
+        capture_output = True,
+        text = True,
+    )
+
 @then('the exit code should be {code:d}')
 def step_exit_code(context, code):
     actual = context.result.returncode
@@ -51,6 +70,11 @@ def step_stdout_contains(context, substr):
 def step_stderr_contains(context, substr):
     assert substr in context.result.stderr, \
         f"Expected stderr to contain '{substr}', but got:\n'{context.result.stderr}'"
+
+@then('stdout should not contain "{substr}"')
+def step_stdout_not_contains(context, substr):
+    assert substr not in context.result.stdout, \
+        f"Expected stdout not to contain '{substr}', but got:\n'{context.result.stdout}'"
 
 @then('stdout should match "{pattern}"')
 def step_stdout_matches(context, pattern):
